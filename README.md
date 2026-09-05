@@ -104,7 +104,7 @@
 
 ![慧研网络搜索任务执行页：WebSocket 事件流、工具调用和最终回答](docs/images/insight-agents-network-search-result.jpg)
 
-![慧研数据库报告任务执行页：SQL 查询过程与生成的 Markdown 报告](docs/images/insight-agents-database-report-result.jpg)
+![慧研数据库报告任务执行页：工具调用事件流与报告文件交付](docs/images/insight-agents-database-report-result.jpg)
 
 ## 🛠️ 技术栈
 
