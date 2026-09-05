@@ -171,6 +171,90 @@ function EventIcon({ event }: { event: string }) {
   return <ClockCircleOutlined aria-hidden />;
 }
 
+// 事件标识符到中文标签的映射：时间线面向使用者，不必暴露内部事件名
+const EVENT_LABELS: Record<string, string> = {
+  task_start: "任务启动",
+  session_created: "创建工作目录",
+  assistant_call: "调度助手",
+  tool_start: "调用工具",
+  tool_end: "工具返回",
+  token_usage: "Token 用量",
+  task_result: "任务完成",
+  task_cancelled: "任务已取消",
+  task_files: "输出文件",
+  task_sources: "来源登记",
+  error: "异常",
+  budget_exceeded: "调用预算超限"
+};
+
+function eventLabel(event: string): string {
+  return EVENT_LABELS[event] ?? event;
+}
+
+/**
+ * 把工具/助手调用的参数对象压成一句可读摘要。
+ * 原始 JSON 一行塞进时间线既难读又暴露内部结构；这里取出关键字段拼成短语，
+ * 找不到已知字段时退化为截断的 JSON 文本。
+ */
+function summarizeCallData(event: string, data: unknown): string {
+  if (!data || typeof data !== "object") {
+    return "";
+  }
+  const record = data as Record<string, unknown>;
+  const parts: string[] = [];
+  if (event === "assistant_call") {
+    if (typeof record.assistant_name === "string") {
+      parts.push(record.assistant_name);
+    }
+    const args = record.args;
+    if (args && typeof args === "object") {
+      const argEntries = Object.entries(args as Record<string, unknown>)
+        .filter(([, value]) => typeof value === "string" || typeof value === "number")
+        .slice(0, 3)
+        .map(([key, value]) => `${key}: ${String(value).slice(0, 40)}`);
+      if (argEntries.length > 0) {
+        parts.push(argEntries.join(" · "));
+      }
+    }
+  } else if (event === "tool_start") {
+    if (typeof record.tool_name === "string") {
+      parts.push(record.tool_name);
+    }
+    const args = record.args ?? record.input;
+    if (args && typeof args === "object") {
+      const argEntries = Object.entries(args as Record<string, unknown>)
+        .filter(([, value]) => typeof value === "string" || typeof value === "number")
+        .slice(0, 2)
+        .map(([key, value]) => `${key}: ${String(value).slice(0, 50)}`)
+        .join(" · ");
+      if (argEntries) {
+        parts.push(argEntries);
+      }
+    } else if (typeof args === "string") {
+      parts.push(args.slice(0, 60));
+    }
+  }
+  if (parts.length > 0) {
+    return parts.join(" — ");
+  }
+  const raw = JSON.stringify(record);
+  return raw.length > 90 ? `${raw.slice(0, 90)}…` : raw;
+}
+
+/** 消息里出现的本机绝对路径压缩成会话目录名，避免时间线暴露完整磁盘路径 */
+function summarizeMessage(message: string): string {
+  return message.replace(
+    /[A-Za-z]:[\\/][^"'\s，。]*/g,
+    (match) => {
+      const segments = match.split(/[\\/]/).filter(Boolean);
+      const last = segments[segments.length - 1] ?? match;
+      return segments.some((segment) => segment.startsWith("session_"))
+        ? `…/${segments.find((segment) => segment.startsWith("session_"))}/${last}`
+        : `…/${last}`;
+    }
+  );
+}
+
 function FileIcon({ name }: { name: string }) {
   if (name.endsWith(".pdf")) {
     return <FilePdfOutlined aria-hidden />;
@@ -216,15 +300,15 @@ function ThinkingTimeline({ events }: { events: MonitorMessage[] }) {
           </span>
           <div>
             <div className="thinking-event-meta">
-              <span>{event.event}</span>
+              <span>{eventLabel(event.event)}</span>
               <time dateTime={event.timestamp}>
                 {formatTime(event.timestamp)}
               </time>
             </div>
-            <p>{event.message}</p>
+            <p>{summarizeMessage(event.message)}</p>
             {event.event === "assistant_call" ||
             event.event === "tool_start" ? (
-              <code>{JSON.stringify(event.data)}</code>
+              <code>{summarizeCallData(event.event, event.data)}</code>
             ) : null}
           </div>
         </li>
@@ -438,7 +522,7 @@ function AssistantMessage({
 
         <details
           className="thinking-block"
-          open={isRunning || events.length > 0}
+          open={isRunning}
         >
           <summary>
             <span>
@@ -482,19 +566,19 @@ function AssistantMessage({
           </details>
         ) : null}
 
-        <details
-          className="thinking-block artifact-block"
-          open={files.length > 0}
-        >
-          <summary>
-            <span>
-              <FileSearchOutlined aria-hidden />
-              输出文件
-            </span>
-            <strong>{files.length}</strong>
-          </summary>
-          <ArtifactShelf files={files} />
-        </details>
+        {/* 任务结束后无输出文件时不渲染空面板，减少噪音 */}
+        {files.length > 0 ? (
+          <details className="thinking-block artifact-block" open>
+            <summary>
+              <span>
+                <FileSearchOutlined aria-hidden />
+                输出文件
+              </span>
+              <strong>{files.length}</strong>
+            </summary>
+            <ArtifactShelf files={files} />
+          </details>
+        ) : null}
       </div>
     </article>
   );

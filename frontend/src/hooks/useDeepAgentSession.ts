@@ -78,17 +78,11 @@ export function useDeepAgentSession() {
     uploadedNameSetRef.current.clear();
     setIsRunning(false);
     setIsCancelling(false);
-    // 新会话先出现在列表顶部，标题由首个 task_start 事件补全
-    setSessions((previous) => [
-      {
-        thread_id: nextThreadId,
-        title: "",
-        mtime: Date.now() / 1000,
-        file_count: 0,
-        event_count: 0
-      },
-      ...previous.filter((item) => item.thread_id !== nextThreadId)
-    ]);
+    // 空会话不进历史列表：只有后端真正记录过事件（发生过任务）的会话才有条目，
+    // 避免"新建研究"点击即在侧栏堆积"0 个文件"的空条目；任务启动后由 refreshSessions 拉回
+    setSessions((previous) =>
+      previous.filter((item) => item.thread_id !== nextThreadId)
+    );
   }, []);
 
   const refreshSessions = useCallback(async () => {
@@ -127,11 +121,14 @@ export function useDeepAgentSession() {
           ? lastResult.data.result
           : "";
       // 末尾没有终态事件 => 后端任务大概率仍在执行，恢复运行态让实时事件继续追上。
-      // task_files 是任务收尾时在终态事件之后补发的产物清单，判断时跳过它，
-      // 否则已结束的会话会被误判为"研究中"
+      // task_files / task_sources 是任务收尾时在终态事件之后补发的产物与来源清单，
+      // 判断时跳过它们，否则已结束的会话会被误判为"研究中"
       const lastMeaningfulEvent = [...history]
         .reverse()
-        .find((item) => item.event !== "task_files");
+        .find(
+          (item) =>
+            item.event !== "task_files" && item.event !== "task_sources"
+        );
       const isUnfinished = Boolean(
         lastMeaningfulEvent && !TERMINAL_EVENTS.includes(lastMeaningfulEvent.event)
       );

@@ -3,11 +3,13 @@ import {
   BranchesOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
+  CloseOutlined,
   CloudServerOutlined,
   DatabaseOutlined,
   DeleteOutlined,
   FileSearchOutlined,
   HistoryOutlined,
+  MenuOutlined,
   MessageOutlined,
   ToolOutlined
 } from "@ant-design/icons";
@@ -207,6 +209,8 @@ function formatSessionTime(mtime: number): string {
 export default function App() {
   const { message } = AntApp.useApp();
   const [query, setQuery] = useState("");
+  // ≤980px 时侧栏改为抽屉：记录开合状态，宽屏下该状态不参与布局
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [stagedItems, setStagedItems] = useState<UploadedItem[]>([]);
   const [turns, setTurns] = useState<ChatTurn[]>([]);
   const streamRef = useRef<HTMLElement | null>(null);
@@ -540,14 +544,42 @@ export default function App() {
 
   return (
     <div className="chat-app-shell min-h-dvh">
-      <aside className="chat-sidebar" aria-label="会话信息">
+      {/* 窄屏抽屉打开时的背景遮罩：点击即收起 */}
+      {drawerOpen ? (
+        <div
+          aria-hidden
+          className="sidebar-drawer-mask"
+          onClick={() => setDrawerOpen(false)}
+        />
+      ) : null}
+      <aside
+        aria-label="会话信息"
+        className={`chat-sidebar ${drawerOpen ? "chat-sidebar--open" : ""}`}
+      >
         <div className="sidebar-brand">
-          <span className="panel-kicker">INSIGHT AGENTS</span>
-          <h1>慧研</h1>
-          <p>对话式多智能体研究台</p>
+          <div>
+            <span className="panel-kicker">INSIGHT AGENTS</span>
+            <h1>慧研</h1>
+            <p>对话式多智能体研究台</p>
+          </div>
+          <Button
+            aria-label="关闭会话信息"
+            className="sidebar-drawer-close"
+            onClick={() => setDrawerOpen(false)}
+            type="text"
+          >
+            <CloseOutlined aria-hidden />
+          </Button>
         </div>
 
-        <Button className="new-chat-button" block onClick={handleNewSession}>
+        <Button
+          className="new-chat-button"
+          block
+          onClick={() => {
+            handleNewSession();
+            setDrawerOpen(false);
+          }}
+        >
           新建研究
         </Button>
 
@@ -563,7 +595,10 @@ export default function App() {
                     className={`session-item ${
                       item.thread_id === session.threadId ? "session-item--active" : ""
                     }`}
-                    onClick={() => handleSwitchSession(item.thread_id)}
+                    onClick={() => {
+                      handleSwitchSession(item.thread_id);
+                      setDrawerOpen(false);
+                    }}
                     type="button"
                     title={item.title || item.thread_id}
                   >
@@ -657,9 +692,19 @@ export default function App() {
 
       <main className="chat-main">
         <header className="chat-topbar">
-          <div>
-            <span className="panel-kicker">CHAT WORKSPACE</span>
-            <h2>慧研对话</h2>
+          <div className="chat-topbar-title">
+            <Button
+              aria-label="打开会话信息"
+              className="sidebar-drawer-toggle"
+              onClick={() => setDrawerOpen(true)}
+              type="text"
+            >
+              <MenuOutlined aria-hidden />
+            </Button>
+            <div>
+              <span className="panel-kicker">CHAT WORKSPACE</span>
+              <h2>慧研对话</h2>
+            </div>
           </div>
           <div className={`run-indicator ${session.isRunning ? "run-indicator--live" : ""}`}>
             {session.isRunning ? <BranchesOutlined aria-hidden /> : <CheckCircleOutlined aria-hidden />}
