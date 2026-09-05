@@ -1,6 +1,6 @@
-# DeepSearch Agents Frontend
+# Insight Agents Frontend
 
-React + Vite + Tailwind CSS + Ant Design frontend for the DeepSearch Agents FastAPI backend.
+React + Vite + Tailwind CSS + Ant Design frontend for the Insight Agents FastAPI backend.
 
 ## Run
 

@@ -1,5 +1,5 @@
 <div align='center'>
-  <h1 style="margin-top: 15px;">「深度研搜」对话式多智能体深度研究系统</h1>
+  <h1 style="margin-top: 15px;">「慧研」对话式多智能体深度研究系统</h1>
   <h4><b>insight-agents</b></h4>
   <p><em>基于 DeepAgents 构建的对话式多智能体研究助手：一主三从智能体调度，融合公开网络检索、结构化数据库查询与私有知识库问答，自动汇总多来源信息并交付 Markdown / PDF 研究报告</em></p>
 </div>
@@ -13,11 +13,11 @@
 
 </div>
 
-「深度研搜」是一个可直接部署运行的对话式多智能体深度研究系统。用户提出一个研究任务，系统在后端自动完成信息来源判断、多路检索、附件读取、信息汇总与报告生成，并把完整的执行过程实时推送到前端。
+「慧研」是一个可直接部署运行的对话式多智能体深度研究系统。用户提出一个研究任务，系统在后端自动完成信息来源判断、多路检索、附件读取、信息汇总与报告生成，并把完整的执行过程实时推送到前端。
 
 它不是对大模型的单次调用，也不是套一个搜索 API 的问答演示。系统用 DeepAgents 组织主智能体与专家子智能体，根据任务需要查公开网络、查结构化数据库、查 RAGFlow 私有知识库、读取用户上传附件，在代码层面对工具调用、外部服务、报告引用做了工程化治理，最终把结果整理成回答、Markdown 或 PDF。
 
-![深度研搜前端首页：任务示例、助手状态和对话式多智能体研究台](docs/images/deepsearch-agent-home.jpg)
+![慧研前端首页：任务示例、助手状态和对话式多智能体研究台](docs/images/insight-agents-home.jpg)
 
 ## 📖 项目介绍
 
@@ -82,7 +82,7 @@
 
 ## 🏗️ 系统架构
 
-![深度研搜系统架构图：前端、FastAPI、DeepAgents、子智能体、工具和文件产物之间的关系](docs/images/deepsearch-system-architecture.svg)
+![慧研系统架构图：前端、FastAPI、DeepAgents、子智能体、工具和文件产物之间的关系](docs/images/insight-agents-system-architecture.svg)
 
 项目采用 DeepAgents 中典型的 Orchestrator-Workers 模式：主智能体作为调度中心，三个专家助手负责信息获取，文件工具由主智能体直接掌握。
 
@@ -90,7 +90,7 @@
 
 | 主线             | 做什么                                                       | 涉及模块                                                                  |
 | ---------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------- |
-| 多智能体深度研搜 | 基于用户任务完成规划、分派、检索、读取附件、汇总和生成交付物 | `DeepAgents` / `LangChain` / `LangGraph` / `Tavily` / `SQLite` / `RAGFlow` |
+| 多智能体深度研究 | 基于用户任务完成规划、分派、检索、读取附件、汇总和生成交付物 | `DeepAgents` / `LangChain` / `LangGraph` / `Tavily` / `SQLite` / `RAGFlow` |
 | 前后端实时闭环   | 启动后台任务、上传文件、推送执行过程、展示结果和下载生成文件 | `FastAPI` / `WebSocket` / `React` / `Vite`                                |
 
 ### 智能体与工具
@@ -102,9 +102,9 @@
 | 数据库查询助手 | 发现表名、预览表结构和样例数据、执行 SQL | `list_sql_tables`、`get_table_data`、`execute_sql_query`      |
 | RAGFlow 助手   | 发现可用知识库助手，并向内部知识库提问   | `get_assistant_list`、`create_ask_delete`                     |
 
-![深度研搜网络搜索任务执行页：WebSocket 事件流、工具调用和最终回答](docs/images/deepsearch-network-search-result.jpg)
+![慧研网络搜索任务执行页：WebSocket 事件流、工具调用和最终回答](docs/images/insight-agents-network-search-result.jpg)
 
-![深度研搜数据库报告任务执行页：SQL 查询过程与生成的 Markdown 报告](docs/images/deepsearch-database-report-result.jpg)
+![慧研数据库报告任务执行页：SQL 查询过程与生成的 Markdown 报告](docs/images/insight-agents-database-report-result.jpg)
 
 ## 🛠️ 技术栈
 
@@ -121,7 +121,7 @@
 | 后端接口       | `FastAPI` / `Uvicorn`                            | 提供任务、取消、上传、文件列表、下载和 WebSocket 接口                         |
 | 实时通信       | `WebSocket`                                      | 推送工具调用、助手调用、Token 用量、最终结果和错误事件                        |
 | 调用治理       | `call_guard` / `budget` / `source_registry`      | 超时重试与错误分类、任务级调用预算与去重、来源登记与引用闸门                  |
-| 前端           | `React` / `Vite` / `Ant Design` / `Tailwind CSS` | 提供对话式研搜界面、事件流、附件上传和文件下载                                |
+| 前端           | `React` / `Vite` / `Ant Design` / `Tailwind CSS` | 提供对话式研究界面、事件流、附件上传和文件下载                                |
 | 依赖管理       | `uv` / `pnpm`                                    | 管理 Python 后端和前端依赖                                                    |
 
 ## 📁 项目结构

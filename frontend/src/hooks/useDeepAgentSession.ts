@@ -25,7 +25,7 @@ const MAX_EVENTS = 120;
 // 关键事件分布在整个会话中，窗口过小会截掉早期轮次及其产物与来源归属
 const HISTORY_MAX_EVENTS = 2000;
 
-// 终态事件：历史末尾没有它，说明刷新时任务仍在后端执行，需要恢复"研搜中"状态
+// 终态事件：历史末尾没有它，说明刷新时任务仍在后端执行，需要恢复"研究中"状态
 const TERMINAL_EVENTS = ["task_result", "task_cancelled", "error"];
 
 function extractString(data: Record<string, unknown>, key: string): string | null {
@@ -128,7 +128,7 @@ export function useDeepAgentSession() {
           : "";
       // 末尾没有终态事件 => 后端任务大概率仍在执行，恢复运行态让实时事件继续追上。
       // task_files 是任务收尾时在终态事件之后补发的产物清单，判断时跳过它，
-      // 否则已结束的会话会被误判为"研搜中"
+      // 否则已结束的会话会被误判为"研究中"
       const lastMeaningfulEvent = [...history]
         .reverse()
         .find((item) => item.event !== "task_files");
@@ -335,7 +335,7 @@ export function useDeepAgentSession() {
     async (query: string) => {
       const cleanQuery = query.trim();
       if (!cleanQuery) {
-        throw new Error("请输入研搜任务");
+        throw new Error("请输入研究任务");
       }
 
       setIsRunning(true);

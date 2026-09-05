@@ -2,7 +2,7 @@
 DeepAgents 子智能体：接入 LangGraph 研究规划工作流
 
 演示如何把一个已有 LangGraph StateGraph 封装成 DeepAgents 子智能体。
-这个例子不再只是单节点回显，而是模拟“深度研搜”中的研究规划子任务：
+这个例子不再只是单节点回显，而是模拟“慧研”中的研究规划子任务：
 用户问题 -> 主智能体决策 -> task 调用 research_planner_graph
 -> LangGraph 子图提取主题 -> 条件边选择普通/深度规划 -> 输出研究计划
 
@@ -143,7 +143,7 @@ main_agent = create_deep_agent(
     tools=[],
     subagents=[research_planner_graph],
     system_prompt="""
-    你是深度研搜系统的主智能体。
+    你是慧研系统的主智能体。
     当用户需要研究规划、报告大纲、趋势调研步骤时，必须调用 research_planner_graph。
     你不自己编造研究计划，而是根据子智能体返回的计划整理最终回复。
     """,

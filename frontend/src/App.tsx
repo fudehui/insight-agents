@@ -429,7 +429,7 @@ export default function App() {
   async function handleSubmit() {
     const cleanQuery = query.trim();
     if (!cleanQuery) {
-      message.warning("请输入研搜任务");
+      message.warning("请输入研究任务");
       return;
     }
 
@@ -542,13 +542,13 @@ export default function App() {
     <div className="chat-app-shell min-h-dvh">
       <aside className="chat-sidebar" aria-label="会话信息">
         <div className="sidebar-brand">
-          <span className="panel-kicker">DEEPSEARCH</span>
-          <h1>深度研搜</h1>
+          <span className="panel-kicker">INSIGHT AGENTS</span>
+          <h1>慧研</h1>
           <p>对话式多智能体研究台</p>
         </div>
 
         <Button className="new-chat-button" block onClick={handleNewSession}>
-          新建研搜
+          新建研究
         </Button>
 
         <div className="sidebar-section sidebar-sessions">
@@ -659,11 +659,11 @@ export default function App() {
         <header className="chat-topbar">
           <div>
             <span className="panel-kicker">CHAT WORKSPACE</span>
-            <h2>深度研搜对话</h2>
+            <h2>慧研对话</h2>
           </div>
           <div className={`run-indicator ${session.isRunning ? "run-indicator--live" : ""}`}>
             {session.isRunning ? <BranchesOutlined aria-hidden /> : <CheckCircleOutlined aria-hidden />}
-            {session.isRunning ? "研搜中" : "待命"}
+            {session.isRunning ? "研究中" : "待命"}
           </div>
         </header>
 

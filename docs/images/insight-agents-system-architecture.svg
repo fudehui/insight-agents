@@ -25,7 +25,7 @@
   </defs>
 
   <rect width="1280" height="900" fill="#f8fafc"/>
-  <text x="640" y="42" text-anchor="middle" class="title">深度研搜系统架构图</text>
+  <text x="640" y="42" text-anchor="middle" class="title">慧研系统架构图</text>
   <text x="640" y="70" text-anchor="middle" class="small">前端提交任务 -> FastAPI 后台协程 -> DeepAgents 调度多来源工具 -> WebSocket 回传进度 -> Markdown / PDF 交付</text>
 
   <!-- 用户交互层 -->

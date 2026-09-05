@@ -82,7 +82,7 @@ export function ChatComposer({
   }
 
   return (
-    <section className="chat-composer" aria-label="发送研搜任务">
+    <section className="chat-composer" aria-label="发送研究任务">
       {uploadedItems.length > 0 ? (
         <div className="attachment-strip" aria-label="当前会话附件">
           {uploadedItems.map((item) => (
@@ -108,7 +108,7 @@ export function ChatComposer({
 
       <div className="composer-shell">
         <textarea
-          aria-label="研搜任务"
+          aria-label="研究任务"
           disabled={isRunning}
           onChange={(event) => onQueryChange(event.target.value)}
           onKeyDown={(event) => {
@@ -117,7 +117,7 @@ export function ChatComposer({
               onSubmit();
             }
           }}
-          placeholder="向 DeepSearch Agents 发送任务..."
+          placeholder="向 Insight Agents 发送任务..."
           value={query}
         />
 

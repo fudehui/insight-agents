@@ -121,8 +121,8 @@ class ToolMonitor:
             asyncio.run_coroutine_threadsafe(coroutine, manager_loop)
 
     def report_task_start(self, query: str) -> None:
-        """报告一次研搜任务开始，携带原始问题，前端据此切分对话轮次"""
-        self._emit("task_start", f"研搜任务已启动: {query}", {"query": query})
+        """报告一次研究任务开始，携带原始问题，前端据此切分对话轮次"""
+        self._emit("task_start", f"研究任务已启动: {query}", {"query": query})
 
     def report_tool(
         self,

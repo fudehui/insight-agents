@@ -378,7 +378,7 @@ function ThinkingLoader({ durationLabel }: { durationLabel: string }) {
     >
       <div className="loader-status">
         <span className="loader-pulse" aria-hidden />
-        <strong>正在研搜</strong>
+        <strong>正在研究</strong>
         <span className="loader-duration">已思考 {durationLabel}</span>
         <span className="loader-dots" aria-hidden>
           <i />
@@ -432,7 +432,7 @@ function AssistantMessage({
       <div className="message-avatar">AI</div>
       <div className="message-bubble">
         <div className="message-meta">
-          <span>DeepSearch Agents</span>
+          <span>Insight Agents</span>
           <time>{syncLabel}</time>
         </div>
 
@@ -443,7 +443,7 @@ function AssistantMessage({
           <summary>
             <span>
               <BranchesOutlined aria-hidden />
-              深度研搜过程
+              研究过程
             </span>
             <strong>{events.length}</strong>
           </summary>
@@ -516,7 +516,7 @@ export function ConversationThread({
             </p>
           </div>
 
-          <div className="example-grid" aria-label="研搜任务示例">
+          <div className="example-grid" aria-label="研究任务示例">
             {TASK_EXAMPLES.map((example) => (
               <button
                 className="example-card"

@@ -2,7 +2,7 @@
 DeepAgents 子智能体：接入 LangChain 资料检索 Agent
 
 演示如何把 LangChain create_agent 创建的工具型 Agent 封装成 DeepAgents 子智能体。
-这个例子模拟“深度研搜”中的资料检索子任务：
+这个例子模拟“慧研”中的资料检索子任务：
 用户问题 -> 主智能体决策 -> task 调用 research_retriever_agent
 -> LangChain Agent 自主选择公开资料工具或内部知识库工具 -> 主智能体整理最终回答
 
@@ -92,7 +92,7 @@ deep_agent = create_deep_agent(
     model=llm,
     tools=[],
     system_prompt="""
-    你是深度研搜系统的主智能体。
+    你是慧研系统的主智能体。
     当用户需要查找资料、收集证据、检索公开信息或内部知识库时，必须调用 research_retriever_agent。
     你不直接检索资料，只负责分派任务并整理子智能体返回的结果。
     """,
