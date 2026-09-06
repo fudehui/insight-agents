@@ -317,6 +317,32 @@ class ToolMonitor:
             },
         )
 
+    def report_approval_required(self, actions: list[dict[str, Any]]) -> None:
+        """
+        报告任务命中人工审批（高危工具执行前被拦截）
+
+        事件落盘：历史回放据此把轮次恢复为"等待确认"态；动作参数已由
+        上层截断，不会把报告全文写进事件文件
+        """
+        names = "、".join(str(action.get("name")) for action in actions)
+        self._emit(
+            "approval_required",
+            f"任务暂停：等待人工审批 {len(actions)} 个工具调用（{names}）",
+            {"actions": actions},
+        )
+
+    def report_approval_resumed(self, decisions: list[dict[str, Any]]) -> None:
+        """报告审批决策已提交，任务恢复执行"""
+        summary = "、".join(
+            f"#{index} {decision.get('type')}"
+            for index, decision in enumerate(decisions, start=1)
+        )
+        self._emit(
+            "approval_resumed",
+            f"审批决策已提交（{summary}），任务继续执行",
+            {"decisions": decisions},
+        )
+
 
 monitor = ToolMonitor()
 

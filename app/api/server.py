@@ -8,7 +8,9 @@ WebSocket 长连接。HTTP 接口只做轻量调度，真正的 DeepAgents 执�
 
 import asyncio
 import datetime
+import hmac
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -16,14 +18,18 @@ import sys
 import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 import uvicorn
 from fastapi import (
+    APIRouter,
+    Depends,
     FastAPI,
     File,
     Form,
+    Header,
     HTTPException,
+    Request,
     UploadFile,
     WebSocket,
     WebSocketDisconnect,
@@ -32,7 +38,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-from app.agent.main_agent import get_main_agent, run_deep_agent
+from app.agent.main_agent import (
+    clear_task_runtime_state,
+    get_main_agent,
+    get_pending_approval,
+    resume_deep_agent,
+    run_deep_agent,
+)
 from app.api.budget import cleanup_task_budget
 from app.api.monitor import manager
 from app.api.source_registry import cleanup_task_sources
@@ -56,7 +68,41 @@ async def lifespan(_app: FastAPI):
 current_dir = Path(__file__).resolve().parent
 project_root = current_dir.parent
 
+# 访问令牌鉴权：未配置 APP_ACCESS_TOKEN 时不启用（本地开发零负担）；
+# 配置后所有 REST 接口与 WebSocket 都需要携带令牌
+_access_token = (os.getenv("APP_ACCESS_TOKEN") or "").strip()
+
+
+async def verify_access(
+    request: Request,
+    x_access_token: Optional[str] = Header(default=None, alias="X-Access-Token"),
+    access_token: Optional[str] = None,
+) -> None:
+    """
+    校验访问令牌：X-Access-Token 请求头优先，access_token 查询参数兜底
+
+    查询参数兜底是给下载链接（<a href>）和预览 iframe 用的——浏览器原生
+    请求带不了自定义 header。/api/health 豁免：存活探针不含任何数据，
+    Docker 健康检查也不方便携带令牌
+    """
+    if not _access_token or request.url.path == "/api/health":
+        return
+    provided = x_access_token or access_token
+    if not provided or not hmac.compare_digest(
+        provided.encode(), _access_token.encode()
+    ):
+        raise HTTPException(
+            status_code=401, detail="访问令牌缺失或不正确，请输入访问令牌后重试"
+        )
+
+
 app = FastAPI(title="DeepAgents API", lifespan=lifespan)
+
+# HTTP 路由统一挂到带鉴权 dependency 的 router 上。
+# 不能用 app 级全局依赖：FastAPI 会把它套到 WebSocket 路由，而 Request
+# 参数无法注入 WS 路由（运行时 TypeError）；WebSocket 单独留在 app 并
+# 在握手处自行校验令牌
+api_router = APIRouter(dependencies=[Depends(verify_access)])
 
 # 保存 thread_id -> 后台 Agent 任务，用于同一会话任务替换和主动取消
 active_tasks: dict[str, asyncio.Task] = {}
@@ -79,7 +125,7 @@ app.add_middleware(
 )
 
 
-@app.get("/api/health")
+@api_router.get("/api/health")
 async def health():
     """
     存活探针 (Health Check)。
@@ -95,6 +141,9 @@ class TaskRequest(BaseModel):
 
     query: str
     thread_id: Optional[str] = None
+    # 审批档位（off/standard/strict）；未传时使用服务端缺省
+    # （HITL_APPROVAL_TOOLS 自定义清单或标准档）
+    approval_mode: Optional[str] = None
 
 
 def _forget_task(thread_id: str, task: asyncio.Task) -> None:
@@ -108,7 +157,7 @@ def _forget_task(thread_id: str, task: asyncio.Task) -> None:
         active_tasks.pop(thread_id, None)
 
 
-@app.post("/api/task")
+@api_router.post("/api/task")
 async def run_task(request: TaskRequest):
     """
     启动一次 DeepAgents 后台任务。
@@ -124,14 +173,16 @@ async def run_task(request: TaskRequest):
         old_task.cancel()
 
     # create_task 把长耗时 Agent 执行交给事件循环，接口本身不用等待最终结果
-    task = asyncio.create_task(run_deep_agent(request.query, thread_id))
+    task = asyncio.create_task(
+        run_deep_agent(request.query, thread_id, request.approval_mode)
+    )
     active_tasks[thread_id] = task
     task.add_done_callback(lambda finished_task: _forget_task(thread_id, finished_task))
 
     return {"status": "started", "thread_id": thread_id}
 
 
-@app.post("/api/task/{thread_id}/cancel")
+@api_router.post("/api/task/{thread_id}/cancel")
 async def cancel_task(thread_id: str):
     """
     取消指定 thread_id 对应的后台 Agent 任务。
@@ -142,6 +193,26 @@ async def cancel_task(thread_id: str):
     task = active_tasks.get(thread_id)
     if not task or task.done():
         active_tasks.pop(thread_id, None)
+        # 任务暂停在待审批态：没有活跃协程可取消，此时以全部拒绝恢复执行，
+        # 模型收到拒绝结果后自行收尾出 task_result，避免中断检查点悬挂、
+        # 前端永远停在"等待确认"
+        pending_actions = await get_pending_approval(thread_id)
+        if pending_actions:
+            task = asyncio.create_task(
+                resume_deep_agent(
+                    thread_id,
+                    [{"type": "reject"} for _ in pending_actions],
+                )
+            )
+            active_tasks[thread_id] = task
+            task.add_done_callback(
+                lambda finished_task: _forget_task(thread_id, finished_task)
+            )
+            return {
+                "status": "cancelled",
+                "thread_id": thread_id,
+                "message": "任务正在等待审批，已按全部拒绝处理并由模型收尾",
+            }
         raise HTTPException(status_code=404, detail="任务不存在或已结束")
 
     # 先发出取消信号，再短暂等待协程响应；若底层阻塞中，则返回 cancelling 给前端继续展示状态
@@ -161,7 +232,59 @@ async def cancel_task(thread_id: str):
     return {"status": "cancelled", "thread_id": thread_id}
 
 
-@app.delete("/api/sessions/{thread_id}")
+class ApprovalDecision(BaseModel):
+    """单个待审动作的人工决策；v1 支持 approve/reject，edit 预留扩展"""
+
+    type: Literal["approve", "reject"]
+
+
+class ApprovalRequest(BaseModel):
+    """审批提交：decisions 顺序与 approval_required 事件的 actions 一一对应"""
+
+    decisions: List[ApprovalDecision]
+
+
+@api_router.post("/api/task/{thread_id}/approval")
+async def submit_approval(thread_id: str, request: ApprovalRequest):
+    """
+    提交人工审批决策并恢复被中断的任务 (Approval Submit)。
+
+    待审动作在后端重启后可从检查点重建；决策数量必须与待审动作数量一致，
+    第 i 个决策作用于第 i 个待审动作
+    """
+    running = active_tasks.get(thread_id)
+    if running and not running.done():
+        raise HTTPException(
+            status_code=409, detail="任务正在执行中，当前没有等待审批的操作"
+        )
+
+    pending_actions = await get_pending_approval(thread_id)
+    if not pending_actions:
+        raise HTTPException(status_code=409, detail="当前没有等待审批的任务")
+
+    if len(request.decisions) != len(pending_actions):
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"需要 {len(pending_actions)} 个决策"
+                f"（对应 {len(pending_actions)} 个待审动作），"
+                f"收到 {len(request.decisions)} 个"
+            ),
+        )
+
+    active_tasks.pop(thread_id, None)
+    task = asyncio.create_task(
+        resume_deep_agent(
+            thread_id, [decision.model_dump() for decision in request.decisions]
+        )
+    )
+    active_tasks[thread_id] = task
+    task.add_done_callback(lambda finished_task: _forget_task(thread_id, finished_task))
+
+    return {"status": "resumed", "thread_id": thread_id}
+
+
+@api_router.delete("/api/sessions/{thread_id}")
 async def delete_session(thread_id: str):
     """
     删除指定历史会话 (Session Delete)。
@@ -197,9 +320,11 @@ async def delete_session(thread_id: str):
             # 记忆清理失败不阻断目录删除，但要在日志中可见
             print(f"[ERROR] 清理会话 checkpoint 失败: {e}")
 
-    # 进程内的预算与来源登记同步清理，避免删除会话后残留孤儿数据
+    # 进程内的预算与来源登记同步清理，避免删除会话后残留孤儿数据；
+    # 待审登记与文件基线（审批暂停中的会话）一并清理
     cleanup_task_budget(thread_id)
     cleanup_task_sources(thread_id)
+    clear_task_runtime_state(thread_id)
 
     removed = False
     for base_dir in (output_dir, updated_dir):
@@ -222,7 +347,7 @@ _UPLOAD_MAX_FILE_SIZE = 50 * 1024 * 1024
 _UPLOAD_MAX_FILES = 10
 
 
-@app.post("/api/upload")
+@api_router.post("/api/upload")
 async def upload_files(files: List[UploadFile] = File(...), thread_id: str = Form(...)):
     """
     文件上传接口 (File Upload)。
@@ -293,7 +418,7 @@ async def upload_files(files: List[UploadFile] = File(...), thread_id: str = For
     return {"status": "uploaded", "files": saved_files}
 
 
-@app.get("/api/download")
+@api_router.get("/api/download")
 async def download_file(path: str):
     """
     文件下载接口 (File Download)。
@@ -353,7 +478,7 @@ def _resolve_within_output(path: str) -> Path:
     return abs_path
 
 
-@app.get("/api/files/content")
+@api_router.get("/api/files/content")
 async def get_file_content(path: str):
     """
     应用内预览接口 (Inline File Content)。
@@ -382,7 +507,7 @@ async def get_file_content(path: str):
     )
 
 
-@app.get("/api/sessions")
+@api_router.get("/api/sessions")
 async def list_sessions():
     """
     历史会话列表接口 (Session List)。
@@ -447,7 +572,7 @@ async def list_sessions():
     return {"sessions": sessions}
 
 
-@app.get("/api/sessions/{thread_id}/events")
+@api_router.get("/api/sessions/{thread_id}/events")
 async def get_session_events(thread_id: str):
     """
     历史会话事件回放接口 (Session Event Replay)。
@@ -483,7 +608,7 @@ async def get_session_events(thread_id: str):
     return {"events": events}
 
 
-@app.post("/api/files/reveal")
+@api_router.post("/api/files/reveal")
 async def reveal_in_folder(path: str):
     """
     在操作系统的文件管理器中打开并选中指定产物文件。
@@ -510,7 +635,7 @@ async def reveal_in_folder(path: str):
     return {"status": "revealed", "path": str(abs_path)}
 
 
-@app.get("/api/files")
+@api_router.get("/api/files")
 async def list_files(path: str):
     """
     文件列表查询接口 (File Explorer)。
@@ -556,6 +681,11 @@ async def list_files(path: str):
     return {"files": files}
 
 
+# HTTP 路由统一注册；WebSocket 单独挂在 app 上（不带鉴权 dependency，
+# Request 无法注入 WS 路由），握手处在 endpoint 内自行校验令牌
+app.include_router(api_router)
+
+
 @app.websocket("/ws/{thread_id}")
 async def websocket_endpoint(websocket: WebSocket, thread_id: str):
     """
@@ -566,6 +696,17 @@ async def websocket_endpoint(websocket: WebSocket, thread_id: str):
     receive_text 用于接收前端心跳，避免连接空闲断开。
     """
     print(f"会话向我们发起了请求，要求建立连接：{thread_id} 对应：{websocket}")
+
+    # 令牌校验先于注册：accept 后立即以策略码关闭，前端能从 close code
+    # 1008 识别"令牌无效"并弹窗补录
+    if _access_token:
+        provided_token = websocket.query_params.get("access_token")
+        if not provided_token or not hmac.compare_digest(
+            provided_token.encode(), _access_token.encode()
+        ):
+            await websocket.accept()
+            await websocket.close(code=1008, reason="访问令牌缺失或不正确")
+            return
 
     # 连接建立后立即按 thread_id 注册，monitor 后续才能把事件定向推给当前页面
     await manager.connect(websocket, thread_id)
