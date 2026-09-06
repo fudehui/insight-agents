@@ -176,12 +176,13 @@ export function useDeepAgentSession() {
     async (targetThreadId: string) => {
       const response = await deleteSession(targetThreadId);
 
+      // 无论删除的是否是当前会话，侧栏条目都要立即移除；
+      // 只删当前会话时此前不会过滤，导致已删条目残留到下次刷新
+      setSessions((previous) =>
+        previous.filter((item) => item.thread_id !== targetThreadId)
+      );
       if (targetThreadId === threadId) {
         resetSession();
-      } else {
-        setSessions((previous) =>
-          previous.filter((item) => item.thread_id !== targetThreadId)
-        );
       }
       return response;
     },
