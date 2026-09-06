@@ -16,7 +16,7 @@ import sys
 import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import uvicorn
 from fastapi import (
@@ -32,7 +32,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-from app.agent.main_agent import run_deep_agent
+from app.agent.main_agent import get_main_agent, run_deep_agent
 from app.api.monitor import manager
 
 @asynccontextmanager
@@ -80,7 +80,7 @@ class TaskRequest(BaseModel):
     """前端启动任务时提交的请求体。"""
 
     query: str
-    thread_id: str = None
+    thread_id: Optional[str] = None
 
 
 def _forget_task(thread_id: str, task: asyncio.Task) -> None:
@@ -171,6 +171,17 @@ async def delete_session(thread_id: str):
             # 目录已消失只会让文件写入报错，不会影响其他会话
             pass
         active_tasks.pop(thread_id, None)
+
+    # 会话记忆与目录一同清理：checkpoints 已落盘，不复位的话前端复用同一
+    # thread_id 重建会话时，删除前轮次的对话上下文会"复活"
+    agent = await get_main_agent()
+    checkpointer = getattr(agent, "checkpointer", None)
+    if checkpointer is not None and hasattr(checkpointer, "adelete_thread"):
+        try:
+            await checkpointer.adelete_thread(thread_id)
+        except Exception as e:
+            # 记忆清理失败不阻断目录删除，但要在日志中可见
+            print(f"[ERROR] 清理会话 checkpoint 失败: {e}")
 
     removed = False
     for base_dir in (output_dir, updated_dir):

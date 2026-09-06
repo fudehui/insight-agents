@@ -6,6 +6,8 @@ langchain==1.2.17           # LangChain 核心库
 langchain-core>=0.2.0       # 基础组件 (Prompt, Message, Tool)
 langchain-community>=0.2.0  # 社区工具集成
 langgraph==1.1.10           # 智能体工作流编排
+langgraph-checkpoint-sqlite>=3.1.0  # 会话记忆 SQLite 持久化（AsyncSqliteSaver）
+aiosqlite>=0.20             # AsyncSqliteSaver 依赖的异步 SQLite 驱动
 
 # --- 大模型服务 (LLM Services) ---
 langchain-openai==1.2.1     # OpenAI 接口适配

@@ -11,8 +11,9 @@ import os
 import shutil
 from pathlib import Path
 
+import aiosqlite
 from deepagents import create_deep_agent
-from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 from langgraph.errors import GraphRecursionError
 
 from app.agent.llm import model
@@ -35,20 +36,46 @@ from app.tools.markdown_tools import generate_markdown
 from app.tools.pdf_tools import convert_md_to_pdf
 from app.tools.upload_file_read_tool import read_file_content
 
-# 主智能体是调度中心：
-# 1. tools 只放最终交付相关的文件工具
-# 2. subagents 放网络、数据库、RAGFlow 三类信息获取助手
-# 3. checkpointer 通过 thread_id 保存同一会话中的执行上下文
-main_agent = create_deep_agent(
-    model=model,
-    system_prompt=main_agent_content["system_prompt"],
-    tools=[generate_markdown, convert_md_to_pdf, read_file_content],
-    checkpointer=InMemorySaver(),
-    subagents=[database_query_agent, network_search_agent, knowledge_base_agent],
-)
-
 # 当前文件位于 app/agent/main_agent.py，parents[1] 即 app 目录
 project_root_path = Path(__file__).parents[1].resolve()
+
+# 会话记忆落盘到 data/checkpoints.db：服务重启（含 --reload 改码触发）后，
+# 同一 thread_id 仍能延续对话上下文，与 events.jsonl 回放的历史保持一致。
+# Agent 经 astream 异步驱动，checkpoint 走异步方法，必须用 AsyncSqliteSaver
+# （同步 SqliteSaver 运行时报"does not support async methods"）；
+# aiosqlite 连接只能在运行中的事件循环里创建，因此延迟到首次执行时组装
+_checkpoint_db_path = project_root_path / "data" / "checkpoints.db"
+_checkpoint_db_path.parent.mkdir(parents=True, exist_ok=True)
+
+_main_agent = None
+_main_agent_lock = asyncio.Lock()
+
+
+async def get_main_agent():
+    """
+    取得主智能体；首次调用时在事件循环内创建 AsyncSqliteSaver 并组装，之后复用
+
+    双重检查加锁：多个任务同时首次启动时只组装一次，其余等待复用同一实例
+    """
+    global _main_agent
+    if _main_agent is None:
+        async with _main_agent_lock:
+            if _main_agent is None:
+                conn = await aiosqlite.connect(_checkpoint_db_path)
+                checkpointer = AsyncSqliteSaver(conn)
+                await checkpointer.setup()
+                _main_agent = create_deep_agent(
+                    model=model,
+                    system_prompt=main_agent_content["system_prompt"],
+                    tools=[generate_markdown, convert_md_to_pdf, read_file_content],
+                    checkpointer=checkpointer,
+                    subagents=[
+                        database_query_agent,
+                        network_search_agent,
+                        knowledge_base_agent,
+                    ],
+                )
+    return _main_agent
 
 # 整图最大执行步数（模型/工具轮次），是防止无限循环的最后保险。
 # 默认 80：多助手调度 + 长报告生成的正常任务约需 30-50 步，80 留足余量；
@@ -185,6 +212,8 @@ async def run_deep_agent(task_query, session_id):
     """
 
     try:
+        # 首次执行时在当前事件循环内组装主智能体（含异步 checkpoint 连接）
+        main_agent = await get_main_agent()
         # astream 会持续产出模型节点、工具节点和子智能体节点的状态片段
         async for chunk in main_agent.astream(
             {"messages": [{"role": "user", "content": task_query + path_instruction}]},

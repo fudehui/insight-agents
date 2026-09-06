@@ -12,6 +12,13 @@ from fastapi.testclient import TestClient
 from app.api import server
 
 
+def _fake_get_main_agent(agent):
+    """替代 get_main_agent 的假工厂：返回一个返回假 agent 的异步工厂"""
+    async def _factory():
+        return agent
+    return _factory
+
+
 def _make_session(tmp_path, thread_id="del123", with_upload=True):
     """在临时目录中构造一个已存在会话的 output/updated 目录结构"""
     output_dir = tmp_path / "output"
@@ -99,3 +106,34 @@ def test_delete_session_cancels_running_task_first(tmp_path, monkeypatch):
         assert not session_dir.exists()
     finally:
         server.active_tasks.pop("del123", None)
+
+
+def test_delete_session_purges_checkpoint_memory(tmp_path, monkeypatch):
+    output_dir, updated_dir, _ = _make_session(tmp_path)
+    monkeypatch.setattr(server, "output_dir", output_dir)
+    monkeypatch.setattr(server, "updated_dir", updated_dir)
+
+    # 假 agent 验证：删除会话目录的同时按 thread_id 清理落盘的会话记忆
+    fake_agent = mock.Mock()
+    monkeypatch.setattr(server, "get_main_agent", _fake_get_main_agent(fake_agent))
+
+    client = TestClient(server.app)
+    response = client.delete("/api/sessions/del123")
+
+    assert response.status_code == 200
+    fake_agent.checkpointer.adelete_thread.assert_called_once_with("del123")
+
+
+def test_delete_session_skips_purge_without_checkpointer(tmp_path, monkeypatch):
+    output_dir, updated_dir, session_dir = _make_session(tmp_path)
+    monkeypatch.setattr(server, "output_dir", output_dir)
+    monkeypatch.setattr(server, "updated_dir", updated_dir)
+
+    # checkpointer 缺失（如退回内存 saver 的旧实现）时不应报错，目录删除照常完成
+    monkeypatch.setattr(server, "get_main_agent", _fake_get_main_agent(object()))
+
+    client = TestClient(server.app)
+    response = client.delete("/api/sessions/del123")
+
+    assert response.status_code == 200
+    assert not session_dir.exists()
