@@ -81,6 +81,19 @@
   - WebSocket 断线按指数退避 + 随机抖动自动重连；心跳超时主动断开半开连接；重连成功后自动回放会话事件对账，断线窗口内丢失的事件按事件序号去重补齐。
 - **应用内预览与回答交互**
   - 产物卡片支持应用内预览（Markdown 渲染 / PDF / 图片内联展示）、一键下载、在文件管理器中定位；最终回答一键复制，失败的任务可一键重试。
+- **人机协同审批（Human-in-the-loop）**
+  - 高危工具执行前任务自动暂停，前端弹出审批卡片展示待审动作与参数摘要；逐项批准/拒绝后任务恢复执行，拒绝的工具会把结果告知模型并由其收尾。
+  - **三档审批档位可在输入框工具栏随时切换，对下一个任务生效**：关闭审批（工具直接执行）、标准审批（默认，文件交付前确认）、严格审批（文件、SQL 查询、网络搜索、知识库提问均需确认，含子智能体内部的工具调用）。
+  - 拦截范围也可用 `HITL_APPROVAL_TOOLS` 环境变量作为服务端缺省（前端未传档位时生效，设为空关闭）；审批状态随检查点持久化，后端重启后仍可审批；运行中刷新页面也能恢复"等待确认"态。
+
+![慧研人工审批卡片：展示待审工具调用与参数摘要，支持逐项批准或拒绝](docs/images/insight-agents-approval-card.png)
+
+![慧研审批档位选择器：关闭 / 标准 / 严格三档随时切换，解释文案以淡色呈现](docs/images/insight-agents-approval-mode.png)
+
+- **访问令牌鉴权（可选）**
+  - 配置 `APP_ACCESS_TOKEN` 后所有 REST 接口与 WebSocket 都需要携带令牌（请求头优先、查询参数兜底）；前端首次访问弹窗输入一次并保存在浏览器。不配置则不做任何鉴权，本地开发零负担。
+
+![慧研访问令牌弹窗：后端启用鉴权后首次访问时输入一次即可](docs/images/insight-agents-access-token.png)
 - **会话记忆持久化，重启不丢上下文**
   - 对话检查点通过 `AsyncSqliteSaver` 落盘到 `app/data/checkpoints.db`，同一会话多次提问共享上下文，后端重启（含 `--reload` 改码触发）后追问仍记得前文。
   - 删除会话时会同步清理对应 checkpoint，避免复用同一 `thread_id` 时旧上下文"复活"。
@@ -239,6 +252,14 @@ SQLITE_DB_PATH=app/data/deepsearch.db
 
 # 可选：文件读取工具单次返回的最大字符数（默认 30000，超出可分段续读）
 # FILE_READ_MAX_CHARS=30000
+
+# 可选：访问令牌鉴权。配置后所有 REST 接口与 WebSocket 都需要携带令牌，
+# 前端首次访问会弹窗输入（保存在浏览器）。不配置则不做任何鉴权
+# APP_ACCESS_TOKEN=change-me-to-a-long-random-string
+
+# 可选：人工审批的高危工具清单（逗号分隔）。默认拦截文件交付类工具；
+# 设为空串关闭人机协同审批
+# HITL_APPROVAL_TOOLS=generate_markdown,convert_md_to_pdf
 ```
 
 ### 5. 初始化 SQLite 数据库
@@ -269,8 +290,9 @@ uv run uvicorn app.api.server:app --host 127.0.0.1 --port 8000 --reload
 
 | 接口                                   | 说明                                   |
 | -------------------------------------- | -------------------------------------- |
-| `POST /api/task`                       | 启动一次 DeepAgents 后台任务           |
+| `POST /api/task`                       | 启动一次 DeepAgents 后台任务（可带 `approval_mode` 档位） |
 | `POST /api/task/{thread_id}/cancel`    | 取消指定会话任务                       |
+| `POST /api/task/{thread_id}/approval`  | 提交人工审批决策并恢复被中断的任务     |
 | `POST /api/upload`                     | 上传一个或多个文件到当前会话           |
 | `GET /api/files`                       | 列出当前会话输出目录中的生成文件       |
 | `GET /api/download`                    | 下载输出目录中的文件                   |
