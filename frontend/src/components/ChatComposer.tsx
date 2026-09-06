@@ -4,8 +4,9 @@ import {
   SendOutlined,
   StopOutlined
 } from "@ant-design/icons";
-import { Button, Tooltip, Upload } from "antd";
+import { App as AntApp, Button, Tooltip, Upload } from "antd";
 import type { UploadFile } from "antd";
+import { UPLOAD_ALLOWED_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from "../lib/constants";
 import type { UploadedItem } from "../types";
 
 interface ChatComposerProps {
@@ -61,8 +62,26 @@ export function ChatComposer({
   stagedItems,
   uploadedItems
 }: ChatComposerProps) {
+  const { message } = AntApp.useApp();
   const hasStagedFiles = stagedItems.length > 0;
   const canSubmit = query.trim().length > 0;
+
+  // 前端先拦一层类型与大小（与后端 /api/upload 校验一致），
+  // LIST_IGNORE 让违规文件不进入 fileList，直接无声过滤
+  function handleBeforeUpload(file: UploadFile) {
+    const lower = (file.name || "").toLowerCase();
+    const allowed = UPLOAD_ALLOWED_EXTENSIONS.some((ext) => lower.endsWith(ext));
+    if (!allowed) {
+      message.error(`不支持的文件类型：${file.name}（允许 ${UPLOAD_ALLOWED_EXTENSIONS.join(" ")}）`);
+      return Upload.LIST_IGNORE;
+    }
+    if ((file.size || 0) > UPLOAD_MAX_FILE_SIZE_MB * 1024 * 1024) {
+      message.error(`文件过大（上限 ${UPLOAD_MAX_FILE_SIZE_MB}MB）：${file.name}`);
+      return Upload.LIST_IGNORE;
+    }
+    // 返回 false 关闭 antd 自动上传，仍由 onChange 里的 handleAttachmentChange 手动上传
+    return false;
+  }
 
   function handleAttachmentChange(fileList: UploadFile[]) {
     const nextItems = uniqueUploadedItems(
@@ -112,6 +131,11 @@ export function ChatComposer({
           disabled={isRunning}
           onChange={(event) => onQueryChange(event.target.value)}
           onKeyDown={(event) => {
+            // 中文输入法确认候选词的 Enter（isComposing / keyCode 229）
+            // 不触发发送，否则拼音上屏会把未完成的输入直接提交
+            if (event.nativeEvent.isComposing || event.keyCode === 229) {
+              return;
+            }
             if (event.key === "Enter" && !event.shiftKey) {
               event.preventDefault();
               onSubmit();
@@ -133,7 +157,8 @@ export function ChatComposer({
               />
             </Tooltip>
             <Upload
-              beforeUpload={() => false}
+              accept={UPLOAD_ALLOWED_EXTENSIONS.join(",")}
+              beforeUpload={handleBeforeUpload}
               fileList={[]}
               multiple
               onChange={(info) => {
@@ -157,7 +182,7 @@ export function ChatComposer({
             <Button
               aria-label={isRunning ? "取消当前任务" : "发送任务"}
               className={isRunning ? "send-button send-button--cancel" : "send-button"}
-              disabled={isRunning ? isCancelling : !canSubmit}
+              disabled={isRunning ? isCancelling : !canSubmit || isUploading}
               icon={isRunning ? <StopOutlined /> : <SendOutlined />}
               loading={isCancelling}
               onClick={isRunning ? onCancel : onSubmit}

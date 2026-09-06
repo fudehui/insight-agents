@@ -8,7 +8,6 @@ import {
   DatabaseOutlined,
   DeleteOutlined,
   FileSearchOutlined,
-  HistoryOutlined,
   MenuOutlined,
   MessageOutlined,
   ToolOutlined
@@ -21,6 +20,8 @@ import type { TurnMark } from "./components/ChatScrollIndicator";
 import { ConversationThread } from "./components/ConversationThread";
 import type { ChatTurn } from "./components/ConversationThread";
 import { API_BASE_URL, WS_BASE_URL } from "./lib/config";
+import { TERMINAL_EVENTS } from "./lib/constants";
+import { createThreadId } from "./lib/thread";
 import { useDeepAgentSession } from "./hooks/useDeepAgentSession";
 import type {
   ConnectionState,
@@ -29,9 +30,6 @@ import type {
   SourceCollection,
   UploadedItem
 } from "./types";
-
-// 终态事件：出现即代表一轮对话结束，不再接续实时事件
-const TERMINAL_EVENTS = ["task_result", "task_cancelled", "error"];
 
 function connectionLabel(state: ConnectionState): string {
   const labels: Record<ConnectionState, string> = {
@@ -45,7 +43,7 @@ function connectionLabel(state: ConnectionState): string {
 
 function createTurn(content: string): ChatTurn {
   return {
-    id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}`,
+    id: createThreadId(),
     content,
     events: [],
     files: [],
@@ -108,7 +106,7 @@ function rebuildTurnsFromHistory(events: MonitorMessage[]): ChatTurn[] {
         turns.push(current);
       }
       current = {
-        id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}`,
+        id: createThreadId(),
         content:
           typeof event.data.query === "string" ? event.data.query : event.message,
         events: [],
@@ -140,7 +138,7 @@ function rebuildTurnsFromHistory(events: MonitorMessage[]): ChatTurn[] {
       }
       // 旧版本会话没有 task_start 事件，整段历史归入一个恢复轮次
       current = {
-        id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}`,
+        id: createThreadId(),
         content: "（历史会话恢复）",
         events: [],
         files: [],
@@ -310,7 +308,9 @@ export default function App() {
         files: nextFiles,
         sources: nextSources ?? liveTurn.sources,
         isRunning: session.isRunning,
-        result: session.result
+        result: session.result,
+        // 流式增量先行展示，task_result 权威结果到达后覆盖
+        streamingAnswer: session.streamingText
       };
       // 文件轮询等触发源会在没有新事件时反复进入本 effect：内容没有实际
       // 变化时直接返回旧引用，避免 6 秒一次的轮询引发整棵对话树重渲染
@@ -319,7 +319,8 @@ export default function App() {
         nextFiles === liveTurn.files &&
         nextSources === null &&
         liveTurn.isRunning === session.isRunning &&
-        liveTurn.result === session.result
+        liveTurn.result === session.result &&
+        (liveTurn.streamingAnswer ?? "") === session.streamingText
       ) {
         return previous;
       }
@@ -330,7 +331,7 @@ export default function App() {
     // 终态事件到达后不再立即注销 liveId：task_files / task_sources 由后端在
     // 任务收尾（task_result 之后）补发，必须继续并入这一轮；liveId 会在
     // 下一轮任务提交或切换会话时被替换
-  }, [session.events, session.files, session.isRunning, session.result]);
+  }, [session.events, session.files, session.isRunning, session.result, session.streamingText]);
 
   // 无进行中任务时（如历史回放后），轮询刷新到的文件列表跟随到最后一轮展示；
   // 最后一轮已有自己的 task_files 清单时不要用全量列表覆盖，旧会话无该事件则保持原行为。
@@ -430,16 +431,11 @@ export default function App() {
     });
   }, [turns, measureTurnMarks]);
 
-  async function handleSubmit() {
-    const cleanQuery = query.trim();
-    if (!cleanQuery) {
-      message.warning("请输入研究任务");
-      return;
-    }
-
+  // 启动一轮任务：创建轮次、登记实时同步游标与文件基线，然后调用后端。
+  // 输入框发送与"重试"共用这一条路径
+  async function startTurn(cleanQuery: string) {
     const nextTurn = createTurn(cleanQuery);
     setTurns((previous) => [...previous, nextTurn]);
-    setQuery("");
     // 从这一轮开始进入实时同步：事件游标归零（submitTask 会清空 events）
     liveTurnIdRef.current = nextTurn.id;
     consumedEventsRef.current = 0;
@@ -465,6 +461,22 @@ export default function App() {
       );
       message.error(error instanceof Error ? error.message : "任务启动失败");
     }
+  }
+
+  async function handleSubmit() {
+    const cleanQuery = query.trim();
+    if (!cleanQuery) {
+      message.warning("请输入研究任务");
+      return;
+    }
+
+    setQuery("");
+    await startTurn(cleanQuery);
+  }
+
+  // 失败轮次的"重试"：以原问题新开一轮，不影响输入框当前内容
+  function handleRetry(prompt: string) {
+    void startTurn(prompt);
   }
 
   async function handleCancel() {
@@ -728,6 +740,7 @@ export default function App() {
             ref={streamRef}
           >
             <ConversationThread
+              onRetry={handleRetry}
               onUseExample={setQuery}
               turns={turns}
             />

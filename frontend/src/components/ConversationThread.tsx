@@ -1,24 +1,30 @@
 import {
   BranchesOutlined,
   CheckCircleOutlined,
+  CheckOutlined,
   ClockCircleOutlined,
   CloseCircleOutlined,
   CloudServerOutlined,
+  CopyOutlined,
   DatabaseOutlined,
   DownloadOutlined,
+  EyeOutlined,
   FileMarkdownOutlined,
   FilePdfOutlined,
   FileSearchOutlined,
   FileTextOutlined,
   FolderOpenOutlined,
   LinkOutlined,
+  RedoOutlined,
   StopOutlined,
   ToolOutlined,
 } from "@ant-design/icons";
 import { App as AntApp, Button, Tooltip } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { getDownloadUrl, revealInFolder } from "../lib/api";
+import { formatBytes, formatTime } from "../lib/format";
 import { MarkdownRenderer } from "./MarkdownRenderer";
+import { PreviewDrawer } from "./PreviewDrawer";
 import type { MonitorMessage, OutputFile, SourceCollection } from "../types";
 
 export interface ChatTurn {
@@ -30,9 +36,12 @@ export interface ChatTurn {
   isRunning: boolean;
   result: string;
   timestamp: string;
+  // 后端流式推送的增量文本：result 到达前先行展示，正式结果一到即覆盖
+  streamingAnswer?: string;
 }
 
 interface ConversationThreadProps {
+  onRetry: (prompt: string) => void;
   onUseExample: (prompt: string) => void;
   turns: ChatTurn[];
 }
@@ -74,28 +83,6 @@ const TASK_EXAMPLES = [
     icon: <FileMarkdownOutlined aria-hidden />,
   },
 ];
-
-function formatTime(value: string): string {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return "--:--";
-  }
-  return date.toLocaleTimeString("zh-CN", {
-    hour12: false,
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-function formatBytes(value: number): string {
-  if (value < 1024) {
-    return `${value} B`;
-  }
-  if (value < 1024 * 1024) {
-    return `${(value / 1024).toFixed(1)} KB`;
-  }
-  return `${(value / 1024 / 1024).toFixed(1)} MB`;
-}
 
 function parseTime(value: string): number | null {
   const time = new Date(value).getTime();
@@ -319,6 +306,7 @@ function ThinkingTimeline({ events }: { events: MonitorMessage[] }) {
 
 function ArtifactShelf({ files }: { files: OutputFile[] }) {
   const { message } = AntApp.useApp();
+  const [previewFile, setPreviewFile] = useState<OutputFile | null>(null);
 
   if (files.length === 0) {
     return (
@@ -329,14 +317,11 @@ function ArtifactShelf({ files }: { files: OutputFile[] }) {
     );
   }
 
-  // 浏览器沙箱无法直接调起资源管理器，交由后端 reveal 接口在本地打开并选中
+  // 浏览器沙箱无法直接调起资源管理器，交由后端 reveal 接口在本地打开并选中；
+  // 失败信息（非 output 文件、容器环境无 GUI）由 HTTPException 统一抛出
   async function handleReveal(path: string) {
     try {
-      const response = await revealInFolder(path);
-      if (response.error) {
-        message.error(response.error);
-        return;
-      }
+      await revealInFolder(path);
       message.success("已在文件管理器中打开");
     } catch (error) {
       message.error(error instanceof Error ? error.message : "打开文件管理器失败");
@@ -355,6 +340,15 @@ function ArtifactShelf({ files }: { files: OutputFile[] }) {
             <span>{formatBytes(file.size)}</span>
           </div>
           <div className="artifact-actions">
+            <Tooltip title="预览">
+              <Button
+                aria-label={`预览 ${file.name}`}
+                className="artifact-preview"
+                icon={<EyeOutlined />}
+                onClick={() => setPreviewFile(file)}
+                shape="circle"
+              />
+            </Tooltip>
             <Tooltip title="在文件夹中显示">
               <Button
                 aria-label={`在文件夹中显示 ${file.name}`}
@@ -376,6 +370,8 @@ function ArtifactShelf({ files }: { files: OutputFile[] }) {
           </div>
         </div>
       ))}
+
+      <PreviewDrawer file={previewFile} onClose={() => setPreviewFile(null)} />
     </div>
   );
 }
@@ -486,12 +482,17 @@ function AssistantMessage({
   isRunning,
   result,
   sources,
+  streamingAnswer = "",
   timestamp,
-}: Pick<
-  ChatTurn,
-  "events" | "files" | "isRunning" | "result" | "sources" | "timestamp"
->) {
+  content,
+  onRetry,
+}: Pick<ChatTurn, "events" | "files" | "isRunning" | "result" | "sources" | "timestamp" | "content"> & {
+  streamingAnswer?: string;
+  onRetry: (prompt: string) => void;
+}) {
+  const { message } = AntApp.useApp();
   const [now, setNow] = useState(Date.now());
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!isRunning) {
@@ -507,9 +508,28 @@ function AssistantMessage({
 
   const durationLabel = getThinkingDuration(events, timestamp, isRunning, now);
   const isCancelled = events.some((event) => event.event === "task_cancelled");
+  const failed = events.some((event) => event.event === "error");
   const syncLabel = isRunning
     ? `生成中 · 思考 ${durationLabel}`
-    : `${isCancelled ? "已取消" : "已同步"} · 用时 ${durationLabel}`;
+    : `${isCancelled ? "已取消" : failed ? "已失败" : "已同步"} · 用时 ${durationLabel}`;
+
+  // 展示文本优先级：权威 task_result > 流式增量。流式期间边生成边渲染，
+  // 正式结果一到即整体覆盖，保证与后端登记的内容一致
+  const answerText = result || streamingAnswer;
+
+  async function handleCopy() {
+    if (!answerText) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(answerText);
+      setCopied(true);
+      message.success("回答已复制到剪贴板");
+      window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      message.error("复制失败：浏览器未授权剪贴板访问");
+    }
+  }
 
   return (
     <article className="chat-message chat-message--assistant">
@@ -518,6 +538,19 @@ function AssistantMessage({
         <div className="message-meta">
           <span>Insight Agents</span>
           <time>{syncLabel}</time>
+          {answerText ? (
+            <Tooltip title="复制回答">
+              <Button
+                aria-label="复制回答"
+                className="message-copy"
+                icon={copied ? <CheckOutlined /> : <CopyOutlined />}
+                onClick={handleCopy}
+                shape="circle"
+                size="small"
+                type="text"
+              />
+            </Tooltip>
+          ) : null}
         </div>
 
         <details
@@ -534,9 +567,13 @@ function AssistantMessage({
           <ThinkingTimeline events={events} />
         </details>
 
-        {result ? (
-          <div className="assistant-answer">
-            <MarkdownRenderer content={result} />
+        {answerText ? (
+          <div
+            className={`assistant-answer ${
+              isRunning && !result && streamingAnswer ? "assistant-answer--streaming" : ""
+            }`}
+          >
+            <MarkdownRenderer content={answerText} />
           </div>
         ) : (
           <div className="assistant-answer assistant-answer--pending">
@@ -547,6 +584,19 @@ function AssistantMessage({
             )}
           </div>
         )}
+
+        {!isRunning && failed ? (
+          <div className="assistant-retry">
+            <span>本次任务执行出错，已收集的信息见上方研究过程。</span>
+            <Button
+              icon={<RedoOutlined />}
+              onClick={() => onRetry(content)}
+              size="small"
+            >
+              重试此任务
+            </Button>
+          </div>
+        ) : null}
 
         {sources ? (
           <details
@@ -585,6 +635,7 @@ function AssistantMessage({
 }
 
 export function ConversationThread({
+  onRetry,
   onUseExample,
   turns,
 }: ConversationThreadProps) {
@@ -638,11 +689,14 @@ export function ConversationThread({
             </div>
           </article>
           <AssistantMessage
+            content={turn.content}
             events={turn.events}
             files={turn.files}
             isRunning={turn.isRunning}
+            onRetry={onRetry}
             result={turn.result}
             sources={turn.sources}
+            streamingAnswer={turn.streamingAnswer}
             timestamp={turn.timestamp}
           />
         </div>

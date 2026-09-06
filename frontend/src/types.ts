@@ -18,6 +18,9 @@ export interface MonitorMessage {
   message: string;
   data: Record<string, unknown>;
   timestamp: string;
+  // 会话内单调递增的事件序号：重连对账时用于回放/实时流去重；
+  // 旧版本落盘的历史事件没有该字段
+  seq?: number;
 }
 
 export interface PongMessage {
@@ -72,7 +75,6 @@ export interface SourceCollection {
 
 export interface FileListResponse {
   files?: OutputFile[];
-  error?: string;
 }
 
 export interface SessionSummary {
@@ -85,12 +87,10 @@ export interface SessionSummary {
 
 export interface SessionListResponse {
   sessions?: SessionSummary[];
-  error?: string;
 }
 
 export interface SessionEventsResponse {
   events?: MonitorMessage[];
-  error?: string;
 }
 
 export interface UploadedItem {

@@ -8,6 +8,17 @@ import {
   startTask,
   uploadSessionFiles
 } from "../lib/api";
+import {
+  HEARTBEAT_INTERVAL_MS,
+  HEARTBEAT_TIMEOUT_MS,
+  HISTORY_MAX_EVENTS,
+  MAX_EVENTS,
+  POLL_ACTIVE_MS,
+  POLL_IDLE_MS,
+  RECONNECT_BASE_MS,
+  RECONNECT_MAX_MS,
+  TERMINAL_EVENTS
+} from "../lib/constants";
 import { WS_BASE_URL } from "../lib/config";
 import { createThreadId, getStoredThreadId, storeThreadId } from "../lib/thread";
 import type {
@@ -19,18 +30,18 @@ import type {
   UploadedItem
 } from "../types";
 
-const MAX_EVENTS = 120;
-
-// 历史回放使用远大于实时流的窗口：task_start/task_files/task_sources 等
-// 关键事件分布在整个会话中，窗口过小会截掉早期轮次及其产物与来源归属
-const HISTORY_MAX_EVENTS = 2000;
-
-// 终态事件：历史末尾没有它，说明刷新时任务仍在后端执行，需要恢复"研究中"状态
-const TERMINAL_EVENTS = ["task_result", "task_cancelled", "error"];
-
 function extractString(data: Record<string, unknown>, key: string): string | null {
   const value = data[key];
   return typeof value === "string" ? value : null;
+}
+
+// 旧版本落盘事件没有 seq 序号时的去重指纹：时间戳 + 事件名 + 消息内容
+function eventFingerprint(event: MonitorMessage): string {
+  return `${event.timestamp}|${event.event}|${event.message}`;
+}
+
+function seqOf(event: MonitorMessage): number | null {
+  return typeof event.seq === "number" ? event.seq : null;
 }
 
 export function useDeepAgentSession() {
@@ -38,14 +49,22 @@ export function useDeepAgentSession() {
   const reconnectTimerRef = useRef<number | undefined>(undefined);
   const heartbeatTimerRef = useRef<number | undefined>(undefined);
   const uploadedNameSetRef = useRef<Set<string>>(new Set());
+  // 连接健康度：连续重连次数（指数退避）与最近一次收到服务端消息的时间（半开检测）
+  const reconnectAttemptsRef = useRef(0);
+  const lastServerMessageAtRef = useRef(0);
+  // 事件去重游标：seq 单调序号（新事件）+ 指纹集合（旧版无 seq 的事件）
+  const lastSeqRef = useRef(0);
+  const seenFingerprintsRef = useRef<Set<string>>(new Set());
   const [threadId, setThreadId] = useState(getStoredThreadId);
   const [connectionState, setConnectionState] = useState<ConnectionState>("connecting");
   const [events, setEvents] = useState<MonitorMessage[]>([]);
   const [files, setFiles] = useState<OutputFile[]>([]);
   const [sessionPath, setSessionPath] = useState("");
   const [result, setResult] = useState("");
+  // 流式回答增量走独立状态而不进 events 数组：高频 delta 会把 MAX_EVENTS
+  // 滑窗里的关键事件（tool_start / task_files / task_sources）挤出去
+  const [streamingText, setStreamingText] = useState("");
   const [lastError, setLastError] = useState("");
-  const [lastPongAt, setLastPongAt] = useState("");
   const [isRunning, setIsRunning] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -73,9 +92,12 @@ export function useDeepAgentSession() {
     setFiles([]);
     setSessionPath("");
     setResult("");
+    setStreamingText("");
     setLastError("");
     setUploadedItems([]);
     uploadedNameSetRef.current.clear();
+    lastSeqRef.current = 0;
+    seenFingerprintsRef.current = new Set();
     setIsRunning(false);
     setIsCancelling(false);
     // 空会话不进历史列表：只有后端真正记录过事件（发生过任务）的会话才有条目，
@@ -88,21 +110,19 @@ export function useDeepAgentSession() {
   const refreshSessions = useCallback(async () => {
     try {
       const response = await listSessions();
-      if (response.error) {
-        return;
-      }
       setSessions(response.sessions || []);
-    } catch {
-      // 后端未启动时静默降级：会话列表为空即可，不打断主流程
+    } catch (error) {
+      // 会话列表是次要信息，失败不阻断主流程，但要留下可见痕迹；
+      // WebSocket 连上时会清除 lastError，后端恢复后提示自动消失
+      setLastError(
+        error instanceof Error ? `会话列表加载失败: ${error.message}` : "会话列表加载失败"
+      );
     }
   }, []);
 
   const loadSessionHistory = useCallback(async (targetThreadId: string) => {
     try {
       const response = await getSessionEvents(targetThreadId);
-      if (response.error) {
-        return;
-      }
       const history = response.events || [];
 
       // 从历史事件中恢复会话目录，文件面板才能重新列出旧会话产物
@@ -133,19 +153,42 @@ export function useDeepAgentSession() {
         lastMeaningfulEvent && !TERMINAL_EVENTS.includes(lastMeaningfulEvent.event)
       );
 
-      setEvents(history.slice(-HISTORY_MAX_EVENTS));
+      // 重建去重游标：seq 事件取历史中的最大序号，旧版无 seq 事件重建指纹集合。
+      // 拉取历史期间 WebSocket 可能还在投递新事件（尤其重连对账场景），应用历史时
+      // 保留 seq 大于历史最大序号的在途事件，避免这毫秒级窗口内的事件丢失
+      const historyMaxSeq = history.reduce(
+        (max, item) => Math.max(max, seqOf(item) ?? 0),
+        0
+      );
+      lastSeqRef.current = historyMaxSeq;
+      seenFingerprintsRef.current = new Set(
+        history.filter((item) => seqOf(item) === null).map(eventFingerprint)
+      );
+      setEvents((previous) => {
+        const inFlight = previous.filter((item) => {
+          const seq = seqOf(item);
+          return seq !== null && seq > historyMaxSeq;
+        });
+        return [...history.slice(-HISTORY_MAX_EVENTS), ...inFlight].slice(
+          -HISTORY_MAX_EVENTS
+        );
+      });
       // 只在确实解析到路径时写入：无条件写入会在 WebSocket 重连补发的
       // session_created 已恢复路径之后，把路径覆写成空串，导致文件轮询
       // 永不启动、输出文件面板始终为空
       if (sessionPathFromHistory) {
         setSessionPath(sessionPathFromHistory);
       }
-      setResult(resultFromHistory);
+      // 末轮未结束时不能把历史里上一轮的 task_result 填给进行中的轮次，
+      // 否则刷新后"研究中"的轮次会显示上一轮的旧回答；空结果让加载动画接管
+      setResult(isUnfinished ? "" : resultFromHistory);
       setIsRunning(isUnfinished);
       setIsCancelling(false);
       setHistoryVersion((version) => version + 1);
-    } catch {
-      // 无历史（新会话）或后端不可达时保持空白界面
+    } catch (error) {
+      setLastError(
+        error instanceof Error ? `会话历史加载失败: ${error.message}` : "会话历史加载失败"
+      );
     }
   }, []);
 
@@ -160,9 +203,12 @@ export function useDeepAgentSession() {
       setFiles([]);
       setSessionPath("");
       setResult("");
+      setStreamingText("");
       setLastError("");
       setUploadedItems([]);
       uploadedNameSetRef.current.clear();
+      lastSeqRef.current = 0;
+      seenFingerprintsRef.current = new Set();
       setIsRunning(false);
       setIsCancelling(false);
       void loadSessionHistory(targetThreadId);
@@ -195,9 +241,6 @@ export function useDeepAgentSession() {
     }
 
     const response = await listSessionFiles(sessionPath);
-    if (response.error) {
-      throw new Error(response.error);
-    }
     setFiles(response.files || []);
   }, [sessionPath]);
 
@@ -224,27 +267,69 @@ export function useDeepAgentSession() {
         if (disposed) {
           return;
         }
+        // 先判断再清零：重连成功需要对账断线窗口内丢失的事件
+        const isReconnect = reconnectAttemptsRef.current > 0;
+        reconnectAttemptsRef.current = 0;
+        lastServerMessageAtRef.current = Date.now();
         setConnectionState("connected");
         setLastError("");
+        if (isReconnect) {
+          // 断线期间的 tool_start / task_result 等事件已永久错过，
+          // 重新拉取落盘历史对账：游标重建后新事件继续增量并入
+          void loadSessionHistory(threadId);
+        }
         heartbeatTimerRef.current = window.setInterval(() => {
-          if (socket.readyState === WebSocket.OPEN) {
-            socket.send("ping");
+          if (socket.readyState !== WebSocket.OPEN) {
+            return;
           }
-        }, 25000);
+          // 半开连接检测：超过两个心跳周期没有收到任何服务端消息，
+          // 主动断开（触发 onclose 重连），避免永远显示"已连接"
+          if (Date.now() - lastServerMessageAtRef.current > HEARTBEAT_TIMEOUT_MS) {
+            socket.close();
+            return;
+          }
+          socket.send("ping");
+        }, HEARTBEAT_INTERVAL_MS);
       };
 
       socket.onmessage = (event) => {
         if (socketRef.current !== socket) {
           return;
         }
+        // 任何一帧服务端消息都能证明连接活着（不只 pong）
+        lastServerMessageAtRef.current = Date.now();
         try {
           const payload = JSON.parse(event.data) as SocketMessage;
           if (payload.type === "pong") {
-            setLastPongAt(new Date().toISOString());
             return;
           }
 
           if (payload.type !== "monitor_event") {
+            return;
+          }
+
+          // seq 去重：重连对账时回放与实时流会短暂交叠，同一事件只并入一次；
+          // 旧版无 seq 的事件退化为指纹比较
+          const seq = seqOf(payload);
+          if (seq !== null) {
+            if (seq <= lastSeqRef.current) {
+              return;
+            }
+            lastSeqRef.current = seq;
+          } else {
+            const fingerprint = eventFingerprint(payload);
+            if (seenFingerprintsRef.current.has(fingerprint)) {
+              return;
+            }
+            seenFingerprintsRef.current.add(fingerprint);
+          }
+
+          // 流式增量走独立状态，不进 events 滑窗（理由见 streamingText 定义）
+          if (payload.event === "task_delta") {
+            const delta = extractString(payload.data, "delta");
+            if (delta) {
+              setStreamingText((previous) => previous + delta);
+            }
             return;
           }
 
@@ -257,23 +342,26 @@ export function useDeepAgentSession() {
             }
           }
 
-      if (payload.event === "task_result") {
-        const finalResult = extractString(payload.data, "result");
-        setResult(finalResult || payload.message);
-        setIsRunning(false);
-        setIsCancelling(false);
-        // 任务结束后会话摘要（标题/时间/文件数）已变化，刷新侧边栏列表
-        void refreshSessions();
-      }
+          if (payload.event === "task_result") {
+            const finalResult = extractString(payload.data, "result");
+            setResult(finalResult || payload.message);
+            setStreamingText("");
+            setIsRunning(false);
+            setIsCancelling(false);
+            // 任务结束后会话摘要（标题/时间/文件数）已变化，刷新侧边栏列表
+            void refreshSessions();
+          }
 
           if (payload.event === "task_cancelled") {
             setResult((previous) => previous || payload.message);
+            setStreamingText("");
             setIsRunning(false);
             setIsCancelling(false);
           }
 
           if (payload.event === "error") {
             setLastError(payload.message);
+            setStreamingText("");
             setIsRunning(false);
             setIsCancelling(false);
           }
@@ -298,7 +386,16 @@ export function useDeepAgentSession() {
           return;
         }
         setConnectionState("reconnecting");
-        reconnectTimerRef.current = window.setTimeout(connect, 2000);
+        // 指数退避 + 随机抖动：后端宕机时不再以固定 2 秒无限打点，
+        // 恢复后最多等一个周期即可重连
+        const delay =
+          Math.min(
+            RECONNECT_MAX_MS,
+            RECONNECT_BASE_MS * 2 ** reconnectAttemptsRef.current
+          ) *
+          (0.75 + Math.random() * 0.5);
+        reconnectAttemptsRef.current += 1;
+        reconnectTimerRef.current = window.setTimeout(connect, delay);
       };
     }
 
@@ -309,7 +406,7 @@ export function useDeepAgentSession() {
       clearSocketTimers();
       socketRef.current?.close();
     };
-  }, [clearSocketTimers, threadId]);
+  }, [clearSocketTimers, loadSessionHistory, refreshSessions, threadId]);
 
   useEffect(() => {
     if (!sessionPath) {
@@ -324,7 +421,7 @@ export function useDeepAgentSession() {
       refreshFiles().catch((error: unknown) => {
         setLastError(error instanceof Error ? error.message : "文件列表刷新失败");
       });
-    }, isRunning ? 2500 : 6000);
+    }, isRunning ? POLL_ACTIVE_MS : POLL_IDLE_MS);
 
     return () => window.clearInterval(timer);
   }, [isRunning, refreshFiles, sessionPath]);
@@ -340,6 +437,7 @@ export function useDeepAgentSession() {
       setIsCancelling(false);
       setEvents([]);
       setResult("");
+      setStreamingText("");
       setLastError("");
       try {
         const response = await startTask(cleanQuery, threadId);
@@ -433,7 +531,9 @@ export function useDeepAgentSession() {
     };
   }, [events, files.length]);
 
+  // 只暴露 App 实际消费的状态：sessionPath / 去重游标等内部状态不再外泄
   return {
+    cancelCurrentTask,
     connectionState,
     events,
     files,
@@ -442,17 +542,12 @@ export function useDeepAgentSession() {
     isRunning,
     isUploading,
     lastError,
-    lastPongAt,
-    refreshFiles,
-    refreshSessions,
     removeSession,
     resetSession,
     result,
-    sessionPath,
     sessions,
     stats,
-    cancelCurrentTask,
-    loadSessionHistory,
+    streamingText,
     submitTask,
     switchSession,
     threadId,

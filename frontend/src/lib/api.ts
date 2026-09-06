@@ -12,6 +12,15 @@ function apiUrl(path: string): string {
   return `${API_BASE_URL}${path}`;
 }
 
+// 同源部署时 API_BASE_URL 是空串：new URL(相对路径) 缺少 base 会直接抛
+// "Invalid URL"——下载按钮在渲染期取 href，一旦抛异常整棵 React 树都会
+// 崩溃白屏。带查询参数的接口地址统一用字符串拼接 + URLSearchParams 编码，
+// 同源（相对路径）与显式绝对地址两种配置都安全
+function apiUrlWithParams(path: string, params: Record<string, string>): string {
+  const query = new URLSearchParams(params).toString();
+  return query ? `${API_BASE_URL}${path}?${query}` : `${API_BASE_URL}${path}`;
+}
+
 async function requestJson<T>(input: RequestInfo | URL, init?: RequestInit): Promise<T> {
   const response = await fetch(input, init);
   const contentType = response.headers.get("content-type") || "";
@@ -64,9 +73,7 @@ export async function uploadSessionFiles(
 }
 
 export async function listSessionFiles(path: string): Promise<FileListResponse> {
-  const url = new URL(apiUrl("/api/files"));
-  url.searchParams.set("path", path);
-  return requestJson<FileListResponse>(url);
+  return requestJson<FileListResponse>(apiUrlWithParams("/api/files", { path }));
 }
 
 export async function listSessions(): Promise<SessionListResponse> {
@@ -92,19 +99,23 @@ export async function deleteSession(threadId: string): Promise<DeleteSessionResp
 }
 
 export function getDownloadUrl(path: string): string {
-  const url = new URL(apiUrl("/api/download"));
-  url.searchParams.set("path", path);
-  return url.toString();
+  return apiUrlWithParams("/api/download", { path });
 }
 
 export interface RevealResponse {
   status?: "revealed" | string;
   path?: string;
-  error?: string;
 }
 
 export async function revealInFolder(path: string): Promise<RevealResponse> {
-  const url = new URL(apiUrl("/api/files/reveal"));
-  url.searchParams.set("path", path);
-  return requestJson<RevealResponse>(url, { method: "POST" });
+  return requestJson<RevealResponse>(
+    apiUrlWithParams("/api/files/reveal", { path }),
+    { method: "POST" }
+  );
+}
+
+// 应用内预览：/api/files/content 以 inline 方式返回文件内容，
+// Markdown 可 fetch 成文本渲染，PDF 与图片可直接进 iframe/img
+export function getFileContentUrl(path: string): string {
+  return apiUrlWithParams("/api/files/content", { path });
 }
