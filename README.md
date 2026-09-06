@@ -75,6 +75,12 @@
 - **长任务执行过程可观察、可回放**
   - 工具调用、子智能体调用、Token 消耗、预算超限、工作目录创建、任务结果、取消和异常都会通过 `monitor` 推送到前端。
   - 每次任务的事件实时落盘到 `events.jsonl`，重启后可按会话回放恢复完整对话。
+- **会话记忆持久化，重启不丢上下文**
+  - 对话检查点通过 `AsyncSqliteSaver` 落盘到 `app/data/checkpoints.db`，同一会话多次提问共享上下文，后端重启（含 `--reload` 改码触发）后追问仍记得前文。
+  - 删除会话时会同步清理对应 checkpoint，避免复用同一 `thread_id` 时旧上下文"复活"。
+- **上下文与安全防护**
+  - 大文件分段读取：`read_file_content` 单次最多返回约 3 万字符（`FILE_READ_MAX_CHARS` 可调），超限截断并附续读提示，模型可用 `offset` 参数分段读取。
+  - SQL 表名白名单：`get_table_data` 先对 `sqlite_master` 做参数化校验再以引号包裹执行，并统一走只读连接，防提示词注入拼接危险 SQL。
 - **会话级上下文隔离**
   - 通过 `thread_id` 和 `session_dir` 区分不同任务，`ContextVar` 让深层工具也能拿到当前会话身份和文件目录。
 - **从检索到交付的完整链路**
@@ -111,7 +117,7 @@
 | 模块           | 技术                                             | 作用                                                                          |
 | -------------- | ------------------------------------------------ | ----------------------------------------------------------------------------- |
 | 智能体框架     | `DeepAgents`                                     | 创建主智能体和子智能体，承接长任务、多工具、多助手调度                        |
-| 图与检查点     | `LangGraph`                                      | 提供底层运行时和 `InMemorySaver` 会话检查点                                   |
+| 图与检查点     | `LangGraph`                                      | 提供底层运行时和 `AsyncSqliteSaver` 会话检查点（对话记忆持久化到 SQLite）     |
 | 模型与工具抽象 | `LangChain` / `langchain-core`                   | 封装 OpenAI 兼容模型、工具声明和 Agent 调用结构                               |
 | 大模型接入     | OpenAI 兼容接口                                  | 通过 `.env` 中的 `OPENAI_BASE_URL`、`OPENAI_API_KEY`、`LLM_QWEN_MAX` 接入模型 |
 | 网络搜索       | `Tavily`                                         | 为网络搜索助手提供公开资料检索                                                |
@@ -151,7 +157,8 @@ insight-agents/
 │   └── updated/                    # 运行时生成：用户上传文件的会话暂存目录
 ├── app/data/
 │   ├── init_sqlite.sql             # SQLite 建库脚本：药品、库存、销售记录业务示例数据
-│   └── deepsearch.db               # 运行时生成：SQLite 数据库文件（已 gitignore）
+│   ├── deepsearch.db               # 运行时生成：SQLite 业务数据库文件（已 gitignore）
+│   └── checkpoints.db              # 运行时生成：会话对话记忆检查点文件（已 gitignore）
 ├── docs/knowledge_base/            # RAGFlow 知识库示例 PDF
 ├── examples/                       # DeepAgents 框架能力验证脚本
 ├── frontend/                       # React + Vite 前端项目
@@ -213,6 +220,13 @@ SQLITE_DB_PATH=app/data/deepsearch.db
 
 # 可选：工具调用预算覆盖（JSON 格式，未配置时使用内置默认限额）
 # TOOL_BUDGET_JSON={"internet_search": 3}
+
+# 可选：模型调用超时秒数与重试次数（默认 300 秒 / 2 次）
+# LLM_TIMEOUT_S=300
+# LLM_MAX_RETRIES=2
+
+# 可选：文件读取工具单次返回的最大字符数（默认 30000，超出可分段续读）
+# FILE_READ_MAX_CHARS=30000
 ```
 
 ### 5. 初始化 SQLite 数据库
@@ -257,6 +271,9 @@ uv run uvicorn app.api.server:app --host 127.0.0.1 --port 8000 --reload
 会话历史说明：每次任务的事件会实时落盘到 `app/output/session_{thread_id}/events.jsonl`。
 前端重启后侧边栏可看到历史会话列表，点击即可回放恢复完整对话；重连时服务端会自动补发
 `session_created` 事件以恢复文件面板。
+
+会话记忆说明：同一会话的对话上下文由 `AsyncSqliteSaver` 持久化到 `app/data/checkpoints.db`，
+后端重启后继续追问仍保留前文记忆；删除会话接口会连同 checkpoint 一并清理。
 
 ### 8. 启动前端
 
