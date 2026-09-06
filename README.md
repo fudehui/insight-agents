@@ -311,6 +311,57 @@ VITE_WS_BASE_URL=ws://localhost:8000
 请先读取我上传的行业报告，再结合公开资料整理一份研究摘要。
 ```
 
+## 🐳 Docker 部署
+
+除本地直跑外，项目提供双容器编排（`nginx` 托管前端并同源反代 + `FastAPI` 后端），一条命令起全栈。与本地 uv/pnpm 直跑方式并存互不影响；但**不要同时运行容器后端与本地后端**，两者指向同一份 SQLite 数据会产生并发写冲突。
+
+### 1. 准备环境变量
+
+```bash
+cp .env.example .env   # 至少填好 OPENAI_API_KEY、TAVILY_API_KEY
+```
+
+容器启动时强校验 `LLM_QWEN_MAX` 与 `TAVILY_API_KEY`（缺失会直接退出），RAGFlow 两个变量可选。
+
+### 2. 构建并启动
+
+```bash
+docker compose up -d --build
+```
+
+首次构建需拉取基础镜像并安装 Python 依赖（约 1–1.5GB），之后有层缓存会很快。前端容器等待后端健康检查通过后才启动。
+
+### 3. 访问
+
+| 入口                 | 地址                                        |
+| -------------------- | ------------------------------------------- |
+| 前端页面             | `http://localhost:8080`                     |
+| 后端 API / WebSocket | `http://localhost:8000`（浏览器经前端同源访问，一般无需直连） |
+
+端口可在 `.env` 中用 `FRONTEND_PORT` / `BACKEND_PORT` 覆盖。前端默认使用同源相对路径访问 API，部署到远程服务器时无需任何修改。
+
+### 4. 数据持久化
+
+会话与产物以 bind mount 挂载到宿主机目录，容器重建不丢数据：
+
+| 宿主机目录     | 容器路径             | 内容                                     |
+| -------------- | -------------------- | ---------------------------------------- |
+| `app/data/`    | `/app/app/data`      | 业务 SQLite 库 + 会话记忆 checkpoints.db |
+| `app/output/`  | `/app/app/output`    | 会话事件流与生成的报告/文件              |
+| `app/updated/` | `/app/app/updated`   | 上传文件暂存                             |
+
+### 5. 常用命令
+
+```bash
+docker compose logs -f backend   # 查看后端日志
+docker compose down              # 停止（数据保留在宿主机目录）
+docker compose up -d --build     # 代码更新后重建启动
+```
+
+### 6. 容器环境差异
+
+「在系统文件管理器中打开产物」（`POST /api/files/reveal`）依赖本机 GUI，容器内不可用，接口会返回错误提示但不影响其他功能；产物文件可直接从 `app/output/` 宿主机目录获取。
+
 ## 🎯 适用场景
 
 - 行业与竞品调研：结合公开网络资料与内部数据，产出可交付的研究报告。

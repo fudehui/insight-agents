@@ -685,7 +685,7 @@ export default function App() {
 
         <div className="sidebar-section sidebar-endpoints">
           <span className="sidebar-label">ENDPOINTS</span>
-          <code>{API_BASE_URL}</code>
+          <code>{API_BASE_URL || "(同源)"}</code>
           <code>{WS_BASE_URL}</code>
         </div>
       </aside>

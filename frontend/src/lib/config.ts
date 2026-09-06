@@ -1,4 +1,6 @@
-const DEFAULT_API_BASE_URL = "http://localhost:8000";
+// 默认同源相对路径：本地 dev 走 vite 的 /api、/ws 代理，Docker 部署走 nginx 同源反代；
+// 置空可保证前端部署到远程服务器时不会指向浏览者自己的 localhost
+const DEFAULT_API_BASE_URL = "";
 
 function stripTrailingSlash(value: string): string {
   return value.replace(/\/+$/, "");

@@ -1,0 +1,34 @@
+# 版本控制与本地工具配置
+.git
+.gitignore
+.vscode
+.idea
+.zcode
+.analysis
+.pytest_cache
+.pre-commit-config.yaml
+.python-version
+
+# 密钥与本地环境：不打进镜像，运行时由 compose 的 env_file 注入
+.env
+.env.local
+.venv
+
+# Python 运行产物
+__pycache__
+**/__pycache__
+*.py[cod]
+
+# 运行时数据由 bind mount 提供，不打入镜像（init_sqlite.sql 必须保留）
+app/data/*.db
+app/data/*.db-shm
+app/data/*.db-wal
+app/output
+app/updated
+
+# 与后端镜像无关的内容
+frontend
+docs
+examples
+tests
+README.md

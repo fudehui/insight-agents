@@ -1,0 +1,38 @@
+# 慧研（DeepSearch Agents）双容器部署：nginx 前端 + FastAPI 后端
+# 端口可在根目录 .env 中用 FRONTEND_PORT / BACKEND_PORT 覆盖
+name: deepsearch-agents
+
+services:
+  backend:
+    build: .
+    image: deepsearch-backend:latest
+    container_name: deepsearch-backend
+    env_file: .env
+    environment:
+      # 容器内固定绝对路径，对应挂载卷 ./app/data，避免相对路径歧义
+      SQLITE_DB_PATH: /app/app/data/deepsearch.db
+    volumes:
+      - ./app/data:/app/app/data
+      - ./app/output:/app/app/output
+      - ./app/updated:/app/app/updated
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    healthcheck:
+      # GET /api/sessions 只扫描输出目录、不触数据库，适合做存活探测
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/sessions', timeout=5)"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    image: deepsearch-frontend:latest
+    container_name: deepsearch-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    restart: unless-stopped
