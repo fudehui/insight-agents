@@ -114,11 +114,22 @@ def _list_sql_tables_impl() -> str:
 
 
 def _get_table_data_impl(table_name) -> str:
-    conn = get_connection()
+    # 表名先对 sqlite_master 白名单校验：它来自模型输出，直接拼接存在注入风险；
+    # 校验用参数化查询，命中后再以双引号包裹标识符执行
+    conn = get_readonly_connection()
     try:
         cursor = conn.cursor()
-        # 直接拼接表名以简化查询链路；表名仅来自 list_sql_tables 结果，生产环境建议加白名单校验
-        sql = f"SELECT * FROM {table_name} LIMIT 100"
+        cursor.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?",
+            (str(table_name),),
+        )
+        if cursor.fetchone() is None:
+            return (
+                f"数据表 {table_name} 不存在。请先调用 list_sql_tables 获取真实表名，"
+                "再用 get_table_data 预览。"
+            )
+
+        sql = f'SELECT * FROM "{table_name}" LIMIT 100'
         cursor.execute(sql)
 
         # cursor.description 保存查询结果的列元信息，没有结果集时可能为 None
