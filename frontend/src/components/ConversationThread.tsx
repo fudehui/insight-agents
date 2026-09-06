@@ -16,16 +16,23 @@ import {
   FolderOpenOutlined,
   LinkOutlined,
   RedoOutlined,
+  SafetyCertificateOutlined,
   StopOutlined,
   ToolOutlined,
 } from "@ant-design/icons";
-import { App as AntApp, Button, Tooltip } from "antd";
+import { App as AntApp, Button, Segmented, Tooltip } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { getDownloadUrl, revealInFolder } from "../lib/api";
 import { formatBytes, formatTime } from "../lib/format";
 import { MarkdownRenderer } from "./MarkdownRenderer";
 import { PreviewDrawer } from "./PreviewDrawer";
-import type { MonitorMessage, OutputFile, SourceCollection } from "../types";
+import type {
+  ApprovalAction,
+  ApprovalDecisionPayload,
+  MonitorMessage,
+  OutputFile,
+  SourceCollection
+} from "../types";
 
 export interface ChatTurn {
   id: string;
@@ -38,9 +45,12 @@ export interface ChatTurn {
   timestamp: string;
   // 后端流式推送的增量文本：result 到达前先行展示，正式结果一到即覆盖
   streamingAnswer?: string;
+  // 任务命中人工审批时携带待审动作；决策提交后由 approval_resumed 清除
+  pendingApproval?: ApprovalAction[] | null;
 }
 
 interface ConversationThreadProps {
+  onSubmitApproval: (decisions: ApprovalDecisionPayload[]) => void;
   onRetry: (prompt: string) => void;
   onUseExample: (prompt: string) => void;
   turns: ChatTurn[];
@@ -152,6 +162,12 @@ function EventIcon({ event }: { event: string }) {
   if (event === "task_cancelled") {
     return <StopOutlined aria-hidden />;
   }
+  if (event === "approval_required") {
+    return <SafetyCertificateOutlined aria-hidden />;
+  }
+  if (event === "approval_resumed") {
+    return <CheckCircleOutlined aria-hidden />;
+  }
   if (event === "error") {
     return <CloseCircleOutlined aria-hidden />;
   }
@@ -170,6 +186,8 @@ const EVENT_LABELS: Record<string, string> = {
   task_cancelled: "任务已取消",
   task_files: "输出文件",
   task_sources: "来源登记",
+  approval_required: "等待人工审批",
+  approval_resumed: "审批完成继续执行",
   error: "异常",
   budget_exceeded: "调用预算超限"
 };
@@ -476,6 +494,79 @@ function ThinkingLoader({ durationLabel }: { durationLabel: string }) {
   );
 }
 
+// 人工审批卡片：高危工具调用被拦截后等待用户逐项决策。
+// 参数摘要由后端截断（content 类长参数只保留前 300 字），这里整块只读展示
+function ApprovalCard({
+  actions,
+  onSubmit,
+}: {
+  actions: ApprovalAction[];
+  onSubmit: (decisions: ApprovalDecisionPayload[]) => void;
+}) {
+  const [choices, setChoices] = useState<Record<number, "approve" | "reject">>(
+    () => Object.fromEntries(actions.map((_, index) => [index, "approve" as const]))
+  );
+
+  function submit() {
+    onSubmit(
+      actions.map((_, index) => ({ type: choices[index] ?? "approve" }))
+    );
+  }
+
+  return (
+    <div aria-label="人工审批" className="approval-card" role="group">
+      <div className="approval-card-head">
+        <SafetyCertificateOutlined aria-hidden />
+        <strong>需要人工审批</strong>
+        <span>以下工具调用已被拦截，确认后才会继续执行</span>
+      </div>
+      <ol className="approval-action-list">
+        {actions.map((action, index) => (
+          <li className="approval-action" key={`${action.name}-${index}`}>
+            <div className="approval-action-copy">
+              <strong>{action.name}</strong>
+              {action.args && Object.keys(action.args).length > 0 ? (
+                <pre>
+                  {Object.entries(action.args)
+                    .map(([key, value]) => `${key}: ${value}`)
+                    .join("\n")}
+                </pre>
+              ) : null}
+            </div>
+            <Segmented
+              aria-label={`决策 ${action.name}`}
+              onChange={(value) =>
+                setChoices((previous) => ({
+                  ...previous,
+                  [index]: value as "approve" | "reject"
+                }))
+              }
+              options={[
+                { label: "批准", value: "approve" },
+                { label: "拒绝", value: "reject" }
+              ]}
+              value={choices[index] ?? "approve"}
+            />
+          </li>
+        ))}
+      </ol>
+      <div className="approval-card-actions">
+        <Button
+          onClick={() =>
+            onSubmit(actions.map(() => ({ type: "reject" as const })))
+          }
+          size="small"
+        >
+          全部拒绝
+        </Button>
+        <Button onClick={submit} size="small" type="primary">
+          提交审批结果
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 function AssistantMessage({
   events,
   files,
@@ -486,9 +577,13 @@ function AssistantMessage({
   timestamp,
   content,
   onRetry,
+  pendingApproval,
+  onSubmitApproval,
 }: Pick<ChatTurn, "events" | "files" | "isRunning" | "result" | "sources" | "timestamp" | "content"> & {
   streamingAnswer?: string;
+  pendingApproval?: ApprovalAction[] | null;
   onRetry: (prompt: string) => void;
+  onSubmitApproval: (decisions: ApprovalDecisionPayload[]) => void;
 }) {
   const { message } = AntApp.useApp();
   const [now, setNow] = useState(Date.now());
@@ -555,7 +650,7 @@ function AssistantMessage({
 
         <details
           className="thinking-block"
-          open={isRunning}
+          open={isRunning || Boolean(pendingApproval && pendingApproval.length > 0)}
         >
           <summary>
             <span>
@@ -566,6 +661,10 @@ function AssistantMessage({
           </summary>
           <ThinkingTimeline events={events} />
         </details>
+
+        {pendingApproval && pendingApproval.length > 0 ? (
+          <ApprovalCard actions={pendingApproval} onSubmit={onSubmitApproval} />
+        ) : null}
 
         {answerText ? (
           <div
@@ -636,6 +735,7 @@ function AssistantMessage({
 
 export function ConversationThread({
   onRetry,
+  onSubmitApproval,
   onUseExample,
   turns,
 }: ConversationThreadProps) {
@@ -694,6 +794,8 @@ export function ConversationThread({
             files={turn.files}
             isRunning={turn.isRunning}
             onRetry={onRetry}
+            onSubmitApproval={onSubmitApproval}
+            pendingApproval={turn.pendingApproval}
             result={turn.result}
             sources={turn.sources}
             streamingAnswer={turn.streamingAnswer}

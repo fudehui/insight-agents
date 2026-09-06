@@ -1,5 +1,8 @@
 import { API_BASE_URL } from "./config";
+import { getAccessToken } from "./auth";
 import type {
+  ApprovalDecisionPayload,
+  ApprovalResponse,
   CancelTaskResponse,
   FileListResponse,
   SessionEventsResponse,
@@ -7,6 +10,16 @@ import type {
   TaskResponse,
   UploadResponse
 } from "../types";
+
+// 带 HTTP 状态码的错误：调用方据此识别 401（需要访问令牌）等场景
+export class ApiError extends Error {
+  readonly status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+  }
+}
 
 function apiUrl(path: string): string {
   return `${API_BASE_URL}${path}`;
@@ -22,7 +35,14 @@ function apiUrlWithParams(path: string, params: Record<string, string>): string 
 }
 
 async function requestJson<T>(input: RequestInfo | URL, init?: RequestInit): Promise<T> {
-  const response = await fetch(input, init);
+  // 配置了访问令牌时自动附带请求头；调用方已给的 header（如 Content-Type）保留
+  const headers = new Headers(init?.headers);
+  const token = getAccessToken();
+  if (token) {
+    headers.set("X-Access-Token", token);
+  }
+
+  const response = await fetch(input, { ...init, headers });
   const contentType = response.headers.get("content-type") || "";
   const payload = contentType.includes("application/json")
     ? await response.json()
@@ -33,13 +53,17 @@ async function requestJson<T>(input: RequestInfo | URL, init?: RequestInit): Pro
       typeof payload === "object" && payload && "detail" in payload
         ? String(payload.detail)
         : `HTTP ${response.status}`;
-    throw new Error(message);
+    throw new ApiError(response.status, message);
   }
 
   return payload as T;
 }
 
-export async function startTask(query: string, threadId: string): Promise<TaskResponse> {
+export async function startTask(
+  query: string,
+  threadId: string,
+  approvalMode?: string
+): Promise<TaskResponse> {
   return requestJson<TaskResponse>(apiUrl("/api/task"), {
     method: "POST",
     headers: {
@@ -47,7 +71,8 @@ export async function startTask(query: string, threadId: string): Promise<TaskRe
     },
     body: JSON.stringify({
       query,
-      thread_id: threadId
+      thread_id: threadId,
+      ...(approvalMode ? { approval_mode: approvalMode } : {})
     })
   });
 }
@@ -98,8 +123,14 @@ export async function deleteSession(threadId: string): Promise<DeleteSessionResp
   );
 }
 
+// <a href> / iframe 场景带不了请求头，令牌以查询参数附加
+function appendTokenQuery(url: string): string {
+  const token = getAccessToken();
+  return token ? `${url}&access_token=${encodeURIComponent(token)}` : url;
+}
+
 export function getDownloadUrl(path: string): string {
-  return apiUrlWithParams("/api/download", { path });
+  return appendTokenQuery(apiUrlWithParams("/api/download", { path }));
 }
 
 export interface RevealResponse {
@@ -114,8 +145,24 @@ export async function revealInFolder(path: string): Promise<RevealResponse> {
   );
 }
 
+export async function submitApproval(
+  threadId: string,
+  decisions: ApprovalDecisionPayload[]
+): Promise<ApprovalResponse> {
+  return requestJson<ApprovalResponse>(
+    apiUrl(`/api/task/${encodeURIComponent(threadId)}/approval`),
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ decisions })
+    }
+  );
+}
+
 // 应用内预览：/api/files/content 以 inline 方式返回文件内容，
 // Markdown 可 fetch 成文本渲染，PDF 与图片可直接进 iframe/img
 export function getFileContentUrl(path: string): string {
-  return apiUrlWithParams("/api/files/content", { path });
+  return appendTokenQuery(apiUrlWithParams("/api/files/content", { path }));
 }

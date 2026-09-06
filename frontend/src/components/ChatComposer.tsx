@@ -1,18 +1,23 @@
 import {
+  DownOutlined,
   PaperClipOutlined,
   PlusOutlined,
+  SafetyCertificateOutlined,
   SendOutlined,
   StopOutlined
 } from "@ant-design/icons";
-import { App as AntApp, Button, Tooltip, Upload } from "antd";
+import { App as AntApp, Button, Dropdown, Tooltip, Upload } from "antd";
 import type { UploadFile } from "antd";
 import { UPLOAD_ALLOWED_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from "../lib/constants";
+import { APPROVAL_MODE_OPTIONS, type ApprovalMode } from "../lib/approvalMode";
 import type { UploadedItem } from "../types";
 
 interface ChatComposerProps {
+  approvalMode: ApprovalMode;
   isCancelling: boolean;
   isRunning: boolean;
   isUploading: boolean;
+  onApprovalModeChange: (mode: ApprovalMode) => void;
   onNewSession: () => void;
   onCancel: () => void;
   onQueryChange: (value: string) => void;
@@ -49,9 +54,11 @@ function uniqueUploadedItems(items: UploadedItem[]): UploadedItem[] {
 }
 
 export function ChatComposer({
+  approvalMode,
   isCancelling,
   isRunning,
   isUploading,
+  onApprovalModeChange,
   onCancel,
   onNewSession,
   onQueryChange,
@@ -65,6 +72,9 @@ export function ChatComposer({
   const { message } = AntApp.useApp();
   const hasStagedFiles = stagedItems.length > 0;
   const canSubmit = query.trim().length > 0;
+  const currentMode =
+    APPROVAL_MODE_OPTIONS.find((option) => option.value === approvalMode) ??
+    APPROVAL_MODE_OPTIONS[1];
 
   // 前端先拦一层类型与大小（与后端 /api/upload 校验一致），
   // LIST_IGNORE 让违规文件不进入 fileList，直接无声过滤
@@ -176,6 +186,43 @@ export function ChatComposer({
                 />
               </Tooltip>
             </Upload>
+
+            <Dropdown
+              menu={{
+                items: APPROVAL_MODE_OPTIONS.map((option) => ({
+                  key: option.value,
+                  label: (
+                    <div className="approval-mode-option">
+                      <span className="approval-mode-option-label">{option.label}</span>
+                      <span className="approval-mode-option-desc">{option.description}</span>
+                    </div>
+                  )
+                })),
+                onClick: ({ key }) => {
+                  const mode = APPROVAL_MODE_OPTIONS.find(
+                    (option) => option.value === key
+                  );
+                  if (mode) {
+                    onApprovalModeChange(mode.value);
+                    message.info(`审批档位已切换为「${mode.label}」，对下一个任务生效`);
+                  }
+                },
+                selectable: true,
+                selectedKeys: [approvalMode]
+              }}
+              placement="topLeft"
+              trigger={["click"]}
+            >
+              <Button
+                aria-label="选择审批档位"
+                className="approval-mode-button"
+                size="small"
+              >
+                <SafetyCertificateOutlined aria-hidden />
+                <span>审批·{currentMode.label}</span>
+                <DownOutlined className="approval-mode-caret" aria-hidden />
+              </Button>
+            </Dropdown>
           </div>
 
           <Tooltip title={isRunning ? "取消当前任务" : "发送任务"}>

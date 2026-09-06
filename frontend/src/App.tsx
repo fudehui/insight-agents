@@ -12,7 +12,7 @@ import {
   MessageOutlined,
   ToolOutlined
 } from "@ant-design/icons";
-import { Alert, App as AntApp, Button, Popconfirm } from "antd";
+import { Alert, App as AntApp, Button, Input, Modal, Popconfirm } from "antd";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChatComposer } from "./components/ChatComposer";
 import { ChatScrollIndicator } from "./components/ChatScrollIndicator";
@@ -21,9 +21,16 @@ import { ConversationThread } from "./components/ConversationThread";
 import type { ChatTurn } from "./components/ConversationThread";
 import { API_BASE_URL, WS_BASE_URL } from "./lib/config";
 import { TERMINAL_EVENTS } from "./lib/constants";
+import { setAccessToken } from "./lib/auth";
+import {
+  getStoredApprovalMode,
+  storeApprovalMode,
+  type ApprovalMode
+} from "./lib/approvalMode";
 import { createThreadId } from "./lib/thread";
 import { useDeepAgentSession } from "./hooks/useDeepAgentSession";
 import type {
+  ApprovalDecisionPayload,
   ConnectionState,
   MonitorMessage,
   OutputFile,
@@ -211,6 +218,12 @@ export default function App() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [stagedItems, setStagedItems] = useState<UploadedItem[]>([]);
   const [turns, setTurns] = useState<ChatTurn[]>([]);
+  // 访问令牌补录弹窗的输入值
+  const [authInput, setAuthInput] = useState("");
+  // 审批档位：存 localStorage，随任务提交传给后端，对下一个任务生效
+  const [approvalMode, setApprovalMode] = useState<ApprovalMode>(
+    getStoredApprovalMode
+  );
   const streamRef = useRef<HTMLElement | null>(null);
   const session = useDeepAgentSession();
   // 当前"进行中"轮次的 id，以及已并入 turns 的事件数（增量同步游标）
@@ -259,7 +272,6 @@ export default function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session.historyVersion]);
-
   // 实时同步：只把新产生的事件增量追加到"进行中"的那一轮。
   // 没有进行中的轮次（例如刚回放完历史）时绝不改动 turns，
   // 避免把整段 session.events 灌进最后一轮（刷新后对话全量重复的根因）
@@ -310,7 +322,9 @@ export default function App() {
         isRunning: session.isRunning,
         result: session.result,
         // 流式增量先行展示，task_result 权威结果到达后覆盖
-        streamingAnswer: session.streamingText
+        streamingAnswer: session.streamingText,
+        // 审批暂停时展示待审动作卡片，决策提交后由 approval_resumed 清除
+        pendingApproval: session.pendingApproval
       };
       // 文件轮询等触发源会在没有新事件时反复进入本 effect：内容没有实际
       // 变化时直接返回旧引用，避免 6 秒一次的轮询引发整棵对话树重渲染
@@ -320,7 +334,8 @@ export default function App() {
         nextSources === null &&
         liveTurn.isRunning === session.isRunning &&
         liveTurn.result === session.result &&
-        (liveTurn.streamingAnswer ?? "") === session.streamingText
+        (liveTurn.streamingAnswer ?? "") === session.streamingText &&
+        (liveTurn.pendingApproval ?? null) === (session.pendingApproval ?? null)
       ) {
         return previous;
       }
@@ -331,7 +346,14 @@ export default function App() {
     // 终态事件到达后不再立即注销 liveId：task_files / task_sources 由后端在
     // 任务收尾（task_result 之后）补发，必须继续并入这一轮；liveId 会在
     // 下一轮任务提交或切换会话时被替换
-  }, [session.events, session.files, session.isRunning, session.result, session.streamingText]);
+  }, [
+    session.events,
+    session.files,
+    session.isRunning,
+    session.result,
+    session.streamingText,
+    session.pendingApproval
+  ]);
 
   // 无进行中任务时（如历史回放后），轮询刷新到的文件列表跟随到最后一轮展示；
   // 最后一轮已有自己的 task_files 清单时不要用全量列表覆盖，旧会话无该事件则保持原行为。
@@ -443,7 +465,7 @@ export default function App() {
     baselineFilesRef.current = new Set(session.files.map((file) => file.path));
 
     try {
-      await session.submitTask(cleanQuery);
+      await session.submitTask(cleanQuery, approvalMode);
       message.success("任务已启动，执行过程会显示在对话中");
     } catch (error) {
       // 启动失败时由这里直接写入错误信息，并结束该轮的实时同步
@@ -477,6 +499,34 @@ export default function App() {
   // 失败轮次的"重试"：以原问题新开一轮，不影响输入框当前内容
   function handleRetry(prompt: string) {
     void startTurn(prompt);
+  }
+
+  // 切换审批档位：持久化到 localStorage；进行中的任务不受影响，
+  // 档位随下次任务提交传给后端
+  function handleApprovalModeChange(mode: ApprovalMode) {
+    setApprovalMode(mode);
+    storeApprovalMode(mode);
+  }
+
+  // 提交审批决策：批准/拒绝后任务恢复执行，运行态由后端事件权威接管
+  async function handleSubmitApproval(decisions: ApprovalDecisionPayload[]) {
+    try {
+      await session.submitApproval(decisions);
+      message.success("审批决策已提交");
+    } catch (error) {
+      message.error(error instanceof Error ? error.message : "提交审批失败");
+    }
+  }
+
+  // 保存访问令牌后整页刷新：所有请求与 WebSocket 统一带上新令牌重连
+  function handleAuthSubmit() {
+    const token = authInput.trim();
+    if (!token) {
+      message.warning("请输入访问令牌");
+      return;
+    }
+    setAccessToken(token);
+    window.location.reload();
   }
 
   async function handleCancel() {
@@ -740,6 +790,7 @@ export default function App() {
             ref={streamRef}
           >
             <ConversationThread
+              onSubmitApproval={handleSubmitApproval}
               onRetry={handleRetry}
               onUseExample={setQuery}
               turns={turns}
@@ -755,9 +806,11 @@ export default function App() {
         </div>
 
         <ChatComposer
+          approvalMode={approvalMode}
           isCancelling={session.isCancelling}
           isRunning={session.isRunning}
           isUploading={session.isUploading}
+          onApprovalModeChange={handleApprovalModeChange}
           onCancel={handleCancel}
           onNewSession={handleNewSession}
           onQueryChange={setQuery}
@@ -769,6 +822,31 @@ export default function App() {
           uploadedItems={session.uploadedItems}
         />
       </main>
+
+      {session.authRequired ? (
+        <Modal
+          cancelButtonProps={{ style: { display: "none" } }}
+          closable={false}
+          keyboard={false}
+          maskClosable={false}
+          okText="保存并进入"
+          onOk={handleAuthSubmit}
+          open
+          title="需要访问令牌"
+        >
+          <p style={{ marginBottom: 12 }}>
+            后端已启用访问令牌校验。请输入服务端 `.env` 中 `APP_ACCESS_TOKEN`
+            配置的令牌，输入一次后保存在本浏览器，之后自动携带。
+          </p>
+          <Input.Password
+            aria-label="访问令牌"
+            onChange={(event) => setAuthInput(event.target.value)}
+            onPressEnter={handleAuthSubmit}
+            placeholder="访问令牌"
+            value={authInput}
+          />
+        </Modal>
+      ) : null}
     </div>
   );
 }

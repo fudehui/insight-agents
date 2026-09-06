@@ -9,8 +9,27 @@ export type MonitorEventName =
   | "task_files"
   | "task_sources"
   | "task_cancelled"
+  | "approval_required"
+  | "approval_resumed"
   | "error"
   | string;
+
+// 待审动作：高危工具调用的人工审批项（后端已把长参数截断）
+export interface ApprovalAction {
+  name: string;
+  args: Record<string, string> | null;
+  allowed_decisions: string[];
+}
+
+// 审批决策：第 i 个决策作用于第 i 个待审动作
+export interface ApprovalDecisionPayload {
+  type: "approve" | "reject";
+}
+
+export interface ApprovalResponse {
+  status: "resumed" | string;
+  thread_id: string;
+}
 
 export interface MonitorMessage {
   type: "monitor_event";

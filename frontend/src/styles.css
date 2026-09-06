@@ -1702,3 +1702,133 @@ textarea {
   max-height: calc(100dvh - 160px);
   overflow-y: auto;
 }
+
+/* ==== 人工审批卡片 ==== */
+
+.approval-card {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border: 1px solid rgba(180, 83, 9, 0.35);
+  border-radius: 10px;
+  background: rgba(251, 191, 36, 0.08);
+}
+
+.approval-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--amber);
+  font-size: 13px;
+}
+
+.approval-card-head strong {
+  font-size: 14px;
+}
+
+.approval-card-head span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.approval-action-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.approval-action {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.approval-action-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.approval-action-copy strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.approval-action-copy pre {
+  margin: 0;
+  padding: 8px 10px;
+  max-height: 132px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #f8fafc;
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--muted);
+}
+
+.approval-action .ant-segmented {
+  flex-shrink: 0;
+}
+
+.approval-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ==== 审批档位选择器 ==== */
+
+.approval-mode-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #ffffff;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.approval-mode-button:hover {
+  border-color: var(--line-strong);
+  color: var(--cyan);
+}
+
+.approval-mode-caret {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+.approval-mode-option {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 216px;
+  padding: 3px 0;
+}
+
+.approval-mode-option-label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.approval-mode-option-desc {
+  /* 解释文案刻意比主文字淡一档、小一号，视觉上从属于档位名 */
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+}

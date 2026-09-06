@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  ApiError,
   cancelTask,
   deleteSession,
   getSessionEvents,
   listSessionFiles,
   listSessions,
   startTask,
+  submitApproval,
   uploadSessionFiles
 } from "../lib/api";
+import { getAccessToken } from "../lib/auth";
 import {
   HEARTBEAT_INTERVAL_MS,
   HEARTBEAT_TIMEOUT_MS,
@@ -22,6 +25,8 @@ import {
 import { WS_BASE_URL } from "../lib/config";
 import { createThreadId, getStoredThreadId, storeThreadId } from "../lib/thread";
 import type {
+  ApprovalAction,
+  ApprovalDecisionPayload,
   ConnectionState,
   MonitorMessage,
   OutputFile,
@@ -29,6 +34,7 @@ import type {
   SocketMessage,
   UploadedItem
 } from "../types";
+
 
 function extractString(data: Record<string, unknown>, key: string): string | null {
   const value = data[key];
@@ -42,6 +48,11 @@ function eventFingerprint(event: MonitorMessage): string {
 
 function seqOf(event: MonitorMessage): number | null {
   return typeof event.seq === "number" ? event.seq : null;
+}
+
+// REST 返回 401 说明后端启用了访问令牌校验，且当前令牌缺失或已失效
+function isAuthError(error: unknown): boolean {
+  return error instanceof ApiError && error.status === 401;
 }
 
 export function useDeepAgentSession() {
@@ -64,6 +75,12 @@ export function useDeepAgentSession() {
   // 流式回答增量走独立状态而不进 events 数组：高频 delta 会把 MAX_EVENTS
   // 滑窗里的关键事件（tool_start / task_files / task_sources）挤出去
   const [streamingText, setStreamingText] = useState("");
+  // 待审动作：任务命中高危工具后暂停，等待用户批准/拒绝
+  const [pendingApproval, setPendingApproval] = useState<ApprovalAction[] | null>(
+    null
+  );
+  // 后端启用了访问令牌校验且当前令牌缺失或失效：App 层据此弹窗补录
+  const [authRequired, setAuthRequired] = useState(false);
   const [lastError, setLastError] = useState("");
   const [isRunning, setIsRunning] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
@@ -93,6 +110,7 @@ export function useDeepAgentSession() {
     setSessionPath("");
     setResult("");
     setStreamingText("");
+    setPendingApproval(null);
     setLastError("");
     setUploadedItems([]);
     uploadedNameSetRef.current.clear();
@@ -112,6 +130,10 @@ export function useDeepAgentSession() {
       const response = await listSessions();
       setSessions(response.sessions || []);
     } catch (error) {
+      if (isAuthError(error)) {
+        setAuthRequired(true);
+        return;
+      }
       // 会话列表是次要信息，失败不阻断主流程，但要留下可见痕迹；
       // WebSocket 连上时会清除 lastError，后端恢复后提示自动消失
       setLastError(
@@ -179,13 +201,36 @@ export function useDeepAgentSession() {
       if (sessionPathFromHistory) {
         setSessionPath(sessionPathFromHistory);
       }
-      // 末轮未结束时不能把历史里上一轮的 task_result 填给进行中的轮次，
-      // 否则刷新后"研究中"的轮次会显示上一轮的旧回答；空结果让加载动画接管
-      setResult(isUnfinished ? "" : resultFromHistory);
-      setIsRunning(isUnfinished);
+      // 末轮停在"等待确认"：任务命中了审批拦截，恢复待审卡片而非"研究中"；
+      // 否则按"末尾无终态 = 仍在执行"恢复运行态
+      if (
+        lastMeaningfulEvent &&
+        lastMeaningfulEvent.event === "approval_required"
+      ) {
+        const replayedActions = Array.isArray(lastMeaningfulEvent.data.actions)
+          ? (lastMeaningfulEvent.data.actions as ApprovalAction[])
+          : null;
+        setPendingApproval(
+          replayedActions && replayedActions.length > 0 ? replayedActions : null
+        );
+        // 末轮未结束不能把历史里上一轮的 task_result 填给进行中的轮次，
+        // 否则刷新后待审批的轮次会显示上一轮的旧回答
+        setResult("");
+        setIsRunning(false);
+      } else {
+        setPendingApproval(null);
+        // 末轮未结束时不能把历史里上一轮的 task_result 填给进行中的轮次，
+        // 否则刷新后"研究中"的轮次会显示上一轮的旧回答；空结果让加载动画接管
+        setResult(isUnfinished ? "" : resultFromHistory);
+        setIsRunning(isUnfinished);
+      }
       setIsCancelling(false);
       setHistoryVersion((version) => version + 1);
     } catch (error) {
+      if (isAuthError(error)) {
+        setAuthRequired(true);
+        return;
+      }
       setLastError(
         error instanceof Error ? `会话历史加载失败: ${error.message}` : "会话历史加载失败"
       );
@@ -204,6 +249,7 @@ export function useDeepAgentSession() {
       setSessionPath("");
       setResult("");
       setStreamingText("");
+      setPendingApproval(null);
       setLastError("");
       setUploadedItems([]);
       uploadedNameSetRef.current.clear();
@@ -260,8 +306,34 @@ export function useDeepAgentSession() {
       socketRef.current?.close();
       setConnectionState(hadSocket ? "reconnecting" : "connecting");
 
-      const socket = new WebSocket(`${WS_BASE_URL}/ws/${encodeURIComponent(threadId)}`);
+      // 配置了访问令牌时拼进查询参数：浏览器 WebSocket API 带不了自定义请求头
+      const tokenQuery = getAccessToken()
+        ? `?access_token=${encodeURIComponent(getAccessToken())}`
+        : "";
+      const socket = new WebSocket(
+        `${WS_BASE_URL}/ws/${encodeURIComponent(threadId)}${tokenQuery}`
+      );
       socketRef.current = socket;
+
+      // 半开连接的主动重连：不再依赖 onclose 回调（半开状态下它可能
+      // 永远不触发，界面会停留在"已连接"却收不到任何事件）。
+      // 多次调用以最后一次为准（clearSocketTimers 先清旧定时器）
+      const forceReconnect = () => {
+        if (disposed) {
+          setConnectionState("closed");
+          return;
+        }
+        clearSocketTimers();
+        setConnectionState("reconnecting");
+        const delay =
+          Math.min(
+            RECONNECT_MAX_MS,
+            RECONNECT_BASE_MS * 2 ** reconnectAttemptsRef.current
+          ) *
+          (0.75 + Math.random() * 0.5);
+        reconnectAttemptsRef.current += 1;
+        reconnectTimerRef.current = window.setTimeout(connect, delay);
+      };
 
       socket.onopen = () => {
         if (disposed) {
@@ -283,12 +355,22 @@ export function useDeepAgentSession() {
             return;
           }
           // 半开连接检测：超过两个心跳周期没有收到任何服务端消息，
-          // 主动断开（触发 onclose 重连），避免永远显示"已连接"
+          // 主动断开并直接调度重连（不赌 onclose 一定触发）
           if (Date.now() - lastServerMessageAtRef.current > HEARTBEAT_TIMEOUT_MS) {
-            socket.close();
+            forceReconnect();
+            try {
+              socket.close();
+            } catch {
+              // socket 已不可用，重连定时器已就位
+            }
             return;
           }
-          socket.send("ping");
+          try {
+            socket.send("ping");
+          } catch {
+            // 发送失败说明连接已坏，立即走重连
+            forceReconnect();
+          }
         }, HEARTBEAT_INTERVAL_MS);
       };
 
@@ -342,10 +424,29 @@ export function useDeepAgentSession() {
             }
           }
 
+          // 命中人工审批：任务暂停，展示审批卡片等待用户决策
+          if (payload.event === "approval_required") {
+            const actions = Array.isArray(payload.data.actions)
+              ? (payload.data.actions as ApprovalAction[])
+              : null;
+            setPendingApproval(
+              actions && actions.length > 0 ? actions : null
+            );
+            setIsRunning(false);
+            setIsCancelling(false);
+          }
+
+          // 决策已提交，恢复执行的运行态由后端事件权威置位
+          if (payload.event === "approval_resumed") {
+            setPendingApproval(null);
+            setIsRunning(true);
+          }
+
           if (payload.event === "task_result") {
             const finalResult = extractString(payload.data, "result");
             setResult(finalResult || payload.message);
             setStreamingText("");
+            setPendingApproval(null);
             setIsRunning(false);
             setIsCancelling(false);
             // 任务结束后会话摘要（标题/时间/文件数）已变化，刷新侧边栏列表
@@ -355,6 +456,7 @@ export function useDeepAgentSession() {
           if (payload.event === "task_cancelled") {
             setResult((previous) => previous || payload.message);
             setStreamingText("");
+            setPendingApproval(null);
             setIsRunning(false);
             setIsCancelling(false);
           }
@@ -362,6 +464,7 @@ export function useDeepAgentSession() {
           if (payload.event === "error") {
             setLastError(payload.message);
             setStreamingText("");
+            setPendingApproval(null);
             setIsRunning(false);
             setIsCancelling(false);
           }
@@ -380,22 +483,7 @@ export function useDeepAgentSession() {
         if (socketRef.current !== socket) {
           return;
         }
-        clearSocketTimers();
-        if (disposed) {
-          setConnectionState("closed");
-          return;
-        }
-        setConnectionState("reconnecting");
-        // 指数退避 + 随机抖动：后端宕机时不再以固定 2 秒无限打点，
-        // 恢复后最多等一个周期即可重连
-        const delay =
-          Math.min(
-            RECONNECT_MAX_MS,
-            RECONNECT_BASE_MS * 2 ** reconnectAttemptsRef.current
-          ) *
-          (0.75 + Math.random() * 0.5);
-        reconnectAttemptsRef.current += 1;
-        reconnectTimerRef.current = window.setTimeout(connect, delay);
+        forceReconnect();
       };
     }
 
@@ -409,25 +497,33 @@ export function useDeepAgentSession() {
   }, [clearSocketTimers, loadSessionHistory, refreshSessions, threadId]);
 
   useEffect(() => {
-    if (!sessionPath) {
+    if (!sessionPath || authRequired) {
       return;
     }
 
     refreshFiles().catch((error: unknown) => {
+      if (isAuthError(error)) {
+        setAuthRequired(true);
+        return;
+      }
       setLastError(error instanceof Error ? error.message : "文件列表刷新失败");
     });
 
     const timer = window.setInterval(() => {
       refreshFiles().catch((error: unknown) => {
+        if (isAuthError(error)) {
+          setAuthRequired(true);
+          return;
+        }
         setLastError(error instanceof Error ? error.message : "文件列表刷新失败");
       });
     }, isRunning ? POLL_ACTIVE_MS : POLL_IDLE_MS);
 
     return () => window.clearInterval(timer);
-  }, [isRunning, refreshFiles, sessionPath]);
+  }, [authRequired, isRunning, refreshFiles, sessionPath]);
 
   const submitTask = useCallback(
-    async (query: string) => {
+    async (query: string, approvalMode?: string) => {
       const cleanQuery = query.trim();
       if (!cleanQuery) {
         throw new Error("请输入研究任务");
@@ -438,9 +534,10 @@ export function useDeepAgentSession() {
       setEvents([]);
       setResult("");
       setStreamingText("");
+      setPendingApproval(null);
       setLastError("");
       try {
-        const response = await startTask(cleanQuery, threadId);
+        const response = await startTask(cleanQuery, threadId, approvalMode);
         if (response.thread_id && response.thread_id !== threadId) {
           storeThreadId(response.thread_id);
           setThreadId(response.thread_id);
@@ -475,6 +572,25 @@ export function useDeepAgentSession() {
       throw error;
     }
   }, [isRunning, threadId]);
+
+  // 提交审批决策并恢复任务：成功后先乐观清卡置运行态，
+  // 权威状态由 WS 的 approval_resumed / 终态事件接管
+  const submitApprovalDecisions = useCallback(
+    async (decisions: ApprovalDecisionPayload[]) => {
+      try {
+        const response = await submitApproval(threadId, decisions);
+        setPendingApproval(null);
+        setIsRunning(true);
+        return response;
+      } catch (error) {
+        if (isAuthError(error)) {
+          setAuthRequired(true);
+        }
+        throw error;
+      }
+    },
+    [threadId]
+  );
 
   const uploadFiles = useCallback(
     async (items: UploadedItem[]) => {
@@ -533,6 +649,7 @@ export function useDeepAgentSession() {
 
   // 只暴露 App 实际消费的状态：sessionPath / 去重游标等内部状态不再外泄
   return {
+    authRequired,
     cancelCurrentTask,
     connectionState,
     events,
@@ -542,12 +659,14 @@ export function useDeepAgentSession() {
     isRunning,
     isUploading,
     lastError,
+    pendingApproval,
     removeSession,
     resetSession,
     result,
     sessions,
     stats,
     streamingText,
+    submitApproval: submitApprovalDecisions,
     submitTask,
     switchSession,
     threadId,
