@@ -9,6 +9,7 @@ import asyncio
 import builtins
 import datetime
 import json
+import threading
 from pathlib import Path
 from typing import Any, Optional
 
@@ -20,6 +21,13 @@ from app.api.context import get_thread_context
 _project_root = Path(__file__).resolve().parents[1]
 _output_dir = _project_root / "output"
 _EVENTS_FILENAME = "events.jsonl"
+
+# 事件序号：每个 thread 单调递增，随事件落盘与 WebSocket 一起下发。
+# 前端据此对"断线重连后回放的历史事件"与"实时事件"去重，避免同一条事件被并入两次。
+# 进程内首次遇到某 thread 时按 events.jsonl 现有行数初始化，
+# 保证后端重启后新事件的序号仍大于重启前已落盘事件的序号。
+_seq_lock = threading.Lock()
+_seq_counters: dict[str, int] = {}
 
 
 class ToolMonitor:
@@ -47,6 +55,8 @@ class ToolMonitor:
         event_type: str,
         message: str,
         data: Optional[dict[str, Any]] = None,
+        persist: bool = True,
+        console: bool = True,
     ) -> None:
         """
         构造统一监控事件，并尝试推送到当前 thread_id 对应的前端连接
@@ -54,6 +64,10 @@ class ToolMonitor:
         :param event_type: 事件类型，例如 tool_start、assistant_call
         :param message: 面向前端展示的事件说明
         :param data: 附加结构化数据
+        :param persist: 是否落盘 events.jsonl。流式增量（task_delta）只走
+            WebSocket 不落盘——回放恢复靠完整的 task_result，落盘 delta 只会
+            把事件文件撑大数倍
+        :param console: 是否输出控制台日志。高频事件（如流式增量）跳过，避免刷屏
         """
         payload = {
             "type": "monitor_event",
@@ -62,6 +76,16 @@ class ToolMonitor:
             "data": data or {},
             "timestamp": datetime.datetime.now().isoformat(),
         }
+
+        # 只落盘的事件才分配序号：序号必须与 events.jsonl 的行一一对应，
+        # 否则重启后按行数初始化的基数会与历史序号错位
+        if persist:
+            try:
+                thread_id = get_thread_context()
+                if thread_id:
+                    payload["seq"] = self._next_seq(thread_id)
+            except Exception as e:
+                print(f"[Monitor] 分配事件序号失败: {e}")
 
         if self.websocket_manager:
             try:
@@ -75,17 +99,18 @@ class ToolMonitor:
 
         # 事件落盘：追加到 output/session_{thread_id}/events.jsonl，
         # 前端重启后通过回放接口恢复历史对话；会话目录由 run_deep_agent 先行创建
-        try:
-            persist_thread_id = get_thread_context()
-            if persist_thread_id:
-                events_file = (
-                    _output_dir / f"session_{persist_thread_id}" / _EVENTS_FILENAME
-                )
-                if events_file.parent.exists():
-                    with events_file.open("a", encoding="utf-8") as f:
-                        f.write(json.dumps(payload, ensure_ascii=False) + "\n")
-        except Exception as e:
-            print(f"[Monitor] events.jsonl 写入失败: {e}")
+        if persist:
+            try:
+                persist_thread_id = get_thread_context()
+                if persist_thread_id:
+                    events_file = (
+                        _output_dir / f"session_{persist_thread_id}" / _EVENTS_FILENAME
+                    )
+                    if events_file.parent.exists():
+                        with events_file.open("a", encoding="utf-8") as f:
+                            f.write(json.dumps(payload, ensure_ascii=False) + "\n")
+            except Exception as e:
+                print(f"[Monitor] events.jsonl 写入失败: {e}")
 
         # DeepAgents 脚本调试时，如果运行时暴露了 stream_writer，也同步写入流式输出
         if hasattr(builtins, "runtime") and hasattr(builtins.runtime, "stream_writer"):
@@ -95,7 +120,29 @@ class ToolMonitor:
                 pass
 
         # 控制台保底输出，便于无前端场景下观察执行过程
-        print(f"\n[Monitor:{event_type}] {message}")
+        if console:
+            print(f"\n[Monitor:{event_type}] {message}")
+
+    def _next_seq(self, thread_id: str) -> int:
+        """
+        取得指定会话的下一个事件序号
+
+        首次遇到该 thread 时以 events.jsonl 现有行数为基数，覆盖"后端重启后
+        继续向旧会话追加事件"的场景：新序号必须大于重启前任何已落盘序号
+        """
+        with _seq_lock:
+            if thread_id not in _seq_counters:
+                base = 0
+                events_file = _output_dir / f"session_{thread_id}" / _EVENTS_FILENAME
+                if events_file.exists():
+                    try:
+                        with events_file.open("rb") as f:
+                            base = sum(1 for _ in f)
+                    except OSError:
+                        base = 0
+                _seq_counters[thread_id] = base
+            _seq_counters[thread_id] += 1
+            return _seq_counters[thread_id]
 
     def _send_to_websocket(
         self,
@@ -210,6 +257,21 @@ class ToolMonitor:
     def report_task_result(self, result: str) -> None:
         """报告任务最终结果"""
         self._emit("task_result", "任务执行完成", {"result": result})
+
+    def report_task_delta(self, delta: str) -> None:
+        """
+        报告一段流式生成的回答增量文本
+
+        只推 WebSocket、不落盘、不打印控制台：回放恢复靠完整 task_result，
+        delta 落盘只会把事件文件撑大数倍；高频调用也不应刷屏
+        """
+        self._emit(
+            "task_delta",
+            "回答生成中",
+            {"delta": delta},
+            persist=False,
+            console=False,
+        )
 
     def report_task_cancelled(self) -> None:
         """报告任务已被用户取消"""

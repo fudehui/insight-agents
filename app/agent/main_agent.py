@@ -9,10 +9,12 @@ session_id 创建独立工作目录，并把工具调用、子智能体调用和
 import asyncio
 import os
 import shutil
+import time
 from pathlib import Path
 
 import aiosqlite
 from deepagents import create_deep_agent
+from langchain_core.messages import AIMessageChunk
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 from langgraph.errors import GraphRecursionError
 
@@ -21,14 +23,18 @@ from app.agent.prompts import main_agent_content
 from app.agent.subagents.database_query_agent import database_query_agent
 from app.agent.subagents.knowledge_base_agent import knowledge_base_agent
 from app.agent.subagents.network_search_agent import network_search_agent
-from app.api.budget import reset_task_budget
+from app.api.budget import cleanup_task_budget, reset_task_budget
 from app.api.context import (
     reset_session_context,
     set_session_context,
     set_thread_context,
 )
 from app.api.monitor import monitor
-from app.api.source_registry import get_task_sources, reset_task_sources
+from app.api.source_registry import (
+    cleanup_task_sources,
+    get_task_sources,
+    reset_task_sources,
+)
 from app.agent.usage_callback import TokenUsageCallbackHandler
 
 # 文件类工具由主智能体直接掌握，负责读取上传附件和生成最终交付文档
@@ -76,6 +82,7 @@ async def get_main_agent():
                     ],
                 )
     return _main_agent
+
 
 # 整图最大执行步数（模型/工具轮次），是防止无限循环的最后保险。
 # 默认 80：多助手调度 + 长报告生成的正常任务约需 30-50 步，80 留足余量；
@@ -214,12 +221,47 @@ async def run_deep_agent(task_query, session_id):
     try:
         # 首次执行时在当前事件循环内组装主智能体（含异步 checkpoint 连接）
         main_agent = await get_main_agent()
-        # astream 会持续产出模型节点、工具节点和子智能体节点的状态片段
-        async for chunk in main_agent.astream(
+
+        # 流式增量合帧缓冲：攒够约 150ms 的文本再推一次，避免逐 token
+        # 高频事件拖垮 WebSocket 与前端渲染
+        delta_buffer: list[str] = []
+        last_delta_flush = time.perf_counter()
+
+        def flush_delta() -> None:
+            nonlocal last_delta_flush
+            if delta_buffer:
+                monitor.report_task_delta("".join(delta_buffer))
+                delta_buffer.clear()
+                last_delta_flush = time.perf_counter()
+
+        # 双通道流式：updates 提供节点级状态（子智能体调用、最终结果），
+        # messages 提供主模型 token 级增量，支撑前端"边生成边显示"。
+        # 探针验证（deepagents 0.5.7）：主图 model 节点增量的 checkpoint_ns
+        # 形如 "model:<uuid>"；子智能体内部 token 不会冒泡到顶层流，天然隔离
+        async for mode, chunk in main_agent.astream(
             {"messages": [{"role": "user", "content": task_query + path_instruction}]},
             config=config,
+            stream_mode=["updates", "messages"],
         ):
-            # chunk 形如 {"model": {"messages": [...]}}，这里主要关心模型最新消息
+            if mode == "messages":
+                msg, meta = chunk
+                checkpoint_ns = str(meta.get("checkpoint_ns") or "")
+                # 只转发主图 model 节点的纯文本增量；嵌套子图（含 task: 前缀或
+                # 多级命名空间）与工具调用片段一律跳过
+                if (
+                    meta.get("langgraph_node") == "model"
+                    and "task:" not in checkpoint_ns
+                    and "|" not in checkpoint_ns
+                ):
+                    if isinstance(msg, AIMessageChunk) and not msg.tool_call_chunks:
+                        text = msg.content if isinstance(msg.content, str) else ""
+                        if text:
+                            delta_buffer.append(text)
+                            if time.perf_counter() - last_delta_flush >= 0.15:
+                                flush_delta()
+                continue
+
+            # updates 通道：chunk 形如 {"model": {"messages": [...]}}，关心模型最新消息
             for node_name, state in chunk.items():
                 if not state or "messages" not in state:
                     continue
@@ -243,11 +285,15 @@ async def run_deep_agent(task_query, session_id):
                                         },
                                     )
                         elif last_msg.content:
+                            # 先把尚未推送的流式增量补齐，再发权威的完整结果
+                            flush_delta()
                             # 模型没有继续调用工具时，最新文本内容就是本轮可反馈给前端的结果
                             print(
                                 f"主智能体执行结果，最终结果：{last_msg.content[:100]}"
                             )
                             monitor.report_task_result(last_msg.content)
+        # 图执行正常收尾后兜底补发残余增量（正常情况下已在 task_result 前清空）
+        flush_delta()
 
     except asyncio.CancelledError:
         monitor.report_task_cancelled()
@@ -281,6 +327,10 @@ async def run_deep_agent(task_query, session_id):
                 monitor.report_task_sources(task_sources)
         except Exception as e:
             print(f"[MainAgent] 任务来源清单推送失败: {e}")
+        # 任务收尾清理进程内的预算与来源登记：两者只在任务启动时重置，
+        # 不删除会让条目随任务次数线性增长。必须在 sources 推送之后执行
+        cleanup_task_budget(session_id)
+        cleanup_task_sources(session_id)
         # 任务结束后恢复 ContextVar，避免后续请求复用到本次会话目录或 thread_id
         reset_session_context(session_dir_token, session_id_token)
 

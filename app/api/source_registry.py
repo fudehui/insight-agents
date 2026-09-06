@@ -45,6 +45,17 @@ def reset_task_sources(thread_id: str) -> None:
         }
 
 
+def cleanup_task_sources(thread_id: str) -> None:
+    """
+    任务结束后删除该会话的来源登记
+
+    与 budget 清理同理：只重置不删除会让条目随任务次数线性增长，
+    删除会话后也会残留孤儿数据
+    """
+    with _lock:
+        _task_sources.pop(thread_id, None)
+
+
 def register_web_sources(items: list) -> None:
     """
     登记网络来源（标题 + URL），按 URL 去重

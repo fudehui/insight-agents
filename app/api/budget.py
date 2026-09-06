@@ -12,7 +12,7 @@ import hashlib
 import json
 import os
 import threading
-from typing import Any, Callable, Optional, Tuple
+from typing import Any, Optional, Tuple
 
 from app.api.context import get_thread_context
 
@@ -65,6 +65,17 @@ def reset_task_budget(thread_id: str) -> None:
         _task_budgets[thread_id] = {"counters": {}, "seen": set()}
 
 
+def cleanup_task_budget(thread_id: str) -> None:
+    """
+    任务结束后删除该会话的预算状态
+
+    只在任务启动时重置会让条目只增不减：长期运行（尤其是删除会话后），
+    进程内会积累大量孤儿 thread 的计数与去重指纹
+    """
+    with _lock:
+        _task_budgets.pop(thread_id, None)
+
+
 def _fingerprint(tool_name: str, args: Optional[dict]) -> str:
     """
     生成一次调用的去重指纹：工具名 + 规范化参数
@@ -94,9 +105,7 @@ def consume_tool_quota(tool_name: str, args: Optional[dict]) -> Tuple[bool, str]
     fingerprint = _fingerprint(tool_name, args)
 
     with _lock:
-        budget = _task_budgets.setdefault(
-            thread_id, {"counters": {}, "seen": set()}
-        )
+        budget = _task_budgets.setdefault(thread_id, {"counters": {}, "seen": set()})
 
         if fingerprint in budget["seen"]:
             return False, (
