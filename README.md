@@ -162,7 +162,12 @@ insight-agents/
 ├── docs/knowledge_base/            # RAGFlow 知识库示例 PDF
 ├── examples/                       # DeepAgents 框架能力验证脚本
 ├── frontend/                       # React + Vite 前端项目
+│   ├── Dockerfile                  # 前端镜像：Vite 构建产物由 nginx 托管
+│   └── nginx.conf                  # nginx 同源反代 /api 与 /ws
 ├── tests/                          # 测试目录
+├── Dockerfile                      # 后端镜像：uv 按 uv.lock 安装依赖
+├── docker-compose.yml              # 双容器编排：nginx 前端 + FastAPI 后端
+├── .dockerignore                   # Docker 构建上下文排除清单
 ├── .env.example                    # 环境变量示例
 ├── pyproject.toml                  # Python 项目依赖声明
 ├── requirements.txt                # 依赖清单
