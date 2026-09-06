@@ -75,16 +75,23 @@
 - **长任务执行过程可观察、可回放**
   - 工具调用、子智能体调用、Token 消耗、预算超限、工作目录创建、任务结果、取消和异常都会通过 `monitor` 推送到前端。
   - 每次任务的事件实时落盘到 `events.jsonl`，重启后可按会话回放恢复完整对话。
+- **最终回答流式输出**
+  - 主模型生成的回答以增量文本实时推送到前端，长报告边生成边显示；权威完整结果随 `task_result` 到达后覆盖，流式增量不落盘，回放仍以完整结果恢复。
+- **连接健壮性**
+  - WebSocket 断线按指数退避 + 随机抖动自动重连；心跳超时主动断开半开连接；重连成功后自动回放会话事件对账，断线窗口内丢失的事件按事件序号去重补齐。
+- **应用内预览与回答交互**
+  - 产物卡片支持应用内预览（Markdown 渲染 / PDF / 图片内联展示）、一键下载、在文件管理器中定位；最终回答一键复制，失败的任务可一键重试。
 - **会话记忆持久化，重启不丢上下文**
   - 对话检查点通过 `AsyncSqliteSaver` 落盘到 `app/data/checkpoints.db`，同一会话多次提问共享上下文，后端重启（含 `--reload` 改码触发）后追问仍记得前文。
   - 删除会话时会同步清理对应 checkpoint，避免复用同一 `thread_id` 时旧上下文"复活"。
 - **上下文与安全防护**
   - 大文件分段读取：`read_file_content` 单次最多返回约 3 万字符（`FILE_READ_MAX_CHARS` 可调），超限截断并附续读提示，模型可用 `offset` 参数分段读取。
   - SQL 表名白名单：`get_table_data` 先对 `sqlite_master` 做参数化校验再以引号包裹执行，并统一走只读连接，防提示词注入拼接危险 SQL。
+  - 上传双重校验：前后端一致的类型白名单（md/txt/docx/pdf/xlsx/xls/csv）、单文件 50MB、单次 10 个，超限请求直接拒绝并清理半成品文件。
 - **会话级上下文隔离**
   - 通过 `thread_id` 和 `session_dir` 区分不同任务，`ContextVar` 让深层工具也能拿到当前会话身份和文件目录。
 - **从检索到交付的完整链路**
-  - 真实调用工具、读取数据、生成 Markdown，并转换成 PDF；支持文件上传、产物列表、下载和在系统文件管理器中直接定位。
+  - 真实调用工具、读取数据、生成 Markdown，并转换成 PDF；支持文件上传、产物列表、应用内预览、下载和在系统文件管理器中直接定位。
 
 ## 🏗️ 系统架构
 
@@ -267,11 +274,13 @@ uv run uvicorn app.api.server:app --host 127.0.0.1 --port 8000 --reload
 | `POST /api/upload`                     | 上传一个或多个文件到当前会话           |
 | `GET /api/files`                       | 列出当前会话输出目录中的生成文件       |
 | `GET /api/download`                    | 下载输出目录中的文件                   |
+| `GET /api/files/content`               | 内联返回文件内容，供前端应用内预览     |
 | `POST /api/files/reveal`               | 在系统文件管理器中打开并选中产物文件   |
 | `GET /api/sessions`                    | 列出历史会话（标题、时间、文件数）     |
 | `GET /api/sessions/{thread_id}/events` | 回放指定会话的历史事件，前端据此恢复对话 |
 | `DELETE /api/sessions/{thread_id}`     | 删除指定历史会话及其事件与产物         |
-| `WebSocket /ws/{thread_id}`            | 推送工具调用、助手调用、结果和异常事件 |
+| `GET /api/health`                      | 存活探针（Docker 健康检查使用）        |
+| `WebSocket /ws/{thread_id}`            | 推送工具调用、助手调用、流式回答、结果和异常事件 |
 
 会话历史说明：每次任务的事件会实时落盘到 `app/output/session_{thread_id}/events.jsonl`。
 前端重启后侧边栏可看到历史会话列表，点击即可回放恢复完整对话；重连时服务端会自动补发
