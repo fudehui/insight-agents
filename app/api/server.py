@@ -33,7 +33,10 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from app.agent.main_agent import get_main_agent, run_deep_agent
+from app.api.budget import cleanup_task_budget
 from app.api.monitor import manager
+from app.api.source_registry import cleanup_task_sources
+
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
@@ -74,6 +77,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/api/health")
+async def health():
+    """
+    存活探针 (Health Check)。
+
+    只确认进程与路由可用，不触碰数据库与外部服务；Docker 编排的健康检查
+    用它替代原先借用的 /api/sessions，语义清晰且不受会话数量影响。
+    """
+    return {"status": "ok"}
 
 
 class TaskRequest(BaseModel):
@@ -183,6 +197,10 @@ async def delete_session(thread_id: str):
             # 记忆清理失败不阻断目录删除，但要在日志中可见
             print(f"[ERROR] 清理会话 checkpoint 失败: {e}")
 
+    # 进程内的预算与来源登记同步清理，避免删除会话后残留孤儿数据
+    cleanup_task_budget(thread_id)
+    cleanup_task_sources(thread_id)
+
     removed = False
     for base_dir in (output_dir, updated_dir):
         session_dir = (base_dir / f"session_{thread_id}").resolve()
@@ -196,6 +214,12 @@ async def delete_session(thread_id: str):
         raise HTTPException(status_code=404, detail="会话不存在")
 
     return {"status": "deleted", "thread_id": thread_id}
+
+
+# 上传限制：类型与 read_file_content 支持的格式对齐，大小/数量上限防磁盘占满
+_UPLOAD_ALLOWED_EXTENSIONS = {".md", ".txt", ".docx", ".pdf", ".xlsx", ".xls", ".csv"}
+_UPLOAD_MAX_FILE_SIZE = 50 * 1024 * 1024
+_UPLOAD_MAX_FILES = 10
 
 
 @app.post("/api/upload")
@@ -217,17 +241,53 @@ async def upload_files(files: List[UploadFile] = File(...), thread_id: str = For
     target_dir.mkdir(parents=True, exist_ok=True)
     target_dir_resolved = target_dir.resolve()
 
+    if len(files) > _UPLOAD_MAX_FILES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"单次最多上传 {_UPLOAD_MAX_FILES} 个文件",
+        )
+
     saved_files = []
     for file in files:
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="文件名不能为空")
+
+        # 扩展名白名单与 read_file_content 的解析能力对齐，
+        # 同时拦下可执行文件与脚本类内容进入会话目录
+        extension = Path(file.filename).suffix.lower()
+        if extension not in _UPLOAD_ALLOWED_EXTENSIONS:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"不支持的文件类型: {file.filename}"
+                    f"（允许：{'、'.join(sorted(_UPLOAD_ALLOWED_EXTENSIONS))}）"
+                ),
+            )
+
         # file.filename 由客户端控制，resolve 后必须仍在上传目录内，防止 ../ 路径穿越
         file_path = (target_dir / file.filename).resolve()
         if not file_path.is_relative_to(target_dir_resolved):
-            raise HTTPException(
-                status_code=400, detail=f"非法文件名: {file.filename}"
-            )
-        # 直接复制文件流，避免大文件一次性读入内存
-        with file_path.open("wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+            raise HTTPException(status_code=400, detail=f"非法文件名: {file.filename}")
+
+        # 流式复制并累计大小：既避免大文件一次性读入内存，也能在超限时
+        # 立即中止并清理半成品文件，而不是等整个文件写完
+        try:
+            with file_path.open("wb") as buffer:
+                written = 0
+                while chunk := await file.read(1024 * 1024):
+                    written += len(chunk)
+                    if written > _UPLOAD_MAX_FILE_SIZE:
+                        raise HTTPException(
+                            status_code=413,
+                            detail=(
+                                f"文件过大: {file.filename}"
+                                f"（单文件上限 {_UPLOAD_MAX_FILE_SIZE // (1024 * 1024)}MB）"
+                            ),
+                        )
+                    buffer.write(chunk)
+        except HTTPException:
+            file_path.unlink(missing_ok=True)
+            raise
         saved_files.append(file.filename)
 
     return {"status": "uploaded", "files": saved_files}
@@ -245,21 +305,81 @@ async def download_file(path: str):
     Args:
         path (str): 文件的绝对路径 (通常从 list_files 接口获取)。
     """
+    # resolve 后再做 is_relative_to，防止 `../` 之类的路径穿越到 output 之外；
+    # 错误统一走 HTTPException（400/403/404），前端 requestJson 直接解析 detail
+    abs_path = _resolve_within_output(path)
+
+    if not abs_path.exists():
+        raise HTTPException(status_code=404, detail="文件不存在")
+
+    # FileResponse 会以流式响应返回文件内容，并让浏览器使用原文件名下载
+    return FileResponse(abs_path, filename=abs_path.name)
+
+
+# 预览接口放行的类型：浏览器可直接内联渲染且无脚本执行风险；
+# SVG/HTML 可内嵌脚本，即便会话产物由后端生成也不放行内联
+_INLINE_CONTENT_TYPES = {
+    ".md": "text/markdown",
+    ".txt": "text/plain",
+    ".csv": "text/csv",
+    ".json": "application/json",
+    ".pdf": "application/pdf",
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+    ".webp": "image/webp",
+}
+
+
+def _resolve_within_output(path: str) -> Path:
+    """
+    把客户端传入的路径解析并校验在 output 目录内，越界直接抛 HTTPException
+
+    下载、预览、文件列表三个接口共用同一条安全边界
+    """
     try:
-        # resolve 后再做 is_relative_to，防止 `../` 之类的路径穿越到 output 之外
         abs_path = Path(path).resolve()
         output_abs = output_dir.resolve()
 
         if not abs_path.is_relative_to(output_abs):
-            return {"error": "拒绝访问: 只能下载输出目录下的文件"}
+            raise HTTPException(
+                status_code=403, detail="拒绝访问: 只能访问输出目录下的文件"
+            )
+    except HTTPException:
+        raise
     except Exception:
-        return {"error": "无效的路径参数"}
+        raise HTTPException(status_code=400, detail="无效的路径参数")
+    return abs_path
 
-    if not abs_path.exists():
-        return {"error": "文件不存在"}
 
-    # FileResponse 会以流式响应返回文件内容，并让浏览器使用原文件名下载
-    return FileResponse(abs_path, filename=abs_path.name)
+@app.get("/api/files/content")
+async def get_file_content(path: str):
+    """
+    应用内预览接口 (Inline File Content)。
+
+    与 /api/download 的差别只在 Content-Disposition：下载接口强制 attachment
+    （浏览器直接保存），本接口强制 inline，Markdown 文本可被 fetch 读取、
+    PDF 与图片可直接塞进 iframe/img 渲染。路径安全边界与下载接口一致。
+    """
+    abs_path = _resolve_within_output(path)
+
+    if not abs_path.is_file():
+        raise HTTPException(status_code=404, detail="文件不存在")
+
+    media_type = _INLINE_CONTENT_TYPES.get(abs_path.suffix.lower())
+    if media_type is None:
+        raise HTTPException(
+            status_code=415,
+            detail=f"该文件类型不支持应用内预览: {abs_path.suffix or '(无后缀)'}",
+        )
+
+    return FileResponse(
+        abs_path,
+        media_type=media_type,
+        filename=abs_path.name,
+        content_disposition_type="inline",
+    )
 
 
 @app.get("/api/sessions")
@@ -337,11 +457,11 @@ async def get_session_events(thread_id: str):
     """
     # thread_id 会拼进会话目录名，只放行安全字符，防止路径穿越
     if not re.fullmatch(r"[A-Za-z0-9_\-]+", thread_id):
-        return {"error": "非法的会话 ID"}
+        raise HTTPException(status_code=400, detail="非法的会话 ID")
 
     events_file = (output_dir / f"session_{thread_id}" / "events.jsonl").resolve()
     if not events_file.is_relative_to(output_dir.resolve()):
-        return {"error": "非法的会话 ID"}
+        raise HTTPException(status_code=400, detail="非法的会话 ID")
 
     if not events_file.exists():
         return {"events": []}
@@ -358,7 +478,7 @@ async def get_session_events(thread_id: str):
                 except json.JSONDecodeError:
                     continue
     except OSError as e:
-        return {"error": f"读取事件文件失败: {e}"}
+        raise HTTPException(status_code=500, detail=f"读取事件文件失败: {e}")
 
     return {"events": events}
 
@@ -371,17 +491,10 @@ async def reveal_in_folder(path: str):
     浏览器沙箱无法直接调起本地资源管理器，只能由后端进程代为执行；
     路径边界校验与下载接口保持一致：仅允许 output 目录内的文件。
     """
-    try:
-        abs_path = Path(path).resolve()
-        output_abs = output_dir.resolve()
-
-        if not abs_path.is_relative_to(output_abs):
-            return {"error": "拒绝访问: 只能打开输出目录下的文件"}
-    except Exception:
-        return {"error": "无效的路径参数"}
+    abs_path = _resolve_within_output(path)
 
     if not abs_path.exists():
-        return {"error": "文件不存在"}
+        raise HTTPException(status_code=404, detail="文件不存在")
 
     try:
         if sys.platform == "win32":
@@ -392,7 +505,7 @@ async def reveal_in_folder(path: str):
         else:
             subprocess.Popen(["xdg-open", str(abs_path.parent)])
     except Exception as e:
-        return {"error": f"打开文件管理器失败: {e}"}
+        raise HTTPException(status_code=500, detail=f"打开文件管理器失败: {e}")
 
     return {"status": "revealed", "path": str(abs_path)}
 
@@ -410,23 +523,11 @@ async def list_files(path: str):
     Args:
         path (str): 目标目录的绝对路径 (必须在 output 目录下)。
     """
-    print(f"[DEBUG] 请求文件列表: {path}")
-
-    try:
-        # 和下载接口保持同一条安全边界：前端只能查看 output 目录内部内容
-        abs_path = Path(path).resolve()
-        output_abs = output_dir.resolve()
-
-        if not abs_path.is_relative_to(output_abs):
-            print(f"[ERROR] 拒绝访问: {abs_path} 不在 {output_abs} 目录下")
-            return {"error": "拒绝访问: 只能访问输出目录下的文件"}
-
-    except Exception as e:
-        print(f"[ERROR] 路径解析失败: {e}")
-        return {"error": f"路径无效: {e}"}
+    # 和下载接口保持同一条安全边界：前端只能查看 output 目录内部内容
+    abs_path = _resolve_within_output(path)
 
     if not abs_path.exists():
-        return {"error": "目录不存在"}
+        raise HTTPException(status_code=404, detail="目录不存在")
 
     files = []
     try:
@@ -447,13 +548,11 @@ async def list_files(path: str):
                     }
                 )
 
-    except Exception as e:
-        print(f"[ERROR] 遍历文件失败: {e}")
-        return {"error": str(e)}
+    except OSError as e:
+        raise HTTPException(status_code=500, detail=f"遍历文件失败: {e}")
 
     # 最新生成的文件排在前面，方便用户优先看到本次任务产物
     files.sort(key=lambda x: x.get("mtime", 0), reverse=True)
-    print(f"[DEBUG] 找到 {len(files)} 个文件")
     return {"files": files}
 
 
@@ -474,7 +573,9 @@ async def websocket_endpoint(websocket: WebSocket, thread_id: str):
     # 前端重启重连时不会再收到当时的 session_created，这里对已存在的会话补发一次，
     # 让前端立即恢复 sessionPath 并能列出历史产物文件
     existing_session_dir = (output_dir / f"session_{thread_id}").resolve()
-    if existing_session_dir.is_dir() and existing_session_dir.is_relative_to(output_dir.resolve()):
+    if existing_session_dir.is_dir() and existing_session_dir.is_relative_to(
+        output_dir.resolve()
+    ):
         await websocket.send_json(
             {
                 "type": "monitor_event",
@@ -505,4 +606,4 @@ async def websocket_endpoint(websocket: WebSocket, thread_id: str):
 
 if __name__ == "__main__":
     # 默认只监听本机回环，避免无鉴权服务暴露到局域网；需要外部访问时显式传 --host
-    uvicorn.run("api.server:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("app.api.server:app", host="127.0.0.1", port=8000, reload=True)

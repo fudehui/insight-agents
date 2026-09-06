@@ -18,8 +18,8 @@ services:
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     healthcheck:
-      # GET /api/sessions 只扫描输出目录、不触数据库，适合做存活探测
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/sessions', timeout=5)"]
+      # 专用存活探针 /api/health 只确认进程与路由可用，不扫目录不触数据库
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=5)"]
       interval: 15s
       timeout: 10s
       retries: 5
