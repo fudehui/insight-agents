@@ -50,7 +50,11 @@ def resolve_path(filename: str, session_dir: Optional[str] = None) -> str:
 
     if not session_dir:
         # 无会话上下文时退化为仅允许项目根目录内的相对路径
-        candidate = ( _project_root() / path ).resolve() if not path.is_absolute() else path.resolve()
+        candidate = (
+            (_project_root() / path).resolve()
+            if not path.is_absolute()
+            else path.resolve()
+        )
         if not candidate.is_relative_to(_project_root()):
             raise ValueError(f"路径 '{filename}' 越出项目目录范围，已拒绝解析")
         return str(candidate)

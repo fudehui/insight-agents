@@ -146,4 +146,6 @@ if __name__ == "__main__":
     print(f"\n调用结果：{result}")
     if "已成功生成" in result or "已生成" in result:
         file_path = Path(result.split("'")[1])
-        print(f"验证结果：文件 {file_path} {'存在' if file_path.exists() else '不存在'}")
+        print(
+            f"验证结果：文件 {file_path} {'存在' if file_path.exists() else '不存在'}"
+        )

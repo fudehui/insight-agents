@@ -15,9 +15,7 @@ _TRUNCATION_MARK = "文件内容未完"
 
 def _read(filename: str, offset: int = 0) -> str:
     """在临时会话目录上下文中调用工具；无 thread 上下文时监控只打印不落盘"""
-    return read_file_content.invoke(
-        {"filename": filename, "offset": offset}
-    )
+    return read_file_content.invoke({"filename": filename, "offset": offset})
 
 
 def test_small_file_returns_full_content(tmp_path, monkeypatch):

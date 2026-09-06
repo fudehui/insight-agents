@@ -14,8 +14,10 @@ from app.api import server
 
 def _fake_get_main_agent(agent):
     """替代 get_main_agent 的假工厂：返回一个返回假 agent 的异步工厂"""
+
     async def _factory():
         return agent
+
     return _factory
 
 

@@ -151,7 +151,9 @@ def _execute_sql_query_impl(query) -> str:
         cursor = conn.cursor()
         # 语句校验 + 只读连接双重防线，避免提示词注入诱导出 DROP/UPDATE 等破坏性 SQL
         normalized_query = query.lstrip().lstrip("(; \t").upper()
-        if not normalized_query.startswith("SELECT") and not normalized_query.startswith("WITH"):
+        if not normalized_query.startswith(
+            "SELECT"
+        ) and not normalized_query.startswith("WITH"):
             return (
                 "查询出现异常：仅允许只读查询（SELECT / WITH 开头），"
                 f"拒绝执行 SQL：{query}"

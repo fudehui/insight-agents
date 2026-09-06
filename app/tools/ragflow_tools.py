@@ -72,7 +72,11 @@ def format_answer_with_references(answer: str, reference: dict | None) -> str:
         page = _extract_page_number(chunk.get("positions"))
         location = f"第{page}页，" if page else ""
         similarity = chunk.get("similarity")
-        score = f"相似度 {float(similarity):.2f}，" if isinstance(similarity, (int, float)) else ""
+        score = (
+            f"相似度 {float(similarity):.2f}，"
+            if isinstance(similarity, (int, float))
+            else ""
+        )
         snippet = str(chunk.get("content") or "").replace("\n", " ").strip()
         if len(snippet) > _REFERENCE_SNIPPET_LEN:
             snippet = snippet[:_REFERENCE_SNIPPET_LEN] + "..."

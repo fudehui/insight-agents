@@ -16,7 +16,9 @@ def test_diff_finds_new_and_modified_files(tmp_path):
     (tmp_path / "old_report.md").write_text("覆写后的内容变长了", encoding="utf-8")
     (tmp_path / "new_report.md").write_text("新报告", encoding="utf-8")
     (tmp_path / "new_report.pdf").write_bytes(b"%PDF-1.4 fake")
-    (tmp_path / "events.jsonl").write_text('{"event": "tool_start"}\n', encoding="utf-8")
+    (tmp_path / "events.jsonl").write_text(
+        '{"event": "tool_start"}\n', encoding="utf-8"
+    )
 
     # Windows 文件时间戳按系统时钟跳变（约 15.6ms 一跳），毫秒内连续写入可能
     # 得到相同 mtime，导致"覆写"无法通过 mtime 差异识别；显式错开时间戳保证确定性

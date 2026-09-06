@@ -36,7 +36,8 @@ def test_report_task_sources_emits_and_persists(tmp_path, monkeypatch):
     assert events_file.exists()
 
     payloads = [
-        json.loads(line) for line in events_file.read_text(encoding="utf-8").splitlines()
+        json.loads(line)
+        for line in events_file.read_text(encoding="utf-8").splitlines()
     ]
     task_sources = [p for p in payloads if p.get("event") == "task_sources"]
     assert len(task_sources) == 1
@@ -64,7 +65,8 @@ def test_empty_sources_message_has_zero_counts(tmp_path, monkeypatch):
 
     events_file = tmp_path / f"session_{thread_id}" / "events.jsonl"
     payloads = [
-        json.loads(line) for line in events_file.read_text(encoding="utf-8").splitlines()
+        json.loads(line)
+        for line in events_file.read_text(encoding="utf-8").splitlines()
     ]
     task_sources = [p for p in payloads if p.get("event") == "task_sources"]
     assert len(task_sources) == 1

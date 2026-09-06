@@ -20,9 +20,7 @@ def thread_context():
 
 
 def test_web_sources_dedup_by_url(thread_context):
-    source_registry.register_web_sources(
-        [{"title": "A", "url": "https://e.com/1"}]
-    )
+    source_registry.register_web_sources([{"title": "A", "url": "https://e.com/1"}])
     # 相同 URL 不同标题视为重复；缺 url 的条目忽略
     source_registry.register_web_sources(
         [{"title": "A-again", "url": "https://e.com/1"}, {"title": "无链接"}]
@@ -72,7 +70,10 @@ def test_no_thread_context_is_noop(monkeypatch):
 
 def test_manifest_renders_all_sections(thread_context):
     source_registry.register_web_sources(
-        [{"title": "行业报告", "url": "https://e.com/r"}, {"title": "", "url": "https://e.com/x"}]
+        [
+            {"title": "行业报告", "url": "https://e.com/r"},
+            {"title": "", "url": "https://e.com/x"},
+        ]
     )
     source_registry.register_doc_source("白皮书.pdf", "3")
     source_registry.register_doc_source("研报.docx", "")

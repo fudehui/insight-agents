@@ -12,7 +12,6 @@ import pytest
 from app.api import source_registry
 from app.api.context import (
     reset_session_context,
-    reset_thread_context,
     set_session_context,
     set_thread_context,
 )
@@ -104,7 +103,7 @@ def test_monitor_logs_preview_not_full_content(gate_env):
     # 修复验证：埋点只记录长度和预览，不再写入整份 content
     with mock.patch.object(markdown_tools.monitor, "report_tool") as report_tool:
         generate_markdown.invoke(
-            {"content": "x" * 5000, "filename": "r.md"}, 
+            {"content": "x" * 5000, "filename": "r.md"},
         )
 
     args = report_tool.call_args[0][1]

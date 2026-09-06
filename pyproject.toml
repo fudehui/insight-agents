@@ -34,3 +34,15 @@ dependencies = [
 
 [tool.uv]
 package = false
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.8",
+]
+
+[tool.ruff.lint]
+# 显式锁定规则集：ruff 0.16 起默认规则集扩大（UP/BLE/SIM/I 等），
+# 一次性引入会对存量代码产生 80+ 告警。这里保持与项目历史行为一致的
+# 基线（错误类 + pyflakes），后续想启用新规则再逐步放开
+select = ["E4", "E7", "E9", "F"]

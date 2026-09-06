@@ -107,7 +107,9 @@ def test_retryable_http_error_then_success(monitor_spy):
     def flaky_429():
         calls["n"] += 1
         if calls["n"] == 1:
-            raise requests.exceptions.HTTPError("rate limited", response=FakeResponse(429))
+            raise requests.exceptions.HTTPError(
+                "rate limited", response=FakeResponse(429)
+            )
         return "恢复后的结果"
 
     async def run():
@@ -126,9 +128,12 @@ def test_retryable_http_error_then_success(monitor_spy):
 
 def test_connection_error_is_retryable():
     # 构造异常对象而非 raise，直接交给分类函数判断
-    assert call_guard.is_retryable(
-        requests.exceptions.ConnectionError("connection refused")
-    ) is True
+    assert (
+        call_guard.is_retryable(
+            requests.exceptions.ConnectionError("connection refused")
+        )
+        is True
+    )
 
 
 def test_tavily_custom_timeout_is_retryable():

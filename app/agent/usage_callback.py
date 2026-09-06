@@ -28,7 +28,9 @@ def _pick(usage: Any, *names: str) -> Optional[int]:
     这里统一兼容并转成 int，取不到返回 None
     """
     for name in names:
-        value = usage.get(name) if isinstance(usage, dict) else getattr(usage, name, None)
+        value = (
+            usage.get(name) if isinstance(usage, dict) else getattr(usage, name, None)
+        )
         if value is not None:
             return int(value)
     return None

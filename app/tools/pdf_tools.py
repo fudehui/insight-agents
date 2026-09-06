@@ -63,7 +63,8 @@ def convert_md_to_pdf(
 
 if __name__ == "__main__":
     # 本地调试入口：直接运行本文件可验证 Markdown 转 PDF 链路
-    get_session_context = lambda: "./examples/test_docs"
+    def get_session_context():
+        return "./examples/test_docs"
 
     test_dir = Path("./examples/test_docs/sub_dir")
     test_dir.mkdir(parents=True, exist_ok=True)

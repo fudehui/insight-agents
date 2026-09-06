@@ -59,11 +59,11 @@ def _limit_text(text: str, filename: str, offset: int) -> str:
             segment = f"（从第 {start} 个字符继续）\n" + segment
         return segment
     return (
-        segment
-        + f"\n\n[文件内容未完] '{filename}' 共 {total} 个字符，本次返回第 "
+        segment + f"\n\n[文件内容未完] '{filename}' 共 {total} 个字符，本次返回第 "
         f"{start} 到 {start + len(segment)} 个字符。继续读取请再次调用本工具，"
         f"并传入 offset={start + len(segment)}。"
     )
+
 
 @tool
 def read_file_content(

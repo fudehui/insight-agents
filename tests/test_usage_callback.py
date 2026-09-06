@@ -43,7 +43,9 @@ def test_reports_from_normalized_usage_metadata():
 def test_falls_back_to_openai_dict_usage():
     # 无 usage_metadata 时兜底读 llm_output 的 OpenAI 命名字段
     message = AIMessage(content="x")
-    llm_output = {"token_usage": {"prompt_tokens": 7, "completion_tokens": 3, "total_tokens": 10}}
+    llm_output = {
+        "token_usage": {"prompt_tokens": 7, "completion_tokens": 3, "total_tokens": 10}
+    }
     handler = TokenUsageCallbackHandler()
 
     with mock.patch("app.agent.usage_callback.monitor") as monitor_mock:

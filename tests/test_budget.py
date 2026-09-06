@@ -21,9 +21,7 @@ def task_context():
 
 
 def test_first_call_allowed(task_context):
-    allowed, reason = budget.consume_tool_quota(
-        "internet_search", {"query": "AI 趋势"}
-    )
+    allowed, reason = budget.consume_tool_quota("internet_search", {"query": "AI 趋势"})
     assert allowed is True
     assert reason == ""
 
@@ -31,9 +29,7 @@ def test_first_call_allowed(task_context):
 def test_duplicate_call_blocked(task_context):
     args = {"query": "AI 趋势", "topic": "general"}
     allowed_first, _ = budget.consume_tool_quota("internet_search", args)
-    allowed_second, reason_second = budget.consume_tool_quota(
-        "internet_search", args
-    )
+    allowed_second, reason_second = budget.consume_tool_quota("internet_search", args)
     assert allowed_first is True
     assert allowed_second is False
     assert "重复调用" in reason_second
@@ -41,9 +37,7 @@ def test_duplicate_call_blocked(task_context):
 
 def test_same_args_different_order_still_duplicate(task_context):
     # sort_keys 保证参数书写顺序不同也视为重复
-    budget.consume_tool_quota(
-        "internet_search", {"query": "q", "topic": "news"}
-    )
+    budget.consume_tool_quota("internet_search", {"query": "q", "topic": "news"})
     allowed, reason = budget.consume_tool_quota(
         "internet_search", {"topic": "news", "query": "q"}
     )
@@ -60,9 +54,7 @@ def test_different_args_are_independent(task_context):
 def test_quota_exhausted_after_limit(task_context):
     # 默认限额 internet_search = 5，参数各不相同以避开去重
     for i in range(5):
-        allowed, _ = budget.consume_tool_quota(
-            "internet_search", {"query": f"问题{i}"}
-        )
+        allowed, _ = budget.consume_tool_quota("internet_search", {"query": f"问题{i}"})
         assert allowed is True
 
     allowed, reason = budget.consume_tool_quota(
@@ -80,9 +72,7 @@ def test_duplicate_does_not_consume_quota(task_context):
     for _ in range(4):
         budget.consume_tool_quota("internet_search", args)
 
-    allowed, _ = budget.consume_tool_quota(
-        "internet_search", {"query": "新问题"}
-    )
+    allowed, _ = budget.consume_tool_quota("internet_search", {"query": "新问题"})
     assert allowed is True
 
 
@@ -98,9 +88,7 @@ def test_reset_clears_state(task_context):
     budget.reset_task_budget(task_context)
 
     # 重置后相同参数不再视为重复
-    allowed, reason = budget.consume_tool_quota(
-        "internet_search", {"query": "重置前"}
-    )
+    allowed, reason = budget.consume_tool_quota("internet_search", {"query": "重置前"})
     assert allowed is True
     assert reason == ""
 
