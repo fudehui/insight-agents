@@ -1,0 +1,49 @@
+# 沙箱代码执行镜像（docs/upgrade-plan.md P0-2 W5）
+#
+# 供 app/tools/sandbox_tools.py 的 run_code 工具使用：LLM 生成代码视为不可信输入，
+# 运行参数（网络隔离 / 资源限额 / 非 root / 只读 rootfs）由 sandbox_tools.py 的
+# docker run 命令模板强制约束，本镜像只负责预装数据分析依赖。
+#
+# 构建命令（默认使用清华 pip 镜像源，国内网络可直连）：
+#   docker build -t huiyan-sandbox:latest -f Dockerfile.sandbox .
+# 使用官方 PyPI 源构建：
+#   docker build -t huiyan-sandbox:latest -f Dockerfile.sandbox --build-arg PIP_INDEX_URL=https://pypi.org/simple .
+#
+# 生产环境建议 digest 锁定：把镜像推送到镜像仓库取得 sha256 摘要后，通过环境变量
+#   SANDBOX_IMAGE=huiyan-sandbox@sha256:<digest>
+# 覆盖默认镜像名（见 sandbox_tools.py 的 sandbox_image()），防止运行时镜像被偷换。
+
+FROM python:3.12-slim
+
+# pip 源参数化：默认清华源，构建时可用 --build-arg PIP_INDEX_URL=... 覆盖
+ARG PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+
+ENV PYTHONUTF8=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_INDEX_URL=${PIP_INDEX_URL}
+
+# matplotlib 首次运行会在用户目录创建配置/字体缓存；沙箱 rootfs 只读，
+# 显式把缓存目录指到 /tmp（docker run 模板中的 tmpfs 可写），避免启动告警与失败。
+# MATPLOTLIBRC 指向自定义默认配置：中文字体默认走 Noto Sans CJK（见下），
+# 负号用 ASCII 显示，避免 unicode_minus 在 CJK 字体下缺字形
+ENV MPLCONFIGDIR=/tmp/mplconfig \
+    MATPLOTLIBRC=/etc/matplotlibrc
+
+RUN pip install --no-cache-dir matplotlib pandas
+
+# 中文字体：Debian 的 fonts-noto-cjk 提供 "Noto Sans CJK SC" 等字体族，
+# 沙箱内 matplotlib 图表的中文不再渲染成豆腐块；配合 sandbox_tools.py 的
+# _normalize_cjk_font_names 把模型惯用的 SimHei 等字体名归一化到该字体
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends fonts-noto-cjk \
+    && rm -rf /var/lib/apt/lists/* \
+    && printf 'font.sans-serif: Noto Sans CJK SC, DejaVu Sans, sans-serif\naxes.unicode_minus: False\n' > /etc/matplotlibrc
+
+# 预建非 root（uid/gid 65534，即 Debian 的 nobody）工作目录并赋权；
+# 实际运行时 /work 会被会话目录以 bind mount 覆盖，此处赋权用于兜底
+# （不挂载直接 docker run 本镜像时，65534 用户也能在 /work/sandbox 落盘）
+RUN mkdir -p /work/sandbox && chown -R 65534:65534 /work
+
+# 与 run_code 命令模板中的 --workdir /work/sandbox 保持一致：
+# 容器内脚本用相对路径保存的图表/CSV 默认落在挂载卷的 sandbox/ 子目录
+WORKDIR /work/sandbox
