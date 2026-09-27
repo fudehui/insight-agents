@@ -73,3 +73,13 @@ Thumbs.db
 
 # ZCode 本地会话配置
 .zcode/
+
+# 本地个人材料与测试残留，不入库
+/output/
+简历项目描述.md
+docs/project-resume.md
+docs/upgrade-plan.md
+
+# coverage artifacts
+coverage.xml
+.coverage*
