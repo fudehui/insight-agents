@@ -34,3 +34,26 @@
 
 > 后续如需扩展更完整的指标体系（结果质量分层、LLM-as-judge、安全测试等），参考 `docs/agent-optimization-recommendations.md` P1-4 及项目评估方案讨论。
 
+## DeepEval 指标映射（W3 新增，evals/deepeval_runner.py）
+
+在 6 指标之上叠加 LLM-as-Judge 维度（升级计划 P0-1：judge 用低价模型控成本）：
+
+| DeepEval 指标 | 输入 | 衡量什么 | 与 6 指标的关系 |
+| --- | --- | --- | --- |
+| Faithfulness（忠实度） | input=query、actual_output=report_md、retrieval_context=登记来源拼接 | 报告结论是否被登记来源支撑（幻觉检测） | 引用覆盖率（指标 3）只看"引没引"，本指标看"引得对不对" |
+| AnswerRelevancy（答案相关性） | input=query、actual_output=report_md | 报告是否切题回答了任务问题 | 6 指标无对应维度，纯增量 |
+
+配置口径：judge 模型取 `EVAL_JUDGE_MODEL`（未设置回退 `LLM_QWEN_MAX` 同档），阈值默认 0.5（`EVAL_JUDGE_THRESHOLD` 可调）；评分结果落 `evals/results/{run_id}/deepeval.json`，支持增量合并（429 冷却后补跑不重复烧 judge token）。**成本口径**：每 case 两个指标约 8-15 次 judge 调用，30 条全量一轮约 1-3 万 judge token——与业务跑批（240 万/窗口）相比可忽略，但仍建议与跑批共用配额窗口规划。
+
+## 故障注入演练指标（W3 新增、W4 补齐 4 类，evals/fault_inject/）
+
+升级计划 P0-1 的"4 类故障 ×10 次"演练量化口径（前 2 类 W3 落地，后 2 类随 W4 接入）：
+
+| 指标 | 怎么算 | 说明 |
+| --- | --- | --- |
+| 事件补齐率 | 演练结束后 events.jsonl 的 seq 连续性：`去重条数 ÷ (max-min+1)`，无缺口无重复=1.0 | 事件已落盘即视为可经断线回放补齐（复用系统既有机制）；seq 跨进程续接（monitor 按落盘行数初始化基数），进程重启本身不产生缺口 |
+| 恢复成功率 | 注入故障后任务仍按预期收尾的次数 ÷ 总次数 | 断网：任务 completed 且 call_guard 重试真实发生；审批中重启：新进程 resume 后 `task_result` 产出；WS 断连：任务 completed 且重连对账结果与落盘全量一致、断连窗口补齐率 1.0；任务执行中重启：强杀后新进程续跑产出 `task_result` |
+| 恢复耗时 | 断网：工具失败事件→下一次同工具成功事件的时间差；审批中重启：`approval_resumed`→`task_result` 时间差（resume 不补发 task_start，不能按 task_start 起算）；WS 断连：重连对账接口（GET /api/sessions/{thread_id}/events）调用耗时，毫秒级真实口径；任务执行中重启：恢复进程首事件（seq>死亡前末序号）→`task_result` 时间差 | 看 P95（最近邻秩，与 run_eval 口径一致） |
+
+场景与口径约束：`disconnect`（fake Tavily 以 requests.ConnectionError 断网一次，验证 call_guard 重试恢复）；`restart_mid_approval`（standard 档停在 generate_markdown 审批中断 → 进程退出 = 进程死亡 → 新进程 `resume_deep_agent` 提交 approve 恢复，真实进程级重启语义）；`ws_disconnect`（进程内：mock-llm 任务全程跑完 = 服务端不受客户端断连影响、事件照常落盘；断连点取 task_start 后第 2 条，"重连"直调事件回放路由函数补齐断连窗口并核对全量一致——取证确认该函数签名仅 thread_id、读模块级 output_dir 常量，不依赖 FastAPI 请求上下文；真实 WS 层的握手鉴权/关闭码处理不在本场景覆盖内）；`process_restart_mid_task`（真实两段子进程：stage3 在 `assistant_call` 出现后短延时 `os._exit(1)` 强杀——死亡落在子智能体节点执行中而非审批中断点，checkpoint 停在最后一个已完成超步，击发点避开 sqlite 写事务窗口、半写由事务原子性兜底；stage4 新进程以 input=None 从 checkpoint 续跑，LangGraph 重放未完成超步，重复的检索调用被去重闸门拦截（blocked）不破坏收敛；恢复判定以事件流为准，收尾阶段无关异常只记录诊断不否定恢复）。**mock/real 双模式**：默认 mock-llm（ScriptedChatModel + 假 Tavily，零 token、CI 可跑）结果标注为机制验证；`--real-llm` 结果才计入简历数字。演练全程隔离：checkpoint 库与会话目录 patch 到演练 workdir，不碰真实数据。
+
