@@ -171,13 +171,21 @@ def _markdown_to_story(
 
         if stripped.startswith("```"):
             flush_paragraph()
+            fence_lang = stripped[3:].strip().lower()
             code_lines = []
             index += 1
             while index < len(lines) and not lines[index].strip().startswith("```"):
                 code_lines.append(lines[index])
                 index += 1
-            story.append(Preformatted("\n".join(code_lines), styles["code"]))
             index += 1
+            if fence_lang == "echarts":
+                # PDF 链路为纯 ReportLab 无浏览器内核，交互图表按升级计划
+                # W7 约定降级为占位说明，不把 option JSON 当代码输出
+                story.append(Paragraph(
+                    "（此处为交互式图表，请于 Web 端查看在线报告）", styles["body"]
+                ))
+            else:
+                story.append(Preformatted("\n".join(code_lines), styles["code"]))
             continue
 
         if _is_table_start(lines, index):

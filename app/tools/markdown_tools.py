@@ -116,7 +116,9 @@ def generate_markdown(
         if not parent_dir.exists():
             parent_dir.mkdir(parents=True, exist_ok=True)
 
-        file_path.write_text(content, encoding="utf-8")
+        # newline="\n"：Windows 上默认会把 \n 转成 CRLF，导致报告修订接口
+        # 的 sha256 乐观锁与前端原始字节口径不一致（详见 server.py patch_report）
+        file_path.write_text(content, encoding="utf-8", newline="\n")
 
         if missing:
             return (

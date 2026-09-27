@@ -8,8 +8,11 @@ WebSocket 长连接。HTTP 接口只做轻量调度，真正的 DeepAgents 执�
 
 import asyncio
 import datetime
+import difflib
+import hashlib
 import hmac
 import json
+import logging
 import os
 import re
 import shutil
@@ -56,12 +59,34 @@ async def lifespan(_app: FastAPI):
     服务生命周期入口。
 
     启动时绑定当前事件循环到 WebSocket 管理器，确保后台 Agent 任务可以把
-    monitor 事件投递回 FastAPI 所在的 loop。
+    monitor 事件投递回 FastAPI 所在的 loop；同时检查访问令牌配置，缺失时
+    输出无鉴权模式警告（只提醒、不阻断启动）。配置了令牌时在启动阶段
+    挂载 MCP SSE（P0-4），其会话管理器的生命周期并入本服务。
     """
+    _warn_if_access_token_missing()
     loop = asyncio.get_running_loop()
     manager.set_loop(loop)
     print(f"[Server] WebSocket Manager bound to loop: {id(loop)}")
-    yield
+
+    mcp_lifespan = None
+    if _access_token:
+        try:
+            from app.mcp_server import mount_mcp_sse
+
+            mcp_lifespan = mount_mcp_sse(_app, _access_token)
+        except Exception:
+            # MCP 挂载失败不阻塞主服务（fastmcp 缺失等环境问题）
+            logger.exception("MCP SSE 挂载失败，主服务继续启动")
+    else:
+        logger.warning(
+            "APP_ACCESS_TOKEN 未配置，MCP SSE 未挂载（外部宿主无法通过 MCP 访问工具）"
+        )
+
+    if mcp_lifespan is not None:
+        async with mcp_lifespan():
+            yield
+    else:
+        yield
 
 
 # 当前文件位于 app/api/server.py，运行时目录统一收敛到 app 目录
@@ -71,6 +96,20 @@ project_root = current_dir.parent
 # 访问令牌鉴权：未配置 APP_ACCESS_TOKEN 时不启用（本地开发零负担）；
 # 配置后所有 REST 接口与 WebSocket 都需要携带令牌
 _access_token = (os.getenv("APP_ACCESS_TOKEN") or "").strip()
+
+logger = logging.getLogger(__name__)
+
+
+def _warn_if_access_token_missing() -> None:
+    """
+    启动时检查访问令牌配置，未设置则输出无鉴权模式警告。
+
+    只做提醒、不改变鉴权语义：未配置 APP_ACCESS_TOKEN 时接口依旧放行
+    （本地开发零负担），但必须在日志中明确当前处于无鉴权状态。取值逻辑
+    与模块级 _access_token 保持一致（strip 后判空），避免两处口径不一致
+    """
+    if not (os.getenv("APP_ACCESS_TOKEN") or "").strip():
+        logger.warning("未设置 APP_ACCESS_TOKEN，API 处于无鉴权模式（仅限本机开发）")
 
 
 async def verify_access(
@@ -505,6 +544,100 @@ async def get_file_content(path: str):
         filename=abs_path.name,
         content_disposition_type="inline",
     )
+
+
+class ReportPatchRequest(BaseModel):
+    """报告修订请求体（P0-3 修订反馈闭环）。"""
+
+    session_id: str
+    # 相对 session 目录的文件名（如 "报告.md"），路径守卫约束在会话目录内
+    filename: str
+    # 编辑基线的内容 SHA-256：agent 收尾重写报告与用户编辑互踩的乐观锁
+    base_sha256: str
+    content: str
+
+
+@api_router.patch("/api/reports")
+async def patch_report(request: ReportPatchRequest):
+    """
+    保存用户对报告的修订（修订审批时序案 A）。
+
+    只写报告文件 + 修订暂存为 pending（pending_revisions 表，独立于
+    thread 生命周期）；下次任务启动时召回该修订并引导模型经 memory_write
+    走审批入库。写入用 base_sha256 做乐观锁——任务运行中直接拒绝编辑
+    （前端同步禁用编辑态），基线不一致返回 409 由用户刷新后重改。
+    """
+    if active_tasks.get(request.session_id) and not active_tasks[
+        request.session_id
+    ].done():
+        raise HTTPException(
+            status_code=409, detail="该会话的任务正在运行，请任务结束后再编辑报告"
+        )
+
+    session_dir = output_dir / f"session_{request.session_id}"
+    target = _resolve_within_output(str(session_dir / request.filename))
+    if not target.is_file():
+        raise HTTPException(status_code=404, detail="报告文件不存在")
+    if target.suffix.lower() != ".md":
+        raise HTTPException(
+            status_code=415, detail="只支持编辑 Markdown 报告（PDF/图片为导出产物）"
+        )
+
+    # 乐观锁以磁盘原始字节为准：Windows 下 read_text 会把 CRLF 折算成 LF，
+    # 与前端对响应原始字节的 sha256（含 CRLF）永不相等，会导致 409 误判
+    current_bytes = target.read_bytes()
+    current_sha = hashlib.sha256(current_bytes).hexdigest()
+    if current_sha != request.base_sha256:
+        raise HTTPException(
+            status_code=409,
+            detail="报告已被其他操作更新（版本冲突），请刷新预览后基于最新内容重改",
+        )
+    current = current_bytes.decode("utf-8")
+
+    new_content = request.content
+    target.write_text(new_content, encoding="utf-8", newline="\n")
+
+    # 修订摘要：unified diff 取前 800 字；主题取报告首个 H1 标题
+    diff_lines = list(
+        difflib.unified_diff(
+            current.splitlines(), new_content.splitlines(), lineterm=""
+        )
+    )
+    diff_summary = "\n".join(diff_lines[:40])[:800] or "（无文本差异）"
+    topic = next(
+        (line.lstrip("# ").strip() for line in new_content.splitlines()
+         if line.startswith("# ")),
+        target.stem,
+    )
+
+    from app.memory.store import get_memory_store
+
+    revision_id = get_memory_store().add_pending_revision(
+        session_id=request.session_id,
+        filename=target.name,
+        topic=topic,
+        diff_summary=diff_summary,
+    )
+
+    return {
+        "message": "修订已保存，并暂存为待沉淀记忆（下次同类任务召回）",
+        "new_sha256": hashlib.sha256(target.read_bytes()).hexdigest(),
+        "revision_id": revision_id,
+    }
+
+
+@api_router.delete("/api/memories")
+async def delete_memories(session_id: str):
+    """
+    删除指定会话来源的记忆与暂存修订（记忆安全：可删除）。
+
+    单用户部署下 user_id 仅作 namespace 键，归属校验即 session 归属：
+    只能按 session_id 删除该会话产生的记忆，不采信其他身份参数。
+    """
+    from app.memory.store import get_memory_store
+
+    deleted = get_memory_store().delete_by_session(session_id)
+    return {"message": f"已删除 {deleted} 条该会话相关的记忆记录", "deleted": deleted}
 
 
 @api_router.get("/api/sessions")

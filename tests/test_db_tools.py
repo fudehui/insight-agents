@@ -68,3 +68,44 @@ def test_get_table_data_accepts_quoted_but_existing_table(tmp_path, monkeypatch)
     # 白名单命中后走双引号包裹的执行路径：普通表名照常返回数据
     result = _invoke("sales_records")
     assert result.startswith("sale_id,")
+
+
+def _invoke_sql(query: str) -> str:
+    """execute_sql_query 同为 async 定义，统一经 asyncio 同步调用"""
+    return asyncio.run(db_tools.execute_sql_query.ainvoke({"query": query}))
+
+
+def test_execute_sql_query_accepts_leading_comments(tmp_path, monkeypatch):
+    _init_tmp_db(tmp_path, monkeypatch)
+
+    # 模型习惯在 SQL 前写注释说明，注释行剥离后是合法 SELECT，应正常返回数据
+    result = _invoke_sql("-- 布洛芬库存总量查询\nSELECT COUNT(*) AS n FROM drugs")
+
+    # 单列 CSV：首行为列名，次行为计数（drugs 表 50 行）
+    assert result == "n\n50"
+
+    # 多行注释 + 空行交错，剥离后仍是合法 SELECT，同样放行
+    result = _invoke_sql("-- 第一条注释\n\n-- 第二条注释\nSELECT COUNT(*) AS n FROM drugs")
+    assert result == "n\n50"
+
+
+def test_execute_sql_query_still_rejects_writes_after_comments(tmp_path, monkeypatch):
+    _init_tmp_db(tmp_path, monkeypatch)
+
+    # 注释剥离不得放松只读防线：注释后跟写语句仍被拒
+    result = _invoke_sql("-- 看似注释\nDROP TABLE drugs")
+
+    assert "仅允许只读查询" in result
+
+    # 纯注释（剥离后为空）不构成合法 SELECT，同样拒绝
+    result = _invoke_sql("-- 只有注释没有语句")
+
+    assert "仅允许只读查询" in result
+
+
+def test_strip_leading_comments_normalization():
+    # 校验归一化辅助函数本身：空串、无注释、连续注释的行为
+    assert db_tools._strip_leading_comments("  \n -- a\n-- b\nSELECT 1") == "SELECT 1"
+    assert db_tools._strip_leading_comments("SELECT 1") == "SELECT 1"
+    assert db_tools._strip_leading_comments("") == ""
+    assert db_tools._strip_leading_comments("-- 只有一行") == ""

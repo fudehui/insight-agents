@@ -30,6 +30,14 @@ dependencies = [
     "tavily-python==0.7.24",
     "typing-extensions>=4.5.0",
     "uvicorn[standard]>=0.20.0",
+    "langfuse>=4.15.6",
+    # W8 MCP（P0-4，依赖冻结点内新增，理由与版本见 docs/mcp.md）：
+    # fastmcp 3.x 锁 <4——4.x 要求 mcp>=2，与 langchain-mcp-adapters 0.3.x 的
+    # mcp<2 约束冲突，3.x 是当前唯一同时满足两端互操作的版本线
+    "fastmcp>=3.4.7,<4",
+    "langchain-mcp-adapters>=0.3.2",
+    # W9 记忆库（P0-3）：向量召回引擎，Windows 预编译 wheel 已验证（v0.1.9）
+    "sqlite-vec==0.1.9",
 ]
 
 [tool.uv]
@@ -38,8 +46,23 @@ package = false
 [dependency-groups]
 dev = [
     "pytest>=8.0",
+    "pytest-cov>=6.0",
     "ruff>=0.8",
+    "deepeval>=4.2.3",
 ]
+
+# 覆盖率配置：W1 只产出基线数字（CI 输出总覆盖率），W4 才引入 fail_under 门禁
+[tool.coverage.run]
+# 只统计 app 业务包；测试目录与将来可能的迁移脚本不纳入基线
+source = ["app"]
+omit = [
+    "tests/*",
+    "*/migrations/*",
+]
+
+[tool.coverage.report]
+# 终端报告逐行标注未覆盖行号，便于定位补测点
+show_missing = true
 
 [tool.ruff.lint]
 # 显式锁定规则集：ruff 0.16 起默认规则集扩大（UP/BLE/SIM/I 等），

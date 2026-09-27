@@ -11,6 +11,9 @@ services:
     environment:
       # 容器内固定绝对路径，对应挂载卷 ./app/data，避免相对路径歧义
       SQLITE_DB_PATH: /app/app/data/deepsearch.db
+      # 访问令牌显式透传（宿主机 shell 或根目录 .env 提供）；
+      # 未设置时为空串，后端启动会输出"无鉴权模式"警告但不拒绝启动
+      APP_ACCESS_TOKEN: ${APP_ACCESS_TOKEN:-}
     volumes:
       - ./app/data:/app/app/data
       - ./app/output:/app/app/output
@@ -36,3 +39,34 @@ services:
     ports:
       - "${FRONTEND_PORT:-8080}:80"
     restart: unless-stopped
+
+  # Langfuse 自托管（可选观测，P1 降格接入：本地起通即可，不做打磨）。
+  # 未配置 LANGFUSE_* 密钥时后端完全不加载 langfuse，此服务可整体注释掉。
+  langfuse-db:
+    image: postgres:16
+    container_name: deepsearch-langfuse-db
+    environment:
+      POSTGRES_USER: langfuse
+      POSTGRES_PASSWORD: ${LANGFUSE_DB_PASSWORD:-langfuse}
+      POSTGRES_DB: langfuse
+    volumes:
+      - langfuse-db-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  langfuse:
+    image: langfuse/langfuse:2
+    container_name: deepsearch-langfuse
+    depends_on:
+      - langfuse-db
+    environment:
+      DATABASE_URL: postgresql://langfuse:${LANGFUSE_DB_PASSWORD:-langfuse}@langfuse-db:5432/langfuse
+      NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:-change-me-in-production}
+      SALTKEY: ${LANGFUSE_SALTKEY:-change-me-in-production}
+      # 仅本机访问；后端经 http://langfuse:3000 容器网互通
+      PORT: "3000"
+    ports:
+      - "127.0.0.1:3000:3000"
+    restart: unless-stopped
+
+volumes:
+  langfuse-db-data:

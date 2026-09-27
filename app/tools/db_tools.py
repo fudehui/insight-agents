@@ -145,12 +145,27 @@ def _get_table_data_impl(table_name) -> str:
         conn.close()
 
 
+def _strip_leading_comments(query: str) -> str:
+    """
+    去掉 SQL 开头的空行与 -- 行注释，仅用于只读前缀校验
+
+    模型习惯在 SQL 前写注释说明（如 "-- 布洛芬库存总量查询"），注释本身不影响
+    只读语义；实际执行的仍是原始语句，这里只服务于前缀校验的归一化
+    """
+    remaining = query.lstrip()
+    while remaining.startswith("--"):
+        _comment, _sep, rest = remaining.partition("\n")
+        remaining = rest.lstrip()
+    return remaining
+
+
 def _execute_sql_query_impl(query) -> str:
     conn = get_readonly_connection()
     try:
         cursor = conn.cursor()
         # 语句校验 + 只读连接双重防线，避免提示词注入诱导出 DROP/UPDATE 等破坏性 SQL
-        normalized_query = query.lstrip().lstrip("(; \t").upper()
+        # 校验前先剥离前导 -- 注释行，避免模型带注释的合法 SELECT 被误拒
+        normalized_query = _strip_leading_comments(query).lstrip("(; \t").upper()
         if not normalized_query.startswith(
             "SELECT"
         ) and not normalized_query.startswith("WITH"):

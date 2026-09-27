@@ -1,13 +1,14 @@
 """
 主智能体组装与异步执行模块
 
-负责把模型、主提示词、文件类工具和三个专家子智能体组装成 DeepAgent，
+负责把模型、主提示词、文件类工具和四个专家子智能体组装成 DeepAgent，
 并提供 run_deep_agent（新任务）与 resume_deep_agent（审批恢复）两个执行入口。
 运行时为每个 session_id 维护独立工作目录，把工具调用、子智能体调用、
 流式增量、审批请求和最终结果推送给前端。
 """
 
 import asyncio
+import datetime
 import os
 import shutil
 import time
@@ -23,9 +24,11 @@ from langgraph.types import Command
 
 from app.agent.llm import model
 from app.agent.prompts import main_agent_content
+from app.agent.subagents.code_analysis_agent import code_analysis_agent
 from app.agent.subagents.database_query_agent import database_query_agent
 from app.agent.subagents.knowledge_base_agent import knowledge_base_agent
 from app.agent.subagents.network_search_agent import network_search_agent
+from app.agent.token_budget_middleware import TokenBudgetMiddleware
 from app.api.budget import cleanup_task_budget, reset_task_budget
 from app.api.context import (
     reset_session_context,
@@ -41,9 +44,15 @@ from app.api.source_registry import (
 from app.agent.usage_callback import TokenUsageCallbackHandler
 
 # 文件类工具由主智能体直接掌握，负责读取上传附件和生成最终交付文档
+from app.tools.chart_tools import generate_chart
 from app.tools.markdown_tools import generate_markdown
+from app.tools.memory_tools import memory_write
 from app.tools.pdf_tools import convert_md_to_pdf
 from app.tools.upload_file_read_tool import read_file_content
+
+# 跨会话记忆（P0-3）：自研 Store 挂进 agent 图，修订先验注入见 run_deep_agent
+from app.memory.prior import optional_memory_injection
+from app.memory.store import get_memory_store
 
 # 当前文件位于 app/agent/main_agent.py，parents[1] 即 app 目录
 project_root_path = Path(__file__).parents[1].resolve()
@@ -64,17 +73,24 @@ _main_agent_lock = asyncio.Lock()
 APPROVAL_MODE_PRESETS: dict[str, dict[str, bool]] = {
     # 关闭审批：工具直接执行（不会产生待审批任务）
     "off": {},
-    # 标准审批（默认）：文件交付类动作需要确认
+    # 标准审批（默认）：文件交付类动作需要确认；run_code 沙箱执行属于
+    # 文件/代码交付类——产物会写入会话目录，需要用户确认后才落盘
     "standard": {
         "generate_markdown": True,
+        "generate_chart": True,
         "convert_md_to_pdf": True,
+        "run_code": True,
+        "memory_write": True,
     },
-    # 严格审批：文件、SQL 查询、网络搜索、知识库提问均需确认；
+    # 严格审批：文件、代码执行、SQL 查询、网络搜索、知识库提问均需确认；
     # 框架会把 interrupt_on 继承给子智能体，因此子智能体内部的
-    # SQL/搜索/知识库工具调用同样会被拦截（探针验证见 .analysis）
+    # SQL/搜索/知识库/沙箱工具调用同样会被拦截（探针验证见 .analysis）
     "strict": {
         "generate_markdown": True,
+        "generate_chart": True,
         "convert_md_to_pdf": True,
+        "run_code": True,
+        "memory_write": True,
         "execute_sql_query": True,
         "internet_search": True,
         "create_ask_delete": True,
@@ -143,12 +159,30 @@ async def get_main_agent(approval_mode: str | None = None):
             _agents[cache_key] = create_deep_agent(
                 model=model,
                 system_prompt=main_agent_content["system_prompt"],
-                tools=[generate_markdown, convert_md_to_pdf, read_file_content],
+                tools=[
+                    generate_markdown,
+                    generate_chart,
+                    convert_md_to_pdf,
+                    read_file_content,
+                    memory_write,
+                ],
+                # 跨会话记忆：自研 SqliteVecStore（P0-3），供 memory_write
+                # 与未来 agent 侧记忆读写共用；pending 修订召回在 run 启动时
+                store=get_memory_store(),
+                # token 治理双层：deepagents 默认中间件栈已内置摘要压缩
+                # （SummarizationMiddleware，逼近上下文上限时收拢历史，延缓触顶，
+                # 不再手动叠加同 langchain 名实例——重名会被 create_deep_agent
+                # 拒绝）；累计消耗超出 TOKEN_BUDGET 后由 TokenBudgetMiddleware
+                # 跳转图末尾强制收尾兜底（防失控循环耗尽免费档窗口）。
+                # deepagents 的子智能体不继承主图中间件，子图消耗由工具级
+                # 预算（budget.py）与递归上限另行约束
+                middleware=[TokenBudgetMiddleware()],
                 checkpointer=_checkpointer,
                 subagents=[
                     database_query_agent,
                     network_search_agent,
                     knowledge_base_agent,
+                    code_analysis_agent,
                 ],
                 # 高危工具执行前中断等待人工审批；空配置等价于不启用
                 interrupt_on=interrupt_on or None,
@@ -313,12 +347,19 @@ def clear_task_runtime_state(thread_id: str) -> None:
 
 def _build_agent_config(thread_id: str) -> dict[str, Any]:
     """任务执行与审批恢复共用的 RunnableConfig"""
+    # Langfuse tracing 为可选观测组件：未配置密钥时 build 返回 None，零开销旁路
+    from app.observability.langfuse_callback import build_langfuse_handler
+
+    callbacks = [TokenUsageCallbackHandler()]
+    langfuse_handler = build_langfuse_handler()
+    if langfuse_handler is not None:
+        callbacks.append(langfuse_handler)
     return {
         "configurable": {"thread_id": thread_id},
         # 步数上限是防止无限循环的最后保险，即使模型无视提示词也会被硬性拦下
         "recursion_limit": AGENT_RECURSION_LIMIT,
         # 回调随 RunnableConfig 穿透到子智能体，Token 用量覆盖主+子全部模型调用
-        "callbacks": [TokenUsageCallbackHandler()],
+        "callbacks": callbacks,
     }
 
 
@@ -479,7 +520,14 @@ async def _execute_agent_run(
     finally:
         # 审批暂停不是终结：产物/来源/预算/基线全部留给恢复轮次
         if not interrupted:
+            # 带时间戳的收尾日志：W2 的 w1-009 收尾挂起（事件停在 task_sources
+            # 之后、协程无法被软超时取消）缺少定位证据，这些节点耗时一旦异常
+            # 即可锁定阻塞阶段（同步阻塞会让事件循环整个停摆）
+            print(f"[MainAgent] astream 结束，开始收尾 thread_id={thread_id} "
+                  f"at {datetime.datetime.now().strftime('%H:%M:%S.%f')[:-3]}")
             _finalize_task(thread_id, session_dir)
+            print(f"[MainAgent] 收尾完成 thread_id={thread_id} "
+                  f"at {datetime.datetime.now().strftime('%H:%M:%S.%f')[:-3]}")
 
 
 async def run_deep_agent(
@@ -564,8 +612,17 @@ async def run_deep_agent(
     4. 若存在上传文件，请先分析内容
     """
 
+        # 记忆先验（P0-3）：top-k 相关历史记忆 + pending 修订召回，统一
+        # 包裹为非指令数据块（sanitize），注入在日志中可见
+        memory_prior = optional_memory_injection(task_query)
+
         agent_input = {
-            "messages": [{"role": "user", "content": task_query + path_instruction}]
+            "messages": [
+                {
+                    "role": "user",
+                    "content": task_query + path_instruction + (memory_prior or ""),
+                }
+            ]
         }
         await _execute_agent_run(
             session_id,

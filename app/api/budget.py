@@ -25,6 +25,10 @@ DEFAULT_TOOL_LIMITS = {
     "get_assistant_list": 5,
     "get_table_data": 10,
     "execute_sql_query": 15,
+    # 沙箱代码执行：单次脚本最长 60 秒，5 次上限防止模型把沙箱当循环体滥用
+    "run_code": 5,
+    # 图表生成：本地校验无外部开销，限额只为防模型反复改图撑爆报告篇幅
+    "generate_chart": 6,
 }
 
 # 可选的环境变量覆盖：TOOL_BUDGET_JSON='{"internet_search": 3}'，便于不改代码调参
@@ -33,6 +37,11 @@ _ENV_OVERRIDE = os.getenv("TOOL_BUDGET_JSON")
 _lock = threading.Lock()
 # thread_id -> {"counters": {工具名: 已调用次数}, "seen": {调用指纹集合}}
 _task_budgets: dict[str, dict[str, Any]] = {}
+
+# MCP 来源调用的独立配额命名空间（docs/upgrade-plan.md P0-4）：与内部任务的
+# thread 预算隔离——外部客户端的调用没有任务边界，不随任务重置，进程生命周期
+# 内累计；限额表与内部共用一套数值。审计上以 caller=mcp 标记区分
+_mcp_budget: dict[str, dict[str, int]] = {"counters": {}}
 
 
 def _tool_limits() -> dict[str, int]:
@@ -123,4 +132,29 @@ def consume_tool_quota(tool_name: str, args: Optional[dict]) -> Tuple[bool, str]
 
         budget["seen"].add(fingerprint)
         budget["counters"][tool_name] = used + 1
+        return True, ""
+
+
+def consume_mcp_quota(tool_name: str) -> Tuple[bool, str]:
+    """
+    MCP 来源调用的独立配额检查与占用
+
+    与内部任务的 consume_tool_quota 的差异：不做参数去重——外部客户端
+    （如 Claude Code）重复发起相同调用是正常使用模式，"参数完全相同请复用"
+    的提示面向模型决策，对 MCP 客户端没有意义；只按工具限额次数。
+    :param tool_name: 工具注册名（限额表的 key，未列入限额表的工具不设限）
+    :return: (是否放行, 拒绝原因说明)
+    """
+    limit = _tool_limits().get(tool_name)
+    if limit is None:
+        return True, ""
+
+    with _lock:
+        used = _mcp_budget["counters"].get(tool_name, 0)
+        if used >= limit:
+            return False, (
+                f"MCP 调用配额已耗尽：{tool_name} 在本服务进程内最多允许"
+                f"通过 MCP 调用 {limit} 次。请稍后重试或联系管理员调整配额。"
+            )
+        _mcp_budget["counters"][tool_name] = used + 1
         return True, ""
