@@ -1,0 +1,34 @@
+{
+  "case_id": "smoke-002",
+  "query": "查询数据库中一共有多少种药品，生成一份简短的 markdown 报告说明统计口径（不超过 200 字）。",
+  "session_id": "eval_smoke-lite_smoke-002",
+  "report_md": "# 数据库药品统计报告\n\n## 统计总数\n\n本数据库中共收录 **50 种药品**，涵盖 24 个治疗领域、8 类剂型。\n\n## 统计口径说明\n\n1. **数据来源**：数据库中的药品主表（drug 表），以 `drug_id` 为唯一标识，每条记录对应一种独立药品。\n\n2. **统计范围**：\n   - 统计口径为\"去重后的药品种类数\"，即同一通用名不同规格按品种归并后计数。\n   - 治疗领域分类依据药品说明书或主数据表中的\"治疗领域\"字段。\n   - 剂型分类依据\"剂型\"字段，按主要给药途径归纳。\n\n3. **关联数据**：\n   - 库存表（inventory）与销售记录表（sales_records）均通过 `drug_id` 与药品表关联，可用于后续库存与销售分析。\n\n## 主要发现\n\n- 心血管类药物数量最多（6 种），其次为糖尿病（5 种）。\n- 片剂是最主要剂型，占比 58%（29/50）。\n- 数据库共覆盖 24 个治疗领域，药品结构较为全面。\n\n---\n\n> 统计时间：基于数据库当前快照数据。\n",
+  "report_path": "D:\\Project\\deepsearch-agents\\app\\output\\session_eval_smoke-lite_smoke-002\\药品统计报告.md",
+  "sources": [
+    {
+      "type": "sql",
+      "title": "SQL 查询记录",
+      "url_or_ref": "SELECT COUNT(*) AS 药品总数 FROM drugs"
+    },
+    {
+      "type": "sql",
+      "title": "SQL 查询记录",
+      "url_or_ref": "SELECT dosage_form AS 剂型, COUNT(*) AS 药品数量 FROM drugs GROUP BY dosage_form ORDER BY 药品数量 DESC"
+    },
+    {
+      "type": "sql",
+      "title": "SQL 查询记录",
+      "url_or_ref": "SELECT therapeutic_area AS 治疗领域, COUNT(*) AS 药品数量 FROM drugs GROUP BY therapeutic_area ORDER BY 药品数量 DESC"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 87410,
+    "output_tokens": 1876,
+    "total_tokens": 89286
+  },
+  "duration_s": 41.15,
+  "status": "completed",
+  "error": null,
+  "started_at": "2026-09-25T20:24:51.002128",
+  "finished_at": "2026-09-25T20:25:32.154938"
+}

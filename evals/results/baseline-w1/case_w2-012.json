@@ -1,0 +1,18 @@
+{
+  "case_id": "w2-012",
+  "query": "向内部知识库助手咨询《全球电商行业AI应用研究报告2025》中 AI 在电商各业务 环节（如营销获客、客服售后、供应链履约、搜索推荐）的具体应用场景与成效， 整理成一份分场景要点报告",
+  "session_id": "eval_baseline-w1_w2-012",
+  "report_md": null,
+  "report_path": null,
+  "sources": [],
+  "token_usage": {
+    "input_tokens": 55620,
+    "output_tokens": 2075,
+    "total_tokens": 57695
+  },
+  "duration_s": 43.95,
+  "status": "failed",
+  "error": "执行主智能发生异常信息：Error code: 429 - {'error': {'code': '', 'message': 'You’ve reached the API rate limit for free users. Upgrade to a Token Plan to unlock higher limits and continue using the API without interruption. (request id: 20260925092307343830070W1t8vMSc)', 'type': 'AgnesAI_error'}}",
+  "started_at": "2026-09-25T17:22:24.559771",
+  "finished_at": "2026-09-25T17:23:08.512936"
+}

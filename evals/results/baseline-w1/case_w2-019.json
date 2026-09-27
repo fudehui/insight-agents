@@ -1,0 +1,18 @@
+{
+  "case_id": "w2-019",
+  "query": "请围绕\"跨境电商的 AI 应用\"，向内部知识库助手逐一咨询以下 10 个子问题， 每个子问题单独发起一次咨询：平台选型、营销获客、智能客服、搜索推荐、 供应链预测、物流履约、风控合规、内容生成、数据治理、投入产出； 全部咨询完成后汇总生成一份要点报告",
+  "session_id": "eval_baseline-w1_w2-019",
+  "report_md": null,
+  "report_path": null,
+  "sources": [],
+  "token_usage": {
+    "input_tokens": 70233,
+    "output_tokens": 4584,
+    "total_tokens": 74817
+  },
+  "duration_s": 30.41,
+  "status": "failed",
+  "error": "执行主智能发生异常信息：Error code: 429 - {'error': {'code': '', 'message': 'You’ve reached the API rate limit for free users. Upgrade to a Token Plan to unlock higher limits and continue using the API without interruption. (request id: 20260925112854138226832IC8SUtce)', 'type': 'AgnesAI_error'}}",
+  "started_at": "2026-09-25T19:28:23.966164",
+  "finished_at": "2026-09-25T19:28:54.376727"
+}

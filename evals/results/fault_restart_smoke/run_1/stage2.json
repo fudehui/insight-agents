@@ -1,0 +1,9 @@
+{
+  "recovered": true,
+  "task_span_s": 0.116,
+  "elapsed_s": 0.14,
+  "error": null,
+  "started_at": "2026-09-25T11:12:22.328263",
+  "finished_at": "2026-09-25T11:12:22.464008",
+  "events_count": 8
+}

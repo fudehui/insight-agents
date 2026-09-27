@@ -1,0 +1,164 @@
+{
+  "case_id": "w2-018",
+  "query": "先向内部知识库助手咨询《贝莱德BlackRock2026年全球投资展望报告》中对 人工智能与科技板块的核心观点，再检索 2026 年公开市场对 AI 板块的最新 动态进行对照，生成一份内外部视角结合的 AI 投资主题简报",
+  "session_id": "eval_baseline-w1_w2-018",
+  "report_md": null,
+  "report_path": null,
+  "sources": [
+    {
+      "type": "web",
+      "title": "【数字经济研究】生根与重构——2026年全球人工智能技术、政策、产业与投融资趋势全景洞察报告",
+      "url_or_ref": "https://www.smartcity.team/reports/%E5%85%A8%E7%90%83%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E8%B6%8B%E5%8A%BF%E5%85%A8%E6%99%AF%E7%99%BD%E7%9A%AE%E4%B9%A62026"
+    },
+    {
+      "type": "web",
+      "title": "20亿收购案叫停背后，Manus该反思的是无法重来的气运-虎嗅网",
+      "url_or_ref": "https://www.huxiu.com/article/4854273.html"
+    },
+    {
+      "type": "web",
+      "title": "亚洲人工智能时代 | 印度尼西亚 | 日本 | 韩国 | 菲律宾 | 台湾 | 泰国 | 越南",
+      "url_or_ref": "https://law.asia/zh-hans/asia-ai-governance-framework"
+    },
+    {
+      "type": "web",
+      "title": "开源人工智能训练数据的合规治理",
+      "url_or_ref": "http://paper.people.com.cn/rmlt/pc/content/202604/02/content_30156114.html"
+    },
+    {
+      "type": "web",
+      "title": "清华大学战略与安全研究中心-中国论坛",
+      "url_or_ref": "https://ciss.tsinghua.edu.cn/info/china_wzft/9204"
+    },
+    {
+      "type": "web",
+      "title": "AI企业动态 - AI Trends HUB",
+      "url_or_ref": "http://m.aitrendshub.net/col.jsp?id=141"
+    },
+    {
+      "type": "web",
+      "title": "Google · 公司 · AI产业链地图·知识库",
+      "url_or_ref": "https://aichainmap.com/%E5%85%AC%E5%8F%B8/Google"
+    },
+    {
+      "type": "web",
+      "title": "Microsoft · 公司 · AI产业链地图·知识库",
+      "url_or_ref": "https://aichainmap.com/%E5%85%AC%E5%8F%B8/Microsoft"
+    },
+    {
+      "type": "web",
+      "title": "AI股集体回调:OpenAI增长担忧正面撞上大型科技财报周",
+      "url_or_ref": "https://www.simianx.ai/zh-CN/stories/ai-stocks-pull-back-as-openai-growth-concerns-hit-big-techearningsweek"
+    },
+    {
+      "type": "web",
+      "title": "IT公司财报 (1)技术资料/方案产品及IT公司财报市场分析/选购测评排行榜信息1条-IT技术网",
+      "url_or_ref": "https://www.itjs.cn/tags/IT%E5%85%AC%E5%8F%B8%E8%B4%A2%E6%8A%A5"
+    },
+    {
+      "type": "web",
+      "title": "道瓊斯、納斯達克、標普500週報：通脹數據與科技股財報將成焦點",
+      "url_or_ref": "https://hk.finance.yahoo.com/news/%E9%81%93%E7%93%8A%E6%96%AF-%E7%B4%8D%E6%96%AF%E9%81%94%E5%85%8B-%E6%A8%99%E6%99%AE500%E9%80%B1%E5%A0%B1-%E9%80%9A%E8%84%B9%E6%95%B8%E6%93%9A%E8%88%87%E7%A7%91%E6%8A%80%E8%82%A1%E8%B2%A1%E5%A0%B1%E5%B0%87%E6%88%90%E7%84%A6%E9%BB%9E-110507338.html"
+    },
+    {
+      "type": "web",
+      "title": "中國平安針對滙豐的分拆大計凸顯馬明哲的求變之心 - Yahoo 財經",
+      "url_or_ref": "https://hk.finance.yahoo.com/news/%E4%B8%AD%E5%9C%8B%E5%B9%B3%E5%AE%89%E9%87%9D%E5%B0%8D%E6%BB%99%E8%B1%90%E7%9A%84%E5%88%86%E6%8B%86%E5%A4%A7%E8%A8%88%E5%87%B8%E9%A1%AF%E9%A6%AC%E6%98%8E%E5%93%B2%E7%9A%84%E6%B1%82%E8%AE%8A%E4%B9%8B%E5%BF%83-050520596.html"
+    },
+    {
+      "type": "web",
+      "title": "伊朗飛彈危機之際,私募信貸市場出現重大裂痕",
+      "url_or_ref": "https://hk.finance.yahoo.com/news/%E4%BC%8A%E6%9C%97%E9%A3%9B%E5%BD%88%E5%8D%B1%E6%A9%9F%E4%B9%8B%E9%9A%9B-%E7%A7%81%E5%8B%9F%E4%BF%A1%E8%B2%B8%E5%B8%82%E5%A0%B4%E5%87%BA%E7%8F%BE%E9%87%8D%E5%A4%A7%E8%A3%82%E7%97%95-140913404.html"
+    },
+    {
+      "type": "web",
+      "title": "一周市场回顾：美中贸易战阴云再起；中国黄金周消费弱；加沙和平曙光",
+      "url_or_ref": "https://hk.finance.yahoo.com/news/%E5%91%A8%E5%B8%82%E5%9C%BA%E5%9B%9E%E9%A1%BE-%E4%B8%AD%E5%9B%BD%E9%BB%84%E9%87%91%E5%91%A8%E6%B6%88%E8%B4%B9%E5%BC%B1-apec%E5%B3%B0%E4%BC%9A%E5%89%8D%E4%B8%AD%E7%BE%8E%E5%8D%9A%E5%BC%88-%E5%8A%A0%E6%B2%99%E5%92%8C%E5%B9%B3%E6%9B%99%E5%85%89-052201116.html"
+    },
+    {
+      "type": "web",
+      "title": "盟友施壓結束加沙戰爭，內塔尼亞胡陷入新的政治困境",
+      "url_or_ref": "https://cn.wsj.com/articles/%E7%9B%9F%E5%8F%8B%E6%96%BD%E5%A3%93%E7%B5%90%E6%9D%9F%E5%8A%A0%E6%B2%99%E6%88%B0%E7%88%AD-%E5%85%A7%E5%A1%94%E5%B0%BC%E4%BA%9E%E8%83%A1%E9%99%B7%E5%85%A5%E6%96%B0%E7%9A%84%E6%94%BF%E6%B2%BB%E5%9B%B0%E5%A2%83-02d89eb6"
+    },
+    {
+      "type": "web",
+      "title": "我們的AI早已預見：盤前勁升11%，這隻先進材料股8月累漲逾55%",
+      "url_or_ref": "https://hk.finance.yahoo.com/news/%E6%88%91%E5%80%91%E7%9A%84ai%E6%97%A9%E5%B7%B2%E9%A0%90%E8%A6%8B-%E7%9B%A4%E5%89%8D%E5%8B%81%E5%8D%8711-%E9%80%99%E9%9A%BB%E5%85%88%E9%80%B2%E6%9D%90%E6%96%99%E8%82%A18%E6%9C%88%E7%B4%AF%E6%BC%B2%E9%80%BE55-060944283.html"
+    },
+    {
+      "type": "web",
+      "title": "巴克萊投資展望: 料第四季保持風險偏好趨勢 - Yahoo 財經",
+      "url_or_ref": "https://hk.finance.yahoo.com/news/%E5%B7%B4%E5%85%8B%E8%90%8A%E6%8A%95%E8%B3%87%E5%B1%95%E6%9C%9B-%E6%96%99%E7%AC%AC%E5%9B%9B%E5%AD%A3%E4%BF%9D%E6%8C%81%E9%A2%A8%E9%9A%AA%E5%81%8F%E5%A5%BD%E8%B6%A8%E5%8B%A2-033351963.html"
+    },
+    {
+      "type": "web",
+      "title": "7月漲幅逾33%的股票已退出AI選股名單，8月新標的曝光 - Yahoo 財經",
+      "url_or_ref": "https://hk.finance.yahoo.com/news/7%E6%9C%88%E6%BC%B2%E5%B9%85%E9%80%BE33-%E7%9A%84%E8%82%A1%E7%A5%A8%E5%B7%B2%E9%80%80%E5%87%BAai%E9%81%B8%E8%82%A1%E5%90%8D%E5%96%AE-8%E6%9C%88%E6%96%B0%E6%A8%99%E7%9A%84%E6%9B%9D%E5%85%89-021537634.html"
+    },
+    {
+      "type": "web",
+      "title": "AI選股報酬率高達+187%，9月全新精選名單即將揭曉 - Yahoo 財經",
+      "url_or_ref": "https://hk.finance.yahoo.com/news/ai%E9%81%B8%E8%82%A1%E5%A0%B1%E9%85%AC%E7%8E%87%E9%AB%98%E9%81%94-187-9%E6%9C%88%E5%85%A8%E6%96%B0%E7%B2%BE%E9%81%B8%E5%90%8D%E5%96%AE%E5%8D%B3%E5%B0%87%E6%8F%AD%E6%9B%89-054149566.html"
+    },
+    {
+      "type": "web",
+      "title": "Citic Securities Co., Ltd. (CIIHY) Q4 FY2025 earnings call transcript",
+      "url_or_ref": "https://finance.yahoo.com/quote/CIIHY/earnings/CIIHY-Q4-2025-earnings_call-399318.html"
+    },
+    {
+      "type": "web",
+      "title": "人工智能板块（股票市场中与人工智能技术相关的上市公司集合）_百度百科",
+      "url_or_ref": "https://baike.baidu.com/item/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E6%9D%BF%E5%9D%97/67908342"
+    },
+    {
+      "type": "web",
+      "title": "标签: AI人工智能股票 - A股自动化交易平台",
+      "url_or_ref": "https://www.aimoca.com/Blog/Tag/AI%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E8%82%A1%E7%A5%A8"
+    },
+    {
+      "type": "web",
+      "title": "中国股市表现亮眼 2026全球股市或延续涨势",
+      "url_or_ref": "https://p.dw.com/zh/%E4%B8%AD%E5%9B%BD%E8%82%A1%E5%B8%82%E8%A1%A8%E7%8E%B0%E4%BA%AE%E7%9C%BC-2026%E5%85%A8%E7%90%83%E8%82%A1%E5%B8%82%E6%88%96%E5%BB%B6%E7%BB%AD%E6%B6%A8%E5%8A%BF/a-75344678"
+    },
+    {
+      "type": "web",
+      "title": "中国股市表现亮眼 2026全球股市或延续涨势",
+      "url_or_ref": "https://www.dw.com/zh/%E4%B8%AD%E5%9B%BD%E8%82%A1%E5%B8%82%E8%A1%A8%E7%8E%B0%E4%BA%AE%E7%9C%BC-2026%E5%85%A8%E7%90%83%E8%82%A1%E5%B8%82%E6%88%96%E5%BB%B6%E7%BB%AD%E6%B6%A8%E5%8A%BF/a-75344678"
+    },
+    {
+      "type": "web",
+      "title": "市场震荡！锂矿、AI概念股强势领涨，军工、煤炭板块亦有表现！ - OPITIOS AI 美股智投",
+      "url_or_ref": "https://opitios.com/en/%E5%B8%82%E5%9C%BA%E9%9C%87%E8%8D%A1%EF%BC%81%E9%94%82%E7%9F%BF%E3%80%81ai%E6%A6%82%E5%BF%B5%E8%82%A1%E5%BC%BA%E5%8A%BF%E9%A2%86%E6%B6%A8%EF%BC%8C%E5%86%9B%E5%B7%A5%E3%80%81%E7%85%A4%E7%82%AD%E6%9D%BF"
+    },
+    {
+      "type": "sql",
+      "title": "SQL 查询记录",
+      "url_or_ref": "SELECT \n    d.drug_id,\n    d.brand_name,\n    d.generic_name,\n    d.therapeutic_area,\n    COALESCE(s.total_amount, 0) AS total_sales,\n    COALESCE(s.quantity_sold, 0) AS total_quantity,\n    i.quantity_on_hand\nFROM drugs d\nLEFT JOIN (\n    SELECT drug_id, SUM(total_amount) AS total_amount, SUM(quantity_sold) AS quantity_sold\n    FROM sales_records\n    GROUP BY drug_id\n) s ON d.drug_id = s.drug_id\nLEFT JOIN inventory i ON d.drug_id = i.drug_id\nORDER BY total_sales DESC\nLIMIT 20"
+    },
+    {
+      "type": "sql",
+      "title": "SQL 查询记录",
+      "url_or_ref": "SELECT \n    d.brand_name,\n    d.generic_name,\n    d.therapeutic_area,\n    MAX(sr.sale_date) AS last_sale_date,\n    SUM(sr.quantity_sold) AS total_qty,\n    SUM(sr.total_amount) AS total_revenue,\n    AVG(sr.unit_price) AS avg_price,\n    i.quantity_on_hand AS current_stock\nFROM drugs d\nLEFT JOIN sales_records sr ON d.drug_id = sr.drug_id\nLEFT JOIN inventory i ON d.drug_id = i.drug_id\nGROUP BY d.drug_id\nHAVING SUM(sr.total_amount) > 20000\nORDER BY total_revenue DESC\nLIMIT 15"
+    },
+    {
+      "type": "sql",
+      "title": "SQL 查询记录",
+      "url_or_ref": "SELECT \n    d.therapeutic_area,\n    COUNT(DISTINCT d.drug_id) AS drug_count,\n    COUNT(sr.sale_id) AS sales_count,\n    SUM(sr.total_amount) AS total_revenue,\n    SUM(sr.quantity_sold) AS total_quantity\nFROM drugs d\nLEFT JOIN sales_records sr ON d.drug_id = sr.drug_id\nGROUP BY d.therapeutic_area\nORDER BY total_revenue DESC"
+    },
+    {
+      "type": "sql",
+      "title": "SQL 查询记录",
+      "url_or_ref": "SELECT \n    d.brand_name,\n    d.generic_name,\n    d.therapeutic_area,\n    d.manufacturer,\n    d.specifications,\n    SUM(sr.quantity_sold) AS total_qty,\n    SUM(sr.total_amount) AS total_revenue,\n    AVG(sr.unit_price) AS avg_price,\n    SUM(i.quantity_on_hand) AS current_stock,\n    MAX(sr.sale_date) AS last_sale_date\nFROM drugs d\nJOIN sales_records sr ON d.drug_id = sr.drug_id\nJOIN inventory i ON d.drug_id = i.drug_id\nGROUP BY d.drug_id\nHAVING SUM(sr.total_amount) > 100000\nORDER BY total_revenue DESC\nLIMIT 20"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 115617,
+    "output_tokens": 3362,
+    "total_tokens": 118979
+  },
+  "duration_s": 30.74,
+  "status": "failed",
+  "error": "执行主智能发生异常信息：Error code: 429 - {'error': {'code': '', 'message': 'You’ve reached the API rate limit for free users. Upgrade to a Token Plan to unlock higher limits and continue using the API without interruption. (request id: 20260925111053620450790YumyAReT)', 'type': 'AgnesAI_error'}}",
+  "started_at": "2026-09-25T19:10:23.147517",
+  "finished_at": "2026-09-25T19:10:53.884518"
+}

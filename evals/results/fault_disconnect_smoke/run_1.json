@@ -1,0 +1,14 @@
+{
+  "run": 1,
+  "scenario": "disconnect",
+  "status": "completed",
+  "recovery_success": true,
+  "recovery_time_s": null,
+  "event_completion_rate": 1.0,
+  "tavily_search_calls": 2,
+  "duration_s": 0.88,
+  "error": null,
+  "started_at": "2026-09-25T11:11:49.971525",
+  "finished_at": "2026-09-25T11:11:50.861414",
+  "events_count": 9
+}

@@ -1,0 +1,18 @@
+{
+  "run_id": "echarts-verify-r2",
+  "started_at": "2026-09-27T14:19:26.119176",
+  "finished_at": "2026-09-27T14:32:26.156223",
+  "cases_run": 1,
+  "cases_completed": 1,
+  "cases_failed": 0,
+  "total_tokens": 121194,
+  "p95_duration_s": 76.96,
+  "per_case": [
+    {
+      "case_id": "echarts-e2e-001",
+      "status": "completed",
+      "duration_s": 76.96,
+      "total_tokens": 121194
+    }
+  ]
+}

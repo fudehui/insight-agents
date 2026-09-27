@@ -1,0 +1,193 @@
+{
+  "run_id": "baseline-w1",
+  "started_at": "2026-09-15T16:18:55.875035",
+  "finished_at": "2026-09-25T12:43:38.483620+00:00",
+  "cases_run": 30,
+  "cases_completed": 19,
+  "cases_failed": 11,
+  "total_tokens": 5891936,
+  "p95_duration_s": 378.7,
+  "per_case": [
+    {
+      "case_id": "w1-001",
+      "status": "completed",
+      "duration_s": 147.76,
+      "total_tokens": 178334
+    },
+    {
+      "case_id": "w1-002",
+      "status": "completed",
+      "duration_s": 176.36,
+      "total_tokens": 173425
+    },
+    {
+      "case_id": "w1-003",
+      "status": "completed",
+      "duration_s": 129.2,
+      "total_tokens": 111255
+    },
+    {
+      "case_id": "w1-004",
+      "status": "completed",
+      "duration_s": 124.48,
+      "total_tokens": 652054
+    },
+    {
+      "case_id": "w1-005",
+      "status": "completed",
+      "duration_s": 110.04,
+      "total_tokens": 148840
+    },
+    {
+      "case_id": "w1-006",
+      "status": "completed",
+      "duration_s": 370.23,
+      "total_tokens": 387178
+    },
+    {
+      "case_id": "w1-007",
+      "status": "completed",
+      "duration_s": 149.17,
+      "total_tokens": 179331
+    },
+    {
+      "case_id": "w1-008",
+      "status": "completed",
+      "duration_s": 402.52,
+      "total_tokens": 371233
+    },
+    {
+      "case_id": "w1-009",
+      "status": "completed",
+      "duration_s": 378.69,
+      "total_tokens": 578632
+    },
+    {
+      "case_id": "w1-010",
+      "status": "completed",
+      "duration_s": 65.54,
+      "total_tokens": 223784
+    },
+    {
+      "case_id": "w2-001",
+      "status": "failed",
+      "duration_s": 252.07,
+      "total_tokens": 261430
+    },
+    {
+      "case_id": "w2-002",
+      "status": "completed",
+      "duration_s": 141.17,
+      "total_tokens": 164313
+    },
+    {
+      "case_id": "w2-003",
+      "status": "completed",
+      "duration_s": 157.0,
+      "total_tokens": 156112
+    },
+    {
+      "case_id": "w2-004",
+      "status": "completed",
+      "duration_s": 162.95,
+      "total_tokens": 174578
+    },
+    {
+      "case_id": "w2-005",
+      "status": "completed",
+      "duration_s": 124.07,
+      "total_tokens": 145770
+    },
+    {
+      "case_id": "w2-006",
+      "status": "completed",
+      "duration_s": 137.13,
+      "total_tokens": 194231
+    },
+    {
+      "case_id": "w2-007",
+      "status": "failed",
+      "duration_s": 176.5,
+      "total_tokens": 183976
+    },
+    {
+      "case_id": "w2-008",
+      "status": "completed",
+      "duration_s": 137.04,
+      "total_tokens": 346411
+    },
+    {
+      "case_id": "w2-009",
+      "status": "completed",
+      "duration_s": 76.26,
+      "total_tokens": 124002
+    },
+    {
+      "case_id": "w2-010",
+      "status": "failed",
+      "duration_s": 137.46,
+      "total_tokens": 166577
+    },
+    {
+      "case_id": "w2-011",
+      "status": "completed",
+      "duration_s": 83.55,
+      "total_tokens": 144835
+    },
+    {
+      "case_id": "w2-012",
+      "status": "failed",
+      "duration_s": 43.95,
+      "total_tokens": 57695
+    },
+    {
+      "case_id": "w2-013",
+      "status": "failed",
+      "duration_s": 114.16,
+      "total_tokens": 171279
+    },
+    {
+      "case_id": "w2-014",
+      "status": "failed",
+      "duration_s": 43.86,
+      "total_tokens": 54288
+    },
+    {
+      "case_id": "w2-015",
+      "status": "completed",
+      "duration_s": 25.41,
+      "total_tokens": 52233
+    },
+    {
+      "case_id": "w2-016",
+      "status": "failed",
+      "duration_s": 32.57,
+      "total_tokens": 84610
+    },
+    {
+      "case_id": "w2-017",
+      "status": "failed",
+      "duration_s": 56.23,
+      "total_tokens": 153405
+    },
+    {
+      "case_id": "w2-018",
+      "status": "failed",
+      "duration_s": 30.74,
+      "total_tokens": 118979
+    },
+    {
+      "case_id": "w2-019",
+      "status": "failed",
+      "duration_s": 30.41,
+      "total_tokens": 74817
+    },
+    {
+      "case_id": "w2-020",
+      "status": "failed",
+      "duration_s": 41.84,
+      "total_tokens": 58329
+    }
+  ],
+  "note": "30 条中 19 完成：w1 全 10 条完成；w2 9/20 完成（11 条免费档 429 未补齐，经 3 轮冷却续跑仍受限；用户指示改为轻量 smoke 验证——见 evals/results/smoke-lite/）"
+}

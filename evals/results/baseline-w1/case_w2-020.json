@@ -1,0 +1,18 @@
+{
+  "case_id": "w2-020",
+  "query": "根据内部知识库中的《贝莱德BlackRock2026年全球投资展望报告》总结 2026 年 宏观经济关键词。注意：按内部格式要求，本报告正文中不要出现任何 \"参考来源\"\"数据来源\"等来源章节，也不要标注文档出处与页码",
+  "session_id": "eval_baseline-w1_w2-020",
+  "report_md": null,
+  "report_path": null,
+  "sources": [],
+  "token_usage": {
+    "input_tokens": 56730,
+    "output_tokens": 1599,
+    "total_tokens": 58329
+  },
+  "duration_s": 41.84,
+  "status": "failed",
+  "error": "执行主智能发生异常信息：Error code: 429 - {'error': {'code': '', 'message': 'You’ve reached the API rate limit for free users. Upgrade to a Token Plan to unlock higher limits and continue using the API without interruption. (request id: 20260925114704605757157TXQa26Fk)', 'type': 'AgnesAI_error'}}",
+  "started_at": "2026-09-25T19:46:23.588555",
+  "finished_at": "2026-09-25T19:47:05.424773"
+}

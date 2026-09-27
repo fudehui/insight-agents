@@ -1,0 +1,147 @@
+
+===== [1/1] case=w2-010 session=eval_baseline-w1_w2-010 =====
+{'tavily': {'name': '网络搜索助手', 'description': '负责进行网络知识搜索的智能体助手，当需要从网络中查询数据的时候，可以执行数据检索，在检索后会返回一段检索结果。\n注意：在需要进行非内部信息，不是数据库数据和 RAGFlow 知识库数据的公开信息查询时，务必使用此助手进行查询。\n', 'system_prompt': '你是一个专业的网络信息查询助手，你可以根据用户的问题，从互联网中检索相关信息。\n你掌握的工具包括 internet_search 工具，此工具可以根据用户的问题，从互联网中检索非内部的公开信息。\n在检索网络知识的时候，至少检索 3 个角度的该问题，一共最多进行 5 次检索，如果超过 5 次，则不允许继续检索。\n返回结果时必须保留来源：按主题整理信息，每条关键信息标注对应的来源编号；\n并在回答末尾用【来源清单】逐条列出实际引用的来源，格式为"编号. 标题 - URL"。\n不得将多个来源的信息混合陈述而不标注出处；检索结果中没有链接的条目要注明"该来源无链接"。\n'}, 'db': {'name': '数据库查询助手', 'description': '负责进行数据库查询的智能体助手。它可以查看数据库中有哪些表，读取表数据和查看表结构，并执行自定义SQL查询以获取精确的业务数据。\n数据库中包含了企业的药品信息、药品库存信息、以及药品销售具体数据，可以看到所有特定商品的一切详细信息。但是数据库中不包含概括性的知识，只包含具体商品的信息。\n', 'system_prompt': "你是一个专业的数据库查询助手。你可以直接与SQLite数据库交互来检索信息。\n你掌握的工具包括：\n 1. list_sql_tables: 列出数据库中所有可用的表，这是了解数据库结构的第一步。\n 2. get_table_data: 读取指定表的前100行数据，用于快速预览数据内容和表列的信息。\n 3. execute_sql_query: 执行自定义SQL查询。当需要复杂的筛选、联接或聚合时使用此工具。\n通常的工作流程是：先列出可用表(list_sql_tables)，确认表名；如果需要，预览表数据了解字段(get_table_data)；最后编写并执行SQL查询(execute_sql_query)以回答用户问题。\n编写SQL时必须使用SQLite方言：当前时间用 date('now')/strftime()，不支持 MySQL 的 NOW()、DATE_FORMAT()；分页只写 LIMIT n，不支持 LIMIT offset,n；没有 SHOW 语句，查看表结构用 get_table_data。\n"}, 'ragflow': {'name': 'RAGFlow助手', 'description': '负责查询 RAGFlow 内部知识库中的非结构化文档信息，例如 PDF、白皮书、研报、制度文件、产品资料等。\n当任务需要查询企业内部私有文档，而不是互联网公开信息或 SQLite 结构化数据时，使用此助手。\n', 'system_prompt': '你是一个专业的 RAGFlow 知识库助手，负责从企业内部非结构化文档中检索信息。\n\n你掌握的工具包括：\n 1. get_assistant_list: 查询当前可用的 RAGFlow 聊天助手，以及每个助手关联的知识库信息。\n 2. create_ask_delete: 向指定 RAGFlow 聊天助手创建临时会话并提问。\n\n工作流程：\n 1. 必须先调用 get_assistant_list，确认有哪些可用助手、助手描述和关联知识库。\n 2. 根据用户问题选择最匹配的助手；如果没有合适助手，不要强行提问，应说明 RAGFlow 当前没有可用知识库能回答该问题。\n 3. 向助手提问时，问题必须围绕用户原始需求，不要发散到无关主题。\n 4. 对复杂、开放性问题，应采用“先宽后窄”的方式提问：先询问总体结论，再追问关键依据、细节、出处或适用场景。\n 5. 复杂问题至少提问 3 个不同角度的问题；简单事实型问题可以只提问 1 次。\n 6. 返回时不要做最终综合结论，但需要按提问轮次保留原始回答、使用的助手名称、问题和重要来源信息，交给后续主智能体汇总。\n'}}
+[MainAgent] 开始执行会话，session_id=eval_baseline-w1_w2-010
+
+[Monitor:task_start] 研究任务已启动: 从数据库查询 2025 年销售额最高的客户及其订单构成，并分析大客户集中度， 生成一份客户销售分析报告
+
+[Monitor:session_created] 工作目录已创建: D:/Project/deepsearch-agents/app/output/session_eval_baseline-w1_w2-010
+
+[Monitor:token_usage] Token 用量：输入 8619 / 输出 317 / 合计 8936
+
+[Monitor:assistant_call] 正在调用助手: 数据库查询助手
+
+[Monitor:token_usage] Token 用量：输入 4586 / 输出 82 / 合计 4668
+
+[Monitor:tool_start] 开始执行工具: 数据库表名查询工具：list_sql_tables
+
+[Monitor:tool_end] 工具执行结束: 数据库表名查询工具：list_sql_tables（success，7ms）｜结果：可用的表有：drugs, inventory, sales_records
+
+[Monitor:token_usage] Token 用量：输入 4671 / 输出 136 / 合计 4807
+
+[Monitor:tool_start] 开始执行工具: 数据库表数据查询工具：get_table_data
+
+[Monitor:tool_start] 开始执行工具: 数据库表数据查询工具：get_table_data
+
+[Monitor:tool_start] 开始执行工具: 数据库表数据查询工具：get_table_data
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：get_table_data（success，2ms）｜结果：sale_id,drug_id,sale_date,quantity_sold,unit_price,total_amount,customer_name,region,sales_rep 1,1,2025-02-15,200,25,5000,北京朝阳医院,华北区,北京朝阳销售部 2,1,2025-08-10,500,24.5,12250,天津大药房,华北区,天津南开销售分部 3,2,2025-0...
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：get_table_data（success，5ms）｜结果：inventory_id,drug_id,batch_number,quantity_on_hand,warehouse_location,production_date,expiry_date,last_updated 1,1,MY-250101-A,5000,北京一号库-A区,2025-01-01,2027-01-01,2026-09-03 09:59:58 2,1,MY-250615-B,8...
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：get_table_data（success，16ms）｜结果：drug_id,generic_name,brand_name,approval_number,specifications,dosage_form,manufacturer,therapeutic_area,description,created_at 1,阿莫西林胶囊,阿莫仙,国药准字H20051234,0.25g*24粒,胶囊剂,本公司制药,抗生素,用于治疗敏感菌引起的上呼吸道感染、泌尿生殖...
+
+[Monitor:token_usage] Token 用量：输入 20433 / 输出 460 / 合计 20893
+
+[Monitor:tool_start] 开始执行工具: 数据库表数据查询工具：execute_sql_query
+
+[Monitor:tool_start] 开始执行工具: 数据库表数据查询工具：execute_sql_query
+
+[Monitor:tool_start] 开始执行工具: 数据库表数据查询工具：execute_sql_query
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：execute_sql_query（success，2ms）｜结果：customer_name,total_sales,order_count 全国连锁大药房总仓,1000000,1 黑龙江省医院,500000,1 石家庄以岭药业,200000,1 北京协和医院,200000,1 北京地坛医院,123600,1 深圳连锁药房中心仓,118400,2 上海连锁药房总仓,76000,2 上海华山医院,75000,1 天津社区健康药房,66400,1 武汉同济呼吸科,6...
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：execute_sql_query（success，7ms）｜结果：customer_name,sale_id,sale_date,drug_id,quantity_sold,unit_price,total_amount 上海华山医院,4,2025-12-05,2,5000,15,75000 上海连锁药房总仓,54,2025-09-05,27,2500,17.5,43750 上海连锁药房总仓,96,2025-12-01,48,1500,21.5,32250 全国...
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：execute_sql_query（success，6ms）｜结果：customer_name,total_sales,percentage 全国连锁大药房总仓,1000000,20.8 黑龙江省医院,500000,10.4 北京协和医院,200000,4.16 石家庄以岭药业,200000,4.16 北京地坛医院,123600,2.57 深圳连锁药房中心仓,118400,2.46 上海连锁药房总仓,76000,1.58 上海华山医院,75000,1.56 天津社...
+
+[Monitor:token_usage] Token 用量：输入 22965 / 输出 1686 / 合计 24651
+
+[Monitor:token_usage] Token 用量：输入 10597 / 输出 3599 / 合计 14196
+
+[Monitor:tool_start] 开始执行工具: Markdown文档生成工具
+
+[Monitor:token_usage] Token 用量：输入 14152 / 输出 194 / 合计 14346
+
+[Monitor:tool_start] 开始执行工具: Markdown转PDF工具
+
+[Monitor:token_usage] Token 用量：输入 14467 / 输出 111 / 合计 14578
+
+[Monitor:token_usage] Token 用量：输入 14656 / 输出 400 / 合计 15056
+
+[Monitor:assistant_call] 正在调用助手: 数据库查询助手
+
+[Monitor:token_usage] Token 用量：输入 4611 / 输出 116 / 合计 4727
+
+[Monitor:tool_start] 开始执行工具: 数据库表名查询工具：list_sql_tables
+
+[Monitor:tool_end] 工具执行结束: 数据库表名查询工具：list_sql_tables（success，3ms）｜结果：可用的表有：drugs, inventory, sales_records
+
+[Monitor:token_usage] Token 用量：输入 4712 / 输出 112 / 合计 4824
+
+[Monitor:budget_exceeded] 调用预算限制触发: 数据库表数据查询工具：get_table_data
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：get_table_data（blocked，0ms）｜拦截原因：检测到重复调用：本次 get_table_data 的参数与之前的调用完全相同，请直接复用之前返回的结果；如需补充新信息，请调整参数后重试。
+
+[Monitor:budget_exceeded] 调用预算限制触发: 数据库表数据查询工具：get_table_data
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：get_table_data（blocked，0ms）｜拦截原因：检测到重复调用：本次 get_table_data 的参数与之前的调用完全相同，请直接复用之前返回的结果；如需补充新信息，请调整参数后重试。
+
+[Monitor:budget_exceeded] 调用预算限制触发: 数据库表数据查询工具：get_table_data
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：get_table_data（blocked，0ms）｜拦截原因：检测到重复调用：本次 get_table_data 的参数与之前的调用完全相同，请直接复用之前返回的结果；如需补充新信息，请调整参数后重试。
+
+[Monitor:token_usage] Token 用量：输入 4924 / 输出 128 / 合计 5052
+
+[Monitor:tool_start] 开始执行工具: 数据库表数据查询工具：execute_sql_query
+
+[Monitor:tool_start] 开始执行工具: 数据库表数据查询工具：execute_sql_query
+
+[Monitor:tool_start] 开始执行工具: 数据库表数据查询工具：execute_sql_query
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：execute_sql_query（success，3ms）｜结果：drug_id,generic_name,brand_name,approval_number,specifications,dosage_form,manufacturer,therapeutic_area,description,created_at 1,阿莫西林胶囊,阿莫仙,国药准字H20051234,0.25g*24粒,胶囊剂,本公司制药,抗生素,用于治疗敏感菌引起的上呼吸道感染、泌尿生殖...
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：execute_sql_query（success，7ms）｜结果：sale_id,drug_id,sale_date,quantity_sold,unit_price,total_amount,customer_name,region,sales_rep 1,1,2025-02-15,200,25,5000,北京朝阳医院,华北区,北京朝阳销售部 2,1,2025-08-10,500,24.5,12250,天津大药房,华北区,天津南开销售分部 3,2,2025-0...
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：execute_sql_query（success，10ms）｜结果：inventory_id,drug_id,batch_number,quantity_on_hand,warehouse_location,production_date,expiry_date,last_updated 1,1,MY-250101-A,5000,北京一号库-A区,2025-01-01,2027-01-01,2026-09-03 09:59:58 2,1,MY-250615-B,8...
+
+[Monitor:token_usage] Token 用量：输入 6280 / 输出 1047 / 合计 7327
+
+[Monitor:tool_start] 开始执行工具: 数据库表数据查询工具：execute_sql_query
+
+[Monitor:tool_start] 开始执行工具: 数据库表数据查询工具：execute_sql_query
+
+[Monitor:tool_start] 开始执行工具: 数据库表数据查询工具：execute_sql_query
+
+[Monitor:tool_start] 开始执行工具: 数据库表数据查询工具：execute_sql_query
+
+[Monitor:tool_start] 开始执行工具: 数据库表数据查询工具：execute_sql_query
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：execute_sql_query（success，2ms）｜结果：customer_name,total_sales,order_count 全国连锁大药房总仓,1000000,1 黑龙江省医院,500000,1 石家庄以岭药业,200000,1 北京协和医院,200000,1 北京地坛医院,123600,1 深圳连锁药房中心仓,118400,2 上海连锁药房总仓,76000,2 上海华山医院,75000,1 天津社区健康药房,66400,1 武汉同济呼吸科,6...
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：execute_sql_query（success，7ms）｜结果：customer_name,customer_type,type_total_sales,type_transaction_count 上海东方医院,医院,53600,1 上海儿童医学中心,其他,22400,1 上海华山医院,医院,75000,1 上海呼吸病研究所,其他,25200,1 上海市第六人民医院,医院,34800,1 上海慢病药房中心仓,药房,44720,1 上海瑞金医院,医院,8400...
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：execute_sql_query（success，9ms）｜结果：customer_name,sale_id,drug_name,quantity,unit_price,total_amount,sale_date,region 上海华山医院,4,芬必得,5000,15,75000,2025-12-05,华东区 上海连锁药房总仓,54,开瑞坦,2500,17.5,43750,2025-09-05,华东区 上海连锁药房总仓,96,达克宁,1500,21.5,322...
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：execute_sql_query（success，8ms）｜结果：customer_name,customer_type,total_sales,transaction_count 全国连锁大药房总仓,药房,1000000,1 黑龙江省医院,医院,500000,1 石家庄以岭药业,其他,200000,1 北京协和医院,医院,200000,1 北京地坛医院,医院,123600,1 深圳连锁药房中心仓,药房,118400,2 上海连锁药房总仓,药房,76000,2 ...
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：execute_sql_query（success，9ms）｜结果：metric,percentage CR3,35.362701710410676 CR5,42.09409598893355 CR10,50.43969359259047
+
+[Monitor:token_usage] Token 用量：输入 10826 / 输出 188 / 合计 11014
+
+[Monitor:tool_start] 开始执行工具: 数据库表数据查询工具：execute_sql_query
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：execute_sql_query（success，1ms）｜结果：customer_type,type_total_sales,customer_count 医院,1946530,47 药房,1702120,20 其他,1123175,31 连锁,35500,2
+
+[Monitor:token_usage] Token 用量：输入 11056 / 输出 446 / 合计 11502
+
+[Monitor:tool_start] 开始执行工具: 数据库表数据查询工具：execute_sql_query
+
+[Monitor:budget_exceeded] 调用预算限制触发: 数据库表数据查询工具：execute_sql_query
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：execute_sql_query（blocked，0ms）｜拦截原因：检测到重复调用：本次 execute_sql_query 的参数与之前的调用完全相同，请直接复用之前返回的结果；如需补充新信息，请调整参数后重试。
+
+[Monitor:tool_start] 开始执行工具: 数据库表数据查询工具：execute_sql_query
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：execute_sql_query（success，7ms）｜结果：customer_name,total_sales,order_count 全国连锁大药房总仓,1000000,1 黑龙江省医院,500000,1 石家庄以岭药业,200000,1 北京协和医院,200000,1 北京地坛医院,123600,1 深圳连锁药房中心仓,118400,2 上海连锁药房总仓,76000,2 上海华山医院,75000,1 天津社区健康药房,66400,1 武汉同济呼吸科,6...
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：execute_sql_query（success，11ms）｜结果：customer_name,total_sales,order_count 全国连锁大药房总仓,1000000,1 黑龙江省医院,500000,1 石家庄以岭药业,200000,1 北京协和医院,200000,1 北京地坛医院,123600,1 深圳连锁药房中心仓,118400,2 上海连锁药房总仓,76000,2 上海华山医院,75000,1 天津社区健康药房,66400,1 武汉同济呼吸科,6...
+
+[Monitor:error] 执行主智能发生异常信息：Error code: 429 - {'error': {'code': '', 'message': 'You’ve reached the API rate limit for free users. Upgrade to a Token Plan to unlock higher limits and continue using the API without interruption. (request id: 20260925084839703396929SEQAG0Uo)', 'type': 'AgnesAI_error'}}
+[MainAgent] astream 结束，开始收尾 thread_id=eval_baseline-w1_w2-010 at 16:48:40.891
+
+[Monitor:task_files] 本次任务共生成 2 个文件
+
+[Monitor:task_sources] 本次任务共引用 14 个来源（网络 0 / 文档 0 / 数据库 14）
+[MainAgent] 收尾完成 thread_id=eval_baseline-w1_w2-010 at 16:48:40.892
+----- case=w2-010 完成：status=failed duration=137.46s 结果=evals\results\baseline-w1\case_w2-010.json

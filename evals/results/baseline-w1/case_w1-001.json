@@ -1,0 +1,144 @@
+{
+  "case_id": "w1-001",
+  "query": "检索并总结 2026 年企业级 AI Agent 的落地趋势与典型应用场景， 生成一份简要趋势报告",
+  "session_id": "eval_baseline-w1_w1-001",
+  "report_md": "# 2026年企业级AI Agent落地趋势与典型应用场景报告\n\n## 摘要\n\n2026年被业界定位为AI Agent的\"产业化元年\"，企业级AI Agent正从概念验证向规模化生产部署加速演进。本报告基于IDC、Gartner、麦肯锡等权威机构数据，结合行业实践案例，系统梳理2026年企业AI Agent的市场趋势、技术演进、典型应用场景及治理挑战，为企业决策者提供参考。\n\n---\n\n## 一、市场规模与增长预测\n\n### 1.1 全球与中国市场展望\n\n| 机构 | 预测指标 | 数据 |\n|------|---------|------|\n| **IDC** | 2026年全球企业AI支出 | 9400亿美元 |\n| **爱分析** | 中国智能体平台市场规模（2026年） | 272.1亿元（2025年144.3亿，+88.6%） |\n| **前瞻产业研究院** | 中国AI Agent市场规模（2028年预测） | 33009亿元（2023年574亿，CAGR超100%） |\n| **德勤** | 2026年数字化转型预算投入AI自动化比例 | 50%的组织将超50%预算投入 |\n| **IBM** | 企业AI投资占IT支出比例（2026年） | 20%（2024年12%，+66%） |\n\n### 1.2 Agent数量爆发式增长\n\nIDC预测显示，全球活跃Agent数量将迎来指数级增长：\n- **2025年**：约2860万个活跃Agent\n- **2030年**：预计达**22.16亿个**（年复合增长率139%）\n\n中国市场增速尤为显著：\n- **2025年**：中国企业活跃智能体约200万个\n- **2026年**：预计达500万个（CAGR约145%）\n- **2031年**：将达到3.5亿个（CAGR 135.3%）\n\n### 1.3 AaaS（Agent即服务）市场崛起\n\nAgent即服务（AaaS）模式正在重塑企业服务市场：\n- **2025年市场规模**：157.4亿美元\n- **2030年预测规模**：739亿美元\n- **复合年增长率**：36.25%\n\n---\n\n## 二、技术演进趋势\n\n### 2.1 从单Agent向多Agent协作转变\n\n2026年最显著的技术趋势是从单Agent工作流向多Agent协调架构演进。Gartner调研数据显示，从2024年一季度到2025年二季度，多Agent架构技术方案的咨询量增长了**1445%**。\n\nGartner已将多Agent协作架构列为2026年顶级战略技术趋势。当前52%的企业已将Agent投入生产环境，其中39%的企业运营超过10个Agent。\n\n**主流多Agent架构模式：**\n\n| 模式 | 特点 | 适用场景 |\n|------|------|----------|\n| **监督者模式（Supervisor）** | 额外设置\"监督者Agent\"，负责任务拆解与委派 | 复杂项目管理 |\n| **流水线模式** | 多个Agent按顺序执行，每个完成特定子任务 | 数据处理流程 |\n| **角色分工模式** | 每个Agent有明确角色分工和工具权限 | 客服谈判系统 |\n\n**主流开发框架对比：**\n\n| 框架 | 开发者 | 核心特点 |\n|------|--------|----------|\n| LangGraph | LangChain | 最灵活，图编排 |\n| CrewAI | CrewAI团队 | 多Agent协作，高级抽象 |\n| AutoGen | Microsoft | 对话式多Agent |\n| Google ADK | Google | 深度集成Google生态 |\n\n### 2.2 框架收敛与MCP标准化\n\nAgent开发框架正从百花齐放收敛到3-5个主流选择。这一收敛的核心驱动力是**MCP（Model Context Protocol）协议**的标准化：\n\n- 开发从\"每个工具写一个适配器\"变为\"实现一个MCP Server\"\n- 企业IT部门需思考\"如何将内部系统暴露为MCP Server\"\n- 工具生态从碎片化走向标准化\n\n### 2.3 从\"聊天\"到\"做事\"的范式转移\n\n2026年企业AI Agent的核心转变是：**从被动问答转向自主执行任务**。这一转变体现在：\n\n1. **任务自主性**：Agent能够理解目标、规划步骤、调用工具、执行操作\n2. **持久化运行**：支持24/7后台运行（如Google Gemini CLI升级为Managed Agents）\n3. **记忆能力**：部分开源框架（如Hermes）开始支持多Agent桌面版带记忆功能\n\n---\n\n## 三、典型应用场景\n\n### 3.1 客户服务场景\n\n**效果数据：**\n- 客户咨询响应时间：从小时级降至秒级\n- AI客服准确率：达92%（基于专属知识库训练）\n\n**典型案例：**\n- **支付宝**：AI支付累计完成3亿笔智能体支付，支持95%通用智能体框架\n- **美的集团**：5000+员工Agent应用，实现降本40%\n\n### 3.2 销售场景\n\n**Google Cloud零售方案：**\n- **Customer Experience Agent Studio**：构建全天候客户支持，拖放式画布快速部署\n- **购物智能体**：虚拟私人购物助理，支持产品推荐、引导结账\n- **Gemini Enterprise AI Commerce Search**：对话式商品过滤，支持100+语言\n\n**北森AI陪练案例：**\n- 某新能源汽车企业：销售通关率达99.5%，总部培训成本直降20万\n- 提炼20+销售实战训练场景，新员工1个月内完成全场景通关\n\n### 3.3 研发场景\n\n**典型工具与应用：**\n- **Manus.im**：端到端完成开发任务\n- **Devin**：AI工程师，自动编码调试\n- **Google Gemini CLI**：升级为Managed Agents，支持24/7后台运行daemon\n\n**效果数据：** 产品设计效率提升80%，营销成本降低95%\n\n### 3.4 人力资源场景\n\n根据LinkedIn 2026全球人才趋势报告数据：\n\n| 指标 | 传统模式 | AI Agent辅助 | 提升幅度 |\n|------|---------|-------------|---------|\n| 平均到岗时间 | 42天 | 19天 | ↓55% |\n| 简历筛选准确率 | 23% | 67% | ↑191% |\n\n**核心应用场景：**\n\n1. **招聘数字助理**：某世界500强生物制药企业，全球30000+员工，面临候选人群体窄、专业要求高、招聘成本高的挑战，通过AI Agent显著提升招聘效率\n\n2. **人事运营自动化**：某800人零售企业，传统模式下HR每月需60小时处理离职管理（8.5天流程），AI Agent后月度投入降至12小时（3.2天流程），入离职流程自动化率达85%\n\n3. **员工智能助手**：某2000人物流装备企业，释放83% HR精力用于制度问答，扩展到安全生产知识问答后员工应用率达100%\n\n4. **人才管理数字化**：AI Agent持续观察记录员工能力表现、项目贡献、协作模式，自动构建动态人才画像\n\n### 3.5 金融服务场景\n\n**典型应用：**\n- **量化交易**：年化收益率超30%\n- **供应链金融**：资金周转率从1.8次/月提升至3.5次/月，坏账率从2.3%降至0.7%（降幅70%）\n- **合规风控**：主动监控与预警\n- **智能投顾**：个性化资产配置建议\n\n**金融投研案例：** 博弈均衡策略使对冲基金夏普比率突破3.0（当前平均1.2）\n\n### 3.6 医疗健康场景\n\n**镁信健康案例（入选《2026中国智能体经济白皮书》）：**\n\n| 智能体 | 功能定位 |\n|--------|----------|\n| 医药理赔AI智能体 | 理赔材料自动审核、诊疗合理性核查、直付结算 |\n| KnowDrug.ai | 创新药患者服务智能体，整合疾病科普、用药履约、支付结算、长期随访 |\n| KnowIns.ai | 健康险服务智能体，提供保险条款解读、理赔服务、健康管理 |\n\n**效果：** 直击传统理赔场景\"材料处理低效、病程分析粗放、条款解析滞后\"三大痛点\n\n**医疗诊断案例：** Meta的Symbolic Neural Engine在医疗诊断任务中，将误诊率降低至2.7%（纯神经网络为8.4%）\n\n### 3.7 制造业场景\n\n**华为云盘古制造模型：** 已在工业质检与流程优化中商用落地\n\n**应用领域：**\n- 工业质检：结合视觉与工艺优化联动\n- 机器人控制：波士顿动力新版Atlas机器人在复杂地形任务成功率提升47%\n- 供应链管理：多Agent系统优化生产流程\n\n---\n\n## 四、权威机构观点\n\n### 4.1 Gartner 2026预测\n\n| 预测指标 | 内容 |\n|---------|------|\n| 企业应用集成 | 2026年底约**40%企业应用**将集成任务型AI Agent（2025年<5%） |\n| 特定领域模型 | 到2028年，超过50%企业使用的生成式AI模型为特定领域模型（DSLM） |\n| 法律风险 | \"AI死亡\"相关诉讼到2026年将超2000起 |\n| 服务合同价值比 | 到2027年，流程导向服务合同的成本价值比将缩小至少50% |\n| AI治理 | 配备专职人员和专门软件AI治理将成为标配 |\n\n### 4.2 麦肯锡调研洞察\n\n**部署热 vs 规模化冷：**\n- 70%企业计划部署AI Agent\n- 仅23%实现单一业务职能规模化\n- 不足7%实现全公司级规模化\n\n**投资意愿：**\n- 92%企业计划未来三年增加AI投资\n- 仅1%领导者认为公司已实现AI成熟阶段\n\n**ROI压力：** 近80%部署AI的企业未能实现净利润提升\n\n### 4.3 IDC战略建议\n\n1. **为编排而设计**：构建支持多智能体动态协作的系统架构\n2. **拥抱模块化与互操作性**：采用开放API及MCP等生态标准\n3. **为规模与可持续性工程化**：确保Agent可稳定运行\n4. **AI基础设施升级**：面向智能体的新型设施成为刚需\n\n---\n\n## 五、主流建设路线与代表厂商\n\n### 5.1 三类建设路线\n\n| 路线类型 | 代表厂商 | 特点 | 适用企业 |\n|---------|---------|------|---------|\n| **内嵌型AI Agent** | 小鹅通 | AI融入业务系统本身，用户无需切换平台 | 零售电商、教育培训、本地生活、消费品等中小型企业 |\n| **平台型AI Agent** | 迈富时 | 通用智能体中台，标准化模板快速部署 | 跨行业、跨场景快速部署的中大型企业 |\n| **底座型AI Agent** | 华为云（盘古大模型）、字节跳动（火山引擎HiAgent） | 聚焦底层算力与大模型能力 | 对技术底座有高要求的工业制造、通信、金融科技等行业 |\n\n### 5.2 行业覆盖\n\n预计2026年将出现50+行业专用框架，如法律领域的合规审查Agent开发套件。关键应用领域排名：\n1. 客户服务与支持（最大市场份额）\n2. 多Agent系统（最快增长）\n3. 金融与行政工作流\n4. 安全运营\n5. 采购与合同管理\n\n---\n\n## 六、治理与安全挑战\n\n### 6.1 核心风险\n\n企业级AI Agent面临的主要安全风险包括：\n- 恶意提示词注入\n- 工具误用\n- 执行路径偏移\n- 结果不一致\n- 策略理解差异\n\n### 6.2 治理模型\n\n**五大核心组件：**\n\n1. **权限分级管控**：对Agent的所有操作权限进行严格分级，将工具权限控制在合理范围\n2. **完整日志记录**：对Agent的所有操作进行完整日志记录\n3. **安全校验**：在关键环节加入可审计的安全校验，对工具调用、参数输入、结果返回进行实时校验\n4. **监控告警**：配置完整的监控告警规则，实时监控运行状态、资源占用、执行结果\n5. **人工介入**：发现异常时及时告警，由人工介入处理\n\n### 6.3 可观测性体系\n\n**三大支柱：**\n1. **Trace（全链路追踪）**：完整的工具调用链路追踪\n2. **Metrics（业务指标）**：成功率、延迟、成本、用户满意度\n3. **Logs（决策日志）**：结构化的Agent决策日志\n\n**主流工具平台：** LangSmith、Braintrust、Arize\n\n### 6.4 安全实践\n\n1. 沙盒执行环境\n2. 关键节点的人类在环（HITL）审批\n3. 多层次安全防护和监控\n4. 严格的测试和验证流程\n5. 渐进式部署和灰度发布\n6. 快速响应和回滚机制\n\n---\n\n## 七、核心洞察与建议\n\n### 7.1 从Demo到生产的鸿沟\n\n麦肯锡数据显示，能实现规模化部署的企业占比极低。多数Agent停留在演示阶段，上线后面临死循环、幻觉、Token成本失控等问题。\n\n### 7.2 ROI是关键分水岭\n\n2026年企业正从AI炒作向AI回报转换，Agent成功部署必须直接对应业务成果。\n\n### 7.3 数据治理是基础\n\n许多企业数据分散在老旧系统中。IDC预测到2027年，40%企业将把\"AI融合数据架构\"作为战略投资必选项。\n\n### 7.4 政策与合规\n\n《智能体规范应用与创新发展实施意见》明确19个典型应用场景，为行业规范化发展提供政策指引。\n\n---\n\n## 八、结论与展望\n\n2026年是企业级AI Agent发展的关键转折点：\n\n1. **技术成熟度提升**：多Agent协作架构、MCP标准化、框架收敛使Agent工程化落地成为可能\n2. **应用场景深化**：从\"工具级覆盖\"向\"流程级穿透\"转变，覆盖多系统协同的复杂业务流程\n3. **治理与安全优先**：安全成为一等公民，治理模型和可观测性体系日趋成熟\n4. **ROI驱动落地**：企业更加关注实际业务价值，推动Agent从试点走向规模化\n\n**未来展望：** 随着框架收敛、MCP标准化、多Agent生产化部署推进，企业AI Agent将进入更成熟的工程化落地阶段。技术形态虽仍在快速进化，但演进方向已由真实场景的落地需求决定。\n\n---\n\n## 【参考来源】\n\n1. 2026年Agentic AI十大关键趋势，技术、应用与治理三位一体 - https://m.thepaper.cn/newsDetail_forward_32317179\n2. 2026年企业级AI Agent平台100家：双轴网格法下的全景盘点 - https://t.cj.sina.cn/articles/view/5426766895/14375e42f00102xybk\n3. AI智能体落地按下\"加速键\" 机构预测17只概念股高增长 - https://www.stcn.com/article/detail/3930733.html\n4. IDC预测，2030年22亿AI Agent将作为\"新数字劳动力\"席卷全球 - https://www.idc.com/resource-center/blog/idc%E9%A2%84%E6%B5%8B%EF%BC%8C2030%E5%B9%B422%E4%BA%BFai-agent%E5%B0%86%E4%BD%9C%E4%B8%BA%E6%96%B0%E6%95%B0%E5%AD%97%E5%8A%B3%E5%8A%A8%E5%8A%9B%E5%B8%AD%E5%8D%B7%E5%85%A8%E7%90%83\n5. Gartner Unveils Top Predictions for IT Organizations and Users in 2026 and Beyond - https://www.gartner.com/en/newsroom/press-releases/2025-10-21-gartner-unveils-top-predictions-for-it-organizations-and-users-in-2026-and-beyond\n6. Gartner《2026年重要战略技术趋势》：AI超级计算平台；多智能体系统 - https://www.smartcity.team/reports/gartner-2026-top-tech-trends\n7. AI Agent 企业应用 HR：2026年数据揭示的组织效率革命 - https://www.mokahr.com/blog/35703.html\n8. AI Agent在人力资源场景落地的5个实际案例 - https://www.beisen.com/special/222.html\n9. 什么是AI Agent？ - https://www.oracle.com/cn/artificial-intelligence/ai-agents\n10. 15篇AI Agent研报，2026年智能体行业的全球洞察与趋势 - https://mp.ofweek.com/ai/a356714060647\n11. 以AI Agent重构产业｜镁信健康入选2026中国智能体经济白皮书标杆案例 - https://m.sohu.com/a/1075717952_104421\n12. 2026年企业AI Agent三大建设路线全梳理 - https://www.csdn.net/article/2026-07-28/163280891\n13. AICon 2026 上海站正式启动 - https://www.infoq.cn/article/C2WQHsZF6ruKr61USuSa\n14. 智能体赋能实体经济：看AI Agent如何从概念走到工位 - https://mtz.china.com/touzi/2026/0909/265363.html\n15. 入选IDC中国AI Agent全景图！奥哲持续引领企业智能体规模落地 - https://www.authine.com/hangye/1773.html\n16. Google Cloud - AI agent trends 2026 report - https://cloud.google.com/resources/content/ai-agent-trends-2026?hl=zh-CN\n17. AI Agent发展趋势与技术展望 - https://www.aixwriter.cn/article/ai-agent-fa-zhan-qu-shi-yu-ji-shu-zhan-wang\n18. 2026年AI Agent十大趋势 | 灵阙学院 - https://lingque-academy.pages.dev/learn/strategy-research/ai-agent十大趋势-2026\n19. LLM Agent技术洞察报告 - http://decemwind.com/2025/09/llm-agent-technological-insight\n20. 2026 AI Agent技术趋势与多Agent系统实战 - https://blog.51cto.com/u_17591156/14490916\n21. AI Agent开发框架：技术演进与行业实践 - https://www.br-ai.com/posts/AI-Agent-Dev-Framework\n\n---\n\n**报告说明：** 本报告综合引用21条公开来源，涵盖IDC、Gartner、麦肯锡等权威机构预测，以及行业实践案例。数据来源包括网络公开信息，仅供参考。\n",
+  "report_path": "D:\\Project\\deepsearch-agents\\app\\output\\session_eval_baseline-w1_w1-001\\2026年企业级AI Agent趋势报告.md",
+  "sources": [
+    {
+      "type": "web",
+      "title": "15篇AI Agent研报，2026年智能体行业的全球洞察与趋势，附下载 - 维科号V",
+      "url_or_ref": "https://mp.ofweek.com/ai/a356714060647"
+    },
+    {
+      "type": "web",
+      "title": "以AI Agent重构产业｜镁信健康入选 2026 中国智能体经济白皮书标杆案例_搜狐网",
+      "url_or_ref": "https://m.sohu.com/a/1075717952_104421?scm=10001.325_13-325_13.0.0-0-0-0-0.5_1334"
+    },
+    {
+      "type": "web",
+      "title": "2026年企业AI Agent三大建设路线全梳理",
+      "url_or_ref": "https://www.csdn.net/article/2026-07-28/163280891"
+    },
+    {
+      "type": "web",
+      "title": "AICon 2026 上海站正式启动：OpenClaw 袭来，我们来谈点真的 - InfoQ",
+      "url_or_ref": "https://www.infoq.cn/article/C2WQHsZF6ruKr61USuSa"
+    },
+    {
+      "type": "web",
+      "title": "智能体赋能实体经济：看AI Agent如何从概念走到工位",
+      "url_or_ref": "https://mtz.china.com/touzi/2026/0909/265363.html"
+    },
+    {
+      "type": "web",
+      "title": "2026年Agentic AI十大关键趋势，技术、应用与治理三位一体",
+      "url_or_ref": "https://m.thepaper.cn/newsDetail_forward_32317179"
+    },
+    {
+      "type": "web",
+      "title": "2026年企业级AI Agent平台100家：双轴网格法下的全景盘点__财经头条__新浪财经",
+      "url_or_ref": "https://t.cj.sina.cn/articles/view/5426766895/14375e42f00102xybk"
+    },
+    {
+      "type": "web",
+      "title": "AI智能体落地按下“加速键” 机构预测17只概念股高增长",
+      "url_or_ref": "https://www.stcn.com/article/detail/3930733.html"
+    },
+    {
+      "type": "web",
+      "title": "IDC预测，2030年22亿AI Agent将作为“新数字劳动力”席卷全球",
+      "url_or_ref": "https://www.idc.com/resource-center/blog/idc%E9%A2%84%E6%B5%8B%EF%BC%8C2030%E5%B9%B422%E4%BA%BFai-agent%E5%B0%86%E4%BD%9C%E4%B8%BA%E6%96%B0%E6%95%B0%E5%AD%97%E5%8A%B3%E5%8A%A8%E5%8A%9B%E5%B8%AD%E5%8D%B7%E5%85%A8%E7%90%83"
+    },
+    {
+      "type": "web",
+      "title": "Edge AI Daily 早报（ 4月10日）-钛媒体官方网站",
+      "url_or_ref": "https://www.tmtpost.com/7947518.html"
+    },
+    {
+      "type": "web",
+      "title": "AI Agent 企业应用 HR：2026年数据揭示的组织效率革命 – Moka人力资源管理系统-HR系统",
+      "url_or_ref": "https://www.mokahr.com/blog/35703.html"
+    },
+    {
+      "type": "web",
+      "title": "AI Agent在人力资源场景落地的5个实际案例",
+      "url_or_ref": "https://www.beisen.com/special/222.html"
+    },
+    {
+      "type": "web",
+      "title": "什么是AI Agent？",
+      "url_or_ref": "https://www.oracle.com/cn/artificial-intelligence/ai-agents"
+    },
+    {
+      "type": "web",
+      "title": "人力资源AI Agent：如何用智能大脑重塑HR的未来？ - 易路",
+      "url_or_ref": "https://www.ersoft.com/news-Zjp_LdGXs.html"
+    },
+    {
+      "type": "web",
+      "title": "China Archives",
+      "url_or_ref": "https://cloud.google.com/use-cases/ai-in-retail?hl=zh-CN"
+    },
+    {
+      "type": "web",
+      "title": "2026 的 agent 趨勢就是「從聊天變成做事」：Gartner 預測到 2026 年底 40% 企業應用會內建任務型 AI Agent，重點在多 Agent 協作跨部門工作流，直接當「自主數位同事」處理銷售到財務的全鏈路。Google 也點出 5 大走向：個人 Agent 幫員工提效、串連流程做數位產線、顧客體驗升級成專屬禮賓、資安主動應對、決勝關鍵是人才培育。 最有趣的項目今年都在拼「自主執行」：Manus.im 號稱端到端完成任務，Devin 做 AI 工程師，Hermes 開源多 Agent 桌面版帶記憶，Shipper 直接一條龍把遊戲從概念做到上 Steam，Meta 也在測 Instagram 購物 Agent Hatch 用 Claude 比價下單。Google 剛把 Gemini CLI 升級成 Managed Agents，能 24/7 在背景跑 daemon，目標是讓 Agent 真正接管工作不是只聊天。",
+      "url_or_ref": "https://www.threads.com/@meta.ai/post/DY_xviaAvol/2026-%E7%9A%84-agent-%E8%B6%A8%E5%8B%A2%E5%B0%B1%E6%98%AF%E5%BE%9E%E8%81%8A%E5%A4%A9%E8%AE%8A%E6%88%90%E5%81%9A%E4%BA%8Bgartner-%E9%A0%90%E6%B8%AC%E5%88%B0-2026-%E5%B9%B4%E5%BA%95-40-%E4%BC%81%E6%A5%AD%E6%87%89%E7%94%A8%E6%9C%83%E5%85%A7%E5%BB%BA%E4%BB%BB%E5%8B%99%E5%9E%8B-ai-agent%E9%87%8D%E9%BB%9E%E5%9C%A8%E5%A4%9A-agent-%E5%8D%94%E4%BD%9C%E8%B7%A8"
+    },
+    {
+      "type": "web",
+      "title": "入选IDC中国AI Agent全景图！奥哲持续引领企业智能体规模 ...",
+      "url_or_ref": "https://www.authine.com/hangye/1773.html"
+    },
+    {
+      "type": "web",
+      "title": "Gartner《2026年重要战略技术趋势》：AI超级计算平台；多智能 ...",
+      "url_or_ref": "https://www.smartcity.team/reports/gartner-2026-top-tech-trends"
+    },
+    {
+      "type": "web",
+      "title": "AI agent trends 2026 report | Google Cloud",
+      "url_or_ref": "https://cloud.google.com/resources/content/ai-agent-trends-2026?hl=zh-CN"
+    },
+    {
+      "type": "web",
+      "title": "Gartner Unveils Top Predictions for IT Organizations and Users in ...",
+      "url_or_ref": "https://www.gartner.com/en/newsroom/press-releases/2025-10-21-gartner-unveils-top-predictions-for-it-organizations-and-users-in-2026-and-beyond"
+    },
+    {
+      "type": "web",
+      "title": "AI Agent发展趋势与技术展望 - AIWriter — AI智能创作",
+      "url_or_ref": "https://www.aixwriter.cn/article/ai-agent-fa-zhan-qu-shi-yu-ji-shu-zhan-wang"
+    },
+    {
+      "type": "web",
+      "title": "2026 年 AI Agent 十大趋势 | 灵阙学院",
+      "url_or_ref": "https://lingque-academy.pages.dev/learn/strategy-research/ai-agent十大趋势-2026"
+    },
+    {
+      "type": "web",
+      "title": "2026 AI Agent 技术趋势与多Agent系统实战_51CTO博客_多agent系统应用",
+      "url_or_ref": "https://blog.51cto.com/u_17591156/14490916"
+    },
+    {
+      "type": "web",
+      "title": "AI Agent开发框架：技术演进与行业实践 | 博然AI笔记",
+      "url_or_ref": "https://www.br-ai.com/posts/AI-Agent-Dev-Framework"
+    },
+    {
+      "type": "web",
+      "title": "LLM Agent技术洞察报告 - 十二月的风 - 编程架构技术趋势与实践",
+      "url_or_ref": "http://decemwind.com/2025/09/llm-agent-technological-insight"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 165634,
+    "output_tokens": 12700,
+    "total_tokens": 178334
+  },
+  "duration_s": 147.76,
+  "status": "completed",
+  "error": null,
+  "started_at": "2026-09-15T16:18:55.875035",
+  "finished_at": "2026-09-15T16:21:23.628609"
+}

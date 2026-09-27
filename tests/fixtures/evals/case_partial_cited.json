@@ -1,0 +1,35 @@
+{
+  "case_id": "case-002",
+  "query": "整理药品零售渠道趋势速览",
+  "session_id": "eval-session-002",
+  "report_path": "evals/results/run-fixture/report_case-002.md",
+  "report_md": "# 行业速览\n\n渠道结论来自实体药店榜单 [1]，创新药趋势来自全球销售榜 [2]。\n\n此处编号在参考来源中并不存在 [5]。\n\n## 【参考来源】\n\n1. [2024、2025年全球药物销售榜Top10排名预测](https://www.phirda.com/artilce_35201.html)\n2. [2025实体药店销售TOP10药品+企业榜单](https://www.pharnexcloud.com/zixun/sd_114823)\n3. 《药品销售白皮书.pdf》第3页\n",
+  "sources": [
+    {
+      "type": "web",
+      "title": "2024、2025年全球药物销售榜Top10排名预测",
+      "url_or_ref": "https://www.phirda.com/artilce_35201.html"
+    },
+    {
+      "type": "web",
+      "title": "2025实体药店销售TOP10药品+企业榜单",
+      "url_or_ref": "https://www.pharnexcloud.com/zixun/sd_114823"
+    },
+    {
+      "type": "docs",
+      "title": "药品销售白皮书.pdf",
+      "url_or_ref": "药品销售白皮书.pdf"
+    },
+    {
+      "type": "sql",
+      "title": "",
+      "url_or_ref": "SELECT drug_name, SUM(quantity_on_hand) AS total FROM inventory GROUP BY drug_name ORDER BY total DESC LIMIT 10"
+    }
+  ],
+  "token_usage": null,
+  "duration_s": 90.5,
+  "status": "completed",
+  "error": null,
+  "started_at": "2026-09-13T10:05:00",
+  "finished_at": "2026-09-13T10:06:30"
+}

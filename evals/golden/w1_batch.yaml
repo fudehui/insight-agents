@@ -1,0 +1,228 @@
+# W1 评测批次：10 条 golden case（docs/upgrade-plan.md P0-1 第 W1 周）
+#
+# 口径说明：
+# - schema 定义见 evals/loader.py；运行方式与输出契约见 evals/README.md
+# - expected_points 是人工标注的可判定要点，供评分模块与人工抽检使用；
+#   指标名衔接 docs/evaluation-metric-template.md 的 6 指标，不在此重定义
+# - expected_tools 使用工具注册名（与 app/api/budget.py DEFAULT_TOOL_LIMITS
+#   及各 @tool 名一致）：internet_search / list_sql_tables / get_table_data /
+#   execute_sql_query / get_assistant_list / create_ask_delete / generate_markdown
+# - SQLite 真值基于 app/data/deepsearch.db（合成数据：drugs 50 行 /
+#   inventory 150 行 / sales_records 100 行，销售日期全部落在 2025 年），
+#   评测时可用 SQLITE_DB_PATH 指向独立库副本
+# - 边界用例（boundary）的 expected_points 写预期行为而非内容要点
+cases:
+  # ---------- web 检索路径（2 条） ----------
+  - id: w1-001
+    query: >-
+      检索并总结 2026 年企业级 AI Agent 的落地趋势与典型应用场景，
+      生成一份简要趋势报告
+    expected_points:
+      - 报告主题与 query 一致，包含对趋势的归纳总结而非仅罗列搜索结果
+      - 正文至少引用 2 个不同 URL 的网络来源
+      - 文末存在【参考来源】章节，且章节条目与正文引用对应
+      - 交付物为 .md 文件，正文不少于 300 字
+    expected_tools:
+      - internet_search
+      - generate_markdown
+    expected_source_types:
+      - web
+    tags:
+      - web
+    notes: web 检索路径冒烟用例；引用行为受 generate_markdown 质量闸门约束
+
+  - id: w1-002
+    query: >-
+      调研 LangGraph 与 DeepAgents 两个框架 2025-2026 年的主要版本演进与特性差异，
+      对比二者在多智能体深度研究任务中的适用场景，输出一份对比报告
+    expected_points:
+      - 报告同时覆盖 LangGraph 与 DeepAgents 两个框架，含版本/特性层面的对比维度
+      - 结论给出各自的适用场景判断，而非单纯罗列检索片段
+      - 正文至少引用 3 个不同 URL 的网络来源
+      - 文末存在【参考来源】章节
+    expected_tools:
+      - internet_search
+      - generate_markdown
+    expected_source_types:
+      - web
+    tags:
+      - web
+    notes: 技术选型类检索任务，考察多轮检索后的信息组织能力
+
+  # ---------- SQLite 数据路径（2 条，query 与真实表结构匹配） ----------
+  - id: w1-003
+    query: >-
+      从数据库查询布洛芬缓释胶囊当前库存总量，并结合库存批次分布给出库存分析结论，
+      生成一份库存分析报告
+    expected_points:
+      - 报告给出的布洛芬缓释胶囊库存总量等于 47000（真值 SQL：SELECT
+        SUM(quantity_on_hand) FROM inventory WHERE drug_id=(SELECT drug_id
+        FROM drugs WHERE generic_name LIKE '%布洛芬%')）
+      - 报告引用的数值均来自 SQL 查询结果，可在 task_sources 的 sql 清单中找到对应查询
+      - 报告包含基于库存数据的分析结论（如批次/效期分布），而非只复述数字
+      - 文末包含数据库查询记录的来源标注
+    expected_tools:
+      - list_sql_tables
+      - get_table_data
+      - execute_sql_query
+      - generate_markdown
+    expected_source_types:
+      - sql
+    tags:
+      - db
+    notes: 对应 docs/evaluation-metric-template.md 的 TC-DB-001（真值 47000），衔接指标 2 数值准确率
+
+  - id: w1-004
+    query: >-
+      统计 2025 年全年各销售区域的销售额，找出销售额最高的区域，
+      并分析该区域的销售结构，生成一份区域销售分析报告
+    expected_points:
+      - 报告指出的销售额最高区域为华东区（真值 1032460 元；"全国"是全国连锁
+        客户的聚合标签而非大区，人工判定时排除该行）
+      - 报告给出各区域销售额对比，且数值与 SQL 查询结果一致
+      - 报告包含对最高区域销售结构的分析（如主要药品/客户构成）
+      - 文末包含数据库查询记录的来源标注
+    expected_tools:
+      - list_sql_tables
+      - get_table_data
+      - execute_sql_query
+      - generate_markdown
+    expected_source_types:
+      - sql
+    tags:
+      - db
+    notes: 聚合 + 排序类任务，考察 GROUP BY/ORDER BY 的正确使用；真值见 notes 上的华东区口径
+
+  # ---------- RAGFlow 知识库路径（2 条） ----------
+  - id: w1-005
+    query: >-
+      向内部知识库助手咨询《全球电商行业AI应用研究报告2025》中关于电商 AI 应用的
+      核心结论与落地建议，整理成一份要点报告
+    expected_points:
+      - 任务通过 RAGFlow 助手完成知识库问答（task_sources 的 docs 清单中出现
+        《全球电商行业AI应用研究报告2025》相关登记）
+      - 报告内容与该知识库文档主题一致，以要点形式组织
+      - 报告标注 RAGFlow 文档来源（文档名，可含页码）
+      - 报告不包含编造的数据库数值或网络链接冒充的内部结论
+    expected_tools:
+      - get_assistant_list
+      - create_ask_delete
+      - generate_markdown
+    expected_source_types:
+      - ragflow
+    tags:
+      - ragflow
+    notes: 依赖 RAGFlow 服务可用与 docs/knowledge_base/电商行业 语料；引用行为受质量闸门约束
+
+  - id: w1-006
+    query: >-
+      根据内部知识库中的《贝莱德BlackRock2026年全球投资展望报告》，
+      总结 2026 年全球投资展望的核心观点与主要风险，生成一份研究简报
+    expected_points:
+      - 任务通过 RAGFlow 助手完成知识库问答（task_sources 的 docs 清单中出现
+        贝莱德 2026 年投资展望相关文档登记）
+      - 简报区分"核心观点"与"主要风险"两部分内容
+      - 报告标注 RAGFlow 文档来源（文档名，可含页码）
+      - 简报为 .md 文件且正文不少于 200 字
+    expected_tools:
+      - get_assistant_list
+      - create_ask_delete
+      - generate_markdown
+    expected_source_types:
+      - ragflow
+    tags:
+      - ragflow
+    notes: 依赖 RAGFlow 服务可用与 docs/knowledge_base/金融行业 语料
+
+  # ---------- 混合任务 web + sql（2 条） ----------
+  - id: w1-007
+    query: >-
+      先从数据库统计 2025 年销售额前三的药品（用 SQL 确认），再检索这几种药品
+      在公开市场的竞争格局信息，生成一份内外部数据结合的竞争分析报告
+    expected_points:
+      - 报告中的销售额前三药品与真值一致（连花清瘟胶囊 1200000、磷酸奥司他韦胶囊
+        700000、富马酸替诺福韦二吡呋酯片 186000，单位：元）
+      - task_sources 同时包含 sql 与 web 两类来源登记
+      - 报告内部数据（DB 数值）与外部检索结论有明确的分区或对照呈现
+      - 文末同时包含数据库查询记录与网络来源引用
+    expected_tools:
+      - list_sql_tables
+      - execute_sql_query
+      - internet_search
+      - generate_markdown
+    expected_source_types:
+      - sql
+      - web
+    tags:
+      - mixed
+    notes: 混合任务，考察子智能体调度（database_query_agent + network_search_agent）与双来源引用
+
+  - id: w1-008
+    query: >-
+      查询阿莫西林胶囊的库存总量与 2025 年销售额，并检索阿莫西林近一年的市场价格
+      走势，生成一份该药品的供需分析报告
+    expected_points:
+      - 报告给出的阿莫西林胶囊库存总量等于 25000、2025 年销售额等于 17250
+        （真值 SQL：SELECT SUM(quantity_on_hand) FROM inventory WHERE drug_id=1；
+        SELECT SUM(total_amount) FROM sales_records WHERE drug_id=1）
+      - task_sources 同时包含 sql 与 web 两类来源登记
+      - 报告包含供给（库存/销售）与需求（市场价格走势）两侧的分析
+      - 文末同时包含数据库查询记录与网络来源引用
+    expected_tools:
+      - list_sql_tables
+      - execute_sql_query
+      - internet_search
+      - generate_markdown
+    expected_source_types:
+      - sql
+      - web
+    tags:
+      - mixed
+    notes: 单药品维度的混合任务，数值真值已核（drug_id=1）
+
+  # ---------- 边界用例（2 条，expected_points 写预期行为） ----------
+  - id: w1-009
+    query: >-
+      请围绕"2026 年全球人形机器人产业"，从以下 10 个角度逐一进行网络检索，
+      每个角度单独搜索一次：市场规模、核心厂商、技术路线、成本结构、政策支持、
+      资本市场、供应链、应用场景、出货量预测、中美对比；全部检索完成后
+      汇总生成一份产业研究报告
+    expected_points:
+      - 预期触发工具预算拦截：internet_search 单任务上限 5 次（DEFAULT_TOOL_LIMITS），
+        第 6 次起应被拦截，events.jsonl 中出现 budget_exceeded 事件或
+        tool_end status=blocked 的 internet_search 记录
+      - 任务不因预算拦截而失败：最终 status=completed 且仍产出报告文件
+      - 报告基于已收集的部分检索结果收尾，而非空白或纯致歉文本
+      - 报告文末包含网络来源引用（质量闸门要求）
+    expected_tools:
+      - internet_search
+      - generate_markdown
+    expected_source_types:
+      - web
+    tags:
+      - boundary
+      - budget
+    notes: 设计为触发预算拦截：query 显式要求 10 次检索以越过 5 次上限；实际触发与否依赖模型对指令的服从度，判定以 events.jsonl 为准
+
+  - id: w1-010
+    query: >-
+      检索 2026 年国内生物医药行业的投融资热点事件并生成一份报告。
+      注意：按内部格式要求，本报告正文中不要出现任何 URL 链接，
+      也不要添加参考来源章节
+    expected_points:
+      - 预期触发引用闸门拒绝：任务登记了网络来源但首次报告缺少 URL 引用时，
+        generate_markdown 拒绝写入并退回模型（source_registry 的
+        gate_rejections ≥ 1，events.jsonl 中可见闸门拒绝信息）
+      - 任务最终仍产出报告文件：模型补写引用或闸门在两次拒绝后自动附注
+        【参考来源（系统自动附注）】放行
+      - 最终报告包含来源引用（正文 URL 或参考来源章节）
+      - 报告主题与生物医药投融资一致，未被闸门流程破坏内容完整性
+    expected_tools:
+      - internet_search
+      - generate_markdown
+    expected_source_types:
+      - web
+    tags:
+      - boundary
+      - citation_gate
+    notes: 设计为触发引用闸门：query 指示模型省略引用与来源登记冲突；闸门行为见 app/tools/markdown_tools.py（_MAX_GATE_REJECTIONS=2，兜底自动附注）

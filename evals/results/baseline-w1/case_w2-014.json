@@ -1,0 +1,18 @@
+{
+  "case_id": "w2-014",
+  "query": "根据内部知识库中的《贝莱德BlackRock2026年全球投资展望报告》，总结其对 2026 年主要资产类别（股票、债券、另类资产等）的观点与配置建议， 生成一份资产配置要点简报",
+  "session_id": "eval_baseline-w1_w2-014",
+  "report_md": null,
+  "report_path": null,
+  "sources": [],
+  "token_usage": {
+    "input_tokens": 52659,
+    "output_tokens": 1629,
+    "total_tokens": 54288
+  },
+  "duration_s": 43.86,
+  "status": "failed",
+  "error": "执行主智能发生异常信息：Error code: 429 - {'error': {'code': '', 'message': 'You’ve reached the API rate limit for free users. Upgrade to a Token Plan to unlock higher limits and continue using the API without interruption. (request id: 20260925095907377864916MQT95CK)', 'type': 'AgnesAI_error'}}",
+  "started_at": "2026-09-25T17:58:24.290290",
+  "finished_at": "2026-09-25T17:59:08.148987"
+}

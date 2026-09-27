@@ -4,6 +4,19 @@ on:
   push:
     branches: [main]
   pull_request:
+  # 手动触发仅用于评测跑批（evals job）：push / PR 不触发评测，
+  # 避免日常 CI 自动烧真 token（real_run 默认 false，仅 dry-run 校验 schema）
+  workflow_dispatch:
+    inputs:
+      real_run:
+        description: "真实跑批：调用真实 LLM/Tavily API，烧真 token；默认 false 仅 dry-run 校验 30 条 case schema"
+        type: boolean
+        default: false
+      limit:
+        # workflow_dispatch 不支持 number 类型入参，用字符串承接后传给 --limit
+        description: "真实跑批执行的 case 数上限（传给 --limit，防止误烧全量 token）"
+        type: string
+        default: "2"
 
 jobs:
   backend:
@@ -29,7 +42,34 @@ jobs:
       - name: Ruff format check
         run: uv run --frozen ruff format --check app tests
       - name: Pytest
-        run: uv run --frozen python -m pytest tests -q
+        run: uv run --frozen python -m pytest tests -q --cov=app --cov-report=term-missing --cov-report=xml
+      # 步骤名含冒号，必须整体加引号，否则 YAML 解析报"mapping values are not allowed"
+      - name: "Coverage gate: app/tools >= 75"
+        # 覆盖率门禁（P0-1 W4）：门禁值 = 当前实测 77% 向下取整到 5 的倍数，且不低于 55%。
+        # coverage 直接读上一步 pytest --cov 落盘的 .coverage 数据文件，不重复跑测试
+        run: uv run --frozen coverage report --include="app/tools/*" --fail-under=75
+      - name: "Coverage gate: app/api >= 70"
+        # 门禁值 = 当前实测 74% 向下取整到 5 的倍数，且不低于 55%
+        run: uv run --frozen coverage report --include="app/api/*" --fail-under=70
+      - name: Coverage summary
+        # pytest 崩溃时也尽力写汇总，占位提示而不是让步骤报错
+        if: always()
+        run: |
+          if [ ! -f coverage.xml ]; then
+            {
+              echo "## Coverage"
+              echo ""
+              echo "_coverage.xml 未生成，跳过覆盖率汇总_"
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          # 总覆盖率取 coverage.xml 根节点 line-rate（0~1 小数），避免解析终端输出
+          pct=$(python3 -c 'import xml.etree.ElementTree as E; r = E.parse("coverage.xml").getroot(); print(format(float(r.get("line-rate", 0)) * 100, ".1f") + "%")')
+          {
+            echo "## Coverage"
+            echo ""
+            printf '`%s`\n' "$pct"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   frontend:
     runs-on: ubuntu-latest
@@ -52,3 +92,70 @@ jobs:
         run: pnpm lint
       - name: Build
         run: pnpm build
+
+  evals:
+    # 仅手动触发（workflow_dispatch）：push / PR 时直接跳过，评测不随日常 CI 执行。
+    # 选"同文件 + if 守卫"而非独立 workflow 文件：inputs 与消费它的 job 同处一文件、
+    # 便于对照维护，且复用 backend job 的 uv / 缓存配置模式
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    env:
+      # 以下占位变量仅为满足 app 模块导入期的客户端初始化（run_eval 真实执行时
+      # 延迟导入 app.agent.main_agent，导入即构造模型 / Tavily / RAGFlow 客户端，
+      # 不发起真实请求），不含任何真实凭据。真实跑批所需密钥由下方 real_run 步骤
+      # 从 Secrets 注入（步骤级 env 覆盖占位值）。RAGFlow 云端 API 已失效
+      # （见 evals/README.md 已知限制），不放真密钥，仅保留导入期占位。
+      LLM_QWEN_MAX: ci-eval-model
+      OPENAI_API_KEY: sk-ci-eval-dummy
+      OPENAI_BASE_URL: https://example.invalid/v1
+      TAVILY_API_KEY: tvly-ci-eval-dummy
+      RAGFLOW_API_URL: http://127.0.0.1:9380
+      RAGFLOW_API_KEY: ragflow-ci-eval-dummy
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Install dependencies
+        run: uv sync --frozen
+      - name: Dry-run 校验 30 条 golden case schema（零成本：不导入 app、不调用任何 API）
+        run: |
+          output=$(uv run --frozen python evals/run_eval.py --dry-run \
+            --cases evals/golden/w1_batch.yaml \
+            --cases evals/golden/w2_batch.yaml)
+          echo "$output"
+          # 轻量断言：两份批次文件合并后必须恰好 30 条且 schema 校验通过
+          # （run_eval 退出码非 0 或条数漂移都会让本步骤失败）
+          echo "$output" | grep -q "共加载 30 条"
+      - name: 真实跑批（real_run=true 才执行：调用真实 LLM/Tavily，烧真 token）
+        if: inputs.real_run == true
+        env:
+          # 密钥只经环境变量注入，日志中禁止 echo；未配置的 Secret 渲染为空串，
+          # 会在导入期 / 真实调用阶段失败（如 LLM_QWEN_MAX 为空时 app.agent.llm
+          # 直接抛错），属预期的快速失败兜底
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+          LLM_QWEN_MAX: ${{ secrets.LLM_QWEN_MAX }}
+          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+          # 业务库副本路径按需注入（app/data/deepsearch.db 不入库）：未配置时
+          # db 路径 case 在执行期失败并如实记入结果，不影响其余 case
+          SQLITE_DB_PATH: ${{ secrets.SQLITE_DB_PATH }}
+        run: |
+          # 输入被清空时回退默认 2，避免 --limit 空参导致 argparse 报错
+          limit_arg="${{ inputs.limit }}"
+          uv run --frozen python evals/run_eval.py \
+            --cases evals/golden/w1_batch.yaml \
+            --cases evals/golden/w2_batch.yaml \
+            --run-id ci_${{ github.run_id }} \
+            --limit "${limit_arg:-2}" \
+            --resume
+      - name: Upload eval artifacts（real_run=true 才有结果目录）
+        if: inputs.real_run == true
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results-${{ github.run_id }}
+          path: |
+            evals/results/ci_${{ github.run_id }}/
+            evals/report.md
+          retention-days: 14
+          if-no-files-found: error

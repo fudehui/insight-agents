@@ -1,0 +1,18 @@
+{
+  "case_id": "w2-015",
+  "query": "内部知识库中同时有《全球电商行业AI应用研究报告2025》与 《贝莱德BlackRock2026年全球投资展望报告》，请分别咨询两份文档中与 人工智能相关的核心观点，从产业应用与投资视角两侧对比整理， 生成一份关于 AI 主题的交叉要点报告",
+  "session_id": "eval_baseline-w1_w2-015",
+  "report_md": null,
+  "report_path": null,
+  "sources": [],
+  "token_usage": {
+    "input_tokens": 50287,
+    "output_tokens": 1946,
+    "total_tokens": 52233
+  },
+  "duration_s": 25.41,
+  "status": "completed",
+  "error": null,
+  "started_at": "2026-09-25T18:16:24.231522",
+  "finished_at": "2026-09-25T18:16:49.644592"
+}

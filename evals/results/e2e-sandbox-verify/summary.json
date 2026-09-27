@@ -1,0 +1,18 @@
+{
+  "run_id": "e2e-sandbox-verify",
+  "started_at": "2026-09-27T06:42:14.079414",
+  "finished_at": "2026-09-27T06:55:14.110923",
+  "cases_run": 1,
+  "cases_completed": 0,
+  "cases_failed": 1,
+  "total_tokens": 86055,
+  "p95_duration_s": 57.43,
+  "per_case": [
+    {
+      "case_id": "sandbox-e2e-001",
+      "status": "failed",
+      "duration_s": 57.43,
+      "total_tokens": 86055
+    }
+  ]
+}

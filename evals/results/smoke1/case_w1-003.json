@@ -1,0 +1,18 @@
+{
+  "case_id": "w1-003",
+  "query": "从数据库查询布洛芬缓释胶囊当前库存总量，并结合库存批次分布给出库存分析结论， 生成一份库存分析报告",
+  "session_id": "eval_smoke1_w1-003",
+  "report_md": null,
+  "report_path": null,
+  "sources": [],
+  "token_usage": {
+    "input_tokens": 38210,
+    "output_tokens": 877,
+    "total_tokens": 39087
+  },
+  "duration_s": 77.3,
+  "status": "failed",
+  "error": "执行主智能发生异常信息：peer closed connection without sending complete message body (incomplete chunked read)",
+  "started_at": "2026-09-13T23:12:40.587755",
+  "finished_at": "2026-09-13T23:13:57.891683"
+}

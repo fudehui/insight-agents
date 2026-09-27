@@ -1,0 +1,144 @@
+{
+  "case_id": "w2-005",
+  "query": "检索欧盟《人工智能法案》（EU AI Act）2025-2026 年的实施进展与分阶段 时间表，总结企业在合规上需要关注的要点，生成一份合规指引报告",
+  "session_id": "eval_baseline-w1_w2-005",
+  "report_md": "# 欧盟《人工智能法案》（EU AI Act）2025-2026年实施进展与企业合规指引报告\n\n## 摘要\n\n本报告基于2024-2026年的公开资料，系统梳理欧盟《人工智能法案》（EU AI Act）的分阶段实施时间表，重点分析2025-2026年关键合规节点与企业应对策略。报告为企业提供了从禁止实践到高风险系统、从透明度义务到处罚风险的全面合规指引，帮助企业在欧盟监管框架下建立系统的AI治理体系。\n\n---\n\n## 一、法案概况与实施背景\n\n欧盟《人工智能法案》（EU AI Act）是全球首部综合性人工智能监管法规，于**2024年8月1日**正式生效。该法案采用风险分层的管理思路，将AI系统分为四类风险等级：不可接受风险、高风险、有限风险和最小风险，并规定了差异化的合规要求。\n\n### 1.1 立法历程\n\n- **2021年4月**：欧盟委员会提出AI法案提案\n- **2024年6月**：欧洲议会正式通过法案\n- **2024年8月1日**：法案正式生效\n- **2025年2月2日**：第一阶段条款生效（禁止实践、AI素养义务）\n- **2025年8月2日**：第二阶段条款生效（GPAI规则、治理架构）\n- **2026年8月2日**：第三阶段条款生效（高风险系统、透明度义务）\n\n### 1.2 AI Omnibus修订\n\n2025年11月，欧盟委员会提出《数字综合法案》（AI Omnibus）修正案，经谈判于2026年5月达成政治协议，6月16日欧洲议会通过，6月29日欧盟理事会通过，7月24日正式公布。\n\n**关键修订内容** [1][2]：\n- Annex III高风险系统合规截止日期推迟至**2027年12月**\n- 受监管产品中嵌入的AI系统合规截止日期推迟至**2028年8月**\n- GPAI系统合规截止日期调整\n\n---\n\n## 二、分阶段实施时间表\n\n### 2.1 第一阶段（2025年2月2日生效）\n\n#### 禁止的AI实践（Article 5）\n\n以下AI系统被认定为\"不可接受风险\"，严禁在欧盟市场投放或使用 [1][3][4]：\n\n| 禁止类型 | 具体描述 |\n|---------|---------|\n| **潜意识操控系统** | 使用潜意识技术或具有欺骗/操控效果的AI系统，实质性扭曲个人行为 |\n| **弱势群体弱点利用系统** | 利用个人年龄、残疾或特定社会经济状况的脆弱性，可能对其造成严重伤害 |\n| **实时远程生物特征识别系统** | 实时远程面部识别系统（有少数公共安全例外） |\n| **情绪识别系统** | 工作场所和教育机构中的情绪推断系统 |\n| **犯罪风险预测系统** | 基于个人进行风险预测的AI系统 |\n| **社会信用评分系统** | 评估或分类个人社交行为、已知/推断属性的社会信用评分 |\n| **敏感属性生物分类系统** | 基于生物特征推断种族、政治观点、工会会员、宗教或性取向的系统 |\n| **生成非法色情材料系统** | 生成或扩散非自愿深度伪造色情内容 |\n\n#### AI素养义务（Article 4）\n\n**适用对象**：AI系统提供者和部署者\n\n**核心要求**：确保相关人员具备足够的AI素养 [1][5]\n\n**\"AI素养\"定义**：使提供者、部署者和受影响人员能够：\n- 对AI系统的部署做出知情决策\n- 了解AI的机会与风险\n- 认知可能造成何种伤害\n\n**实际措施**：组织培训、教育活动，建立内部AI知识体系\n\n---\n\n### 2.2 第二阶段（2025年8月2日生效）\n\n#### 一般目的AI模型（GPAI）规则（Article 53-57）\n\nGPAI模型提供者须履行合规义务，包括 [1][6]：\n- 编制技术文档\n- 提供欧盟版权政策\n- 算力超过10²⁵ FLOP的模型视为\"高影响力\"，需额外履行系统性风险义务（模型评估等）\n\n#### 治理架构建立\n\n- **AI办公室（AI Office）**：负责GPAI模型监督与执法\n- **AI委员会（AI Board）**：协调欧盟层面监管\n- **科学小组（Scientific Panel）**：提供技术支持\n- **咨询论坛（Advisory Forum）**：多元利益相关方参与\n\n#### 成员国义务\n\n- 指定至少一个市场监管机构\n- 指定一个单一联络点\n- 采用国内处罚法律\n- 对于生物识别、执法、移民、司法行政领域的高风险系统，须指定依据GDPR设立的国家数据保护机构\n\n---\n\n### 2.3 第三阶段（2026年8月2日生效）— 主要合规窗口\n\n#### 高风险AI系统全面合规（Annex III）\n\n**高风险AI系统定义**：对健康、安全或基本权利可能造成重大风险的AI技术 [1][7][8]\n\n**两大类高风险系统**：\n\n**类别一**：受附录I欧盟协调安全立法约束的系统\n- 医疗AI（如辅助诊断系统）\n- 玩具安全组件\n- 无线电设备\n- 农业车辆\n- 需第三方合格性评估的产品\n\n**类别二**：附录III规定的八大高风险应用领域 [1][9]：\n\n| 应用领域 | 典型示例 |\n|---------|---------|\n| **生物特征识别** | 面部识别、指纹识别、声纹识别 |\n| **关键基础设施** | 交通、能源、水务的AI管理系统 |\n| **教育与职业培训** | 入学准入评估、监考系统、学习分析 |\n| **就业** | 简历筛选、招聘决策、绩效评估 |\n| **基本公共服务** | 信贷评分、保险定价、社会福利分配 |\n| **执法** | 犯罪预测、证据分析、监控 |\n| **移民/庇护/边境管控** | 签证评估、边境监控 |\n| **司法行政** | 法律研究、案件风险评估 |\n\n---\n\n## 三、企业合规要点详解\n\n### 3.1 高风险AI系统合规要求\n\n高风险系统涉及多方义务主体，需建立全生命周期的合规管理体系。\n\n#### 提供者（Provider）核心义务 [1][10][11]\n\n| 序号 | 合规要点 | 具体要求 |\n|-----|---------|---------|\n| 1 | **质量管理** | 建立质量管理体系，包括需求分析、设计、开发、测试、验证、确认等流程 |\n| 2 | **数据治理** | 建立数据治理实践：数据来源、处理方法、数据标注、潜在偏差检测与缓解 |\n| 3 | **技术文档** | 编制完整技术文档，包括系统概述、架构设计、算法说明、训练数据描述、性能指标、变更记录 |\n| 4 | **记录保存** | 系统运行日志自动记录，保存期限至少10年 |\n| 5 | **透明度** | 提供清晰易懂的使用说明，包括系统能力与局限 |\n| 6 | **人为监督** | 设计人工监督机制，确保人类能够有效监督系统运行 |\n| 7 | **准确性与鲁棒性** | 测试系统性能，确保在预期条件下稳定运行，防范对抗性攻击 |\n| 8 | **合格评定** | 依据适用条款进行内部或第三方合格评定 |\n| 9 | **CE标志** | 通过后标注CE标志 |\n| 10 | **欧盟注册** | 在欧盟数据库登记系统信息 |\n| 11 | **上市后监测** | 建立持续监测系统，收集分析系统运行数据，评估是否符合法规要求 |\n| 12 | **事件报告** | 向监管机构报告严重事件和合规问题 |\n\n#### 部署者（Deployer）核心义务 [1][12]\n\n| 序号 | 合规要点 | 具体要求 |\n|-----|---------|---------|\n| 1 | **基本权利影响评估** | 评估高风险AI系统部署对基本权利的潜在影响 |\n| 2 | **适当使用** | 仅按提供者设计意图使用系统 |\n| 3 | **人员配置** | 配置具备必要AI素养的人员进行操作和监督 |\n| 4 | **技术基础设施** | 确保足够的技术资源和基础设施支持 |\n| 5 | **操作程序** | 制定系统操作程序和应急预案 |\n| 6 | **人工监督** | 安排人员对系统输出进行必要的人工审查 |\n| 7 | **监控与反馈** | 监控系统运行，向提供者反馈相关问题 |\n\n#### 其他经济运营者义务 [1][13]\n\n| 主体 | 义务要点 |\n|------|---------|\n| **进口商** | 确保提供者已完成合规程序，保留技术文档副本，配合监管 |\n| **经销商** | 以符合法规的方式存储和运输系统，核实提供者身份和合规标识 |\n| **授权代表** | 代表提供者在欧盟履行合规义务，持有技术文档备查 |\n| **产品制造商** | 将AI系统作为产品安全组件时，需确保符合AI Act和相应产品法规要求 |\n\n---\n\n### 3.2 透明度义务（Article 50）\n\n以下四类情况需履行透明度义务 [1][14][15]：\n\n| 情形 | 要求 |\n|------|------|\n| **产生深度伪造内容** | 明确标注为AI生成 |\n| **进行情感推断** | 告知用户系统具备情感识别能力 |\n| **生成合成内容** | 标记为AI生成 |\n| **与AI系统交互** | 告知用户正在与AI互动 |\n\n**AI Omnibus修订后的过渡期**：\n- 2026年8月2日前已投放市场的生成式AI系统：享有至**2026年12月2日**的过渡期（针对机器可读标记义务）\n- 2026年8月2日及之后投放市场的系统：须立即合规\n\n---\n\n### 3.3 GPAI模型合规要求\n\nGPAI模型提供者须履行的义务 [1][16]：\n\n1. **技术文档编制**：包括模型架构、训练方法、性能指标、限制条件等\n2. **版权合规**：确保训练数据的版权归属清晰，提供欧盟版权政策\n3. **系统性风险评估**（高影响力模型）：\n   - 模型评估与测试\n   - 事件响应计划\n   - 网络安全措施\n   - 红队测试\n\n---\n\n## 四、违规处罚体系\n\n### 4.1 分级处罚机制\n\n欧盟AI Act建立了分级处罚机制，按违规严重程度适用不同罚款额度 [1][17][18]：\n\n| 违规类型 | 最高罚款（企业） | 最高罚款（SME） |\n|---------|-----------------|----------------|\n| **违反禁止AI实践**（Article 5） | €35M 或 全球年营业额 7%（取较高者） | €30M 或 6% |\n| **违反高风险AI系统数据治理与透明度义务** | €20M 或 全球年营业额 4% | — |\n| **违反其他高风险AI系统要求** | €10M 或 全球年营业额 2% | €30M 或 4% |\n| **违反其他规定**（如虚假文档、隐瞒信息） | €7.5M 或 全球年营业额 1% | — |\n\n### 4.2 罚款计算特点\n\n- **双重计算方式**：采用\"固定金额与营业额比例取较高者\"的计算方式\n- **对大型企业影响显著**：对大型跨国公司而言，按营业额比例计算可能产生极高罚款\n- **全球营业额基准**：以全球年营业额为基数，体现监管的全球适用性\n\n---\n\n## 五、企业合规策略建议\n\n### 5.1 立即行动项（已完成节点）\n\n截至2025年2月，企业应已完成以下事项：\n\n- [ ] 停止使用任何违反Article 5禁止清单的AI系统\n- [ ] 建立员工AI素养培训计划\n- [ ] 开展AI系统全面盘点，识别高风险应用\n- [ ] 指定合规负责人和联络点\n\n### 5.2 近期准备项（2025年8月-2026年8月）\n\n- [ ] 识别所有高风险AI系统（Annex III范畴）\n- [ ] 建立完整的质量管理体系\n- [ ] 编制技术文档和 conformity assessment 文件\n- [ ] 设计人工监督机制和透明度披露方案\n- [ ] 建立上市后监测和事件报告机制\n- [ ] 为GPAI模型建立合规框架（如适用）\n\n### 5.3 中期规划项（2026年-2027年）\n\n注意：AI Omnibus可能延长部分截止日期，企业应密切关注官方最新公告 [1][2]。\n\n- [ ] 完成高风险系统合规改造\n- [ ] 建立持续合规监控体系\n- [ ] 准备监管检查和审计\n- [ ] 更新供应商协议中的AI合规条款\n- [ ] 关注欧盟委员会实施细则和指南发布\n\n### 5.4 长期策略项\n\n- [ ] 将AI合规纳入企业治理框架\n- [ ] 建立跨部门合规协作机制（法务、IT、业务、HR）\n- [ ] 关注全球AI监管趋势（美国、中国等）\n- [ ] 持续跟踪欧盟指南、标准和最佳实践更新\n\n---\n\n## 六、风险提示与应对策略\n\n### 6.1 主要风险点\n\n1. **合规时间压力** [1][2]：尽管AI Omnibus可能延长部分截止日期，但企业应密切关注官方最新公告，避免误判\n\n2. **执法力度增强**：2026年8月起，AI办公室和各成员国主管机构将获得完整执法权力，预计将启动调查和处罚程序\n\n3. **跨境业务复杂性**：全球AI监管呈现碎片化格局，同一系统在不同法域可能有不同分类和合规要求\n\n4. **举证责任**：企业需证明其合规义务已履行，文档不完整或缺失本身就可能触发处罚\n\n5. **声誉风险**：违规不仅面临财务处罚，还可能造成品牌损害和客户信任流失\n\n6. **供应链风险**：企业需确保上游供应商和下游部署者均符合合规要求\n\n### 6.2 应对策略\n\n#### 战略层面\n\n- **高层承诺**：确立AI合规的企业级战略优先级，获得董事会和高级管理层支持\n- **资源投入**：配备专职合规团队，建立必要的预算和技术资源\n- **文化培育**：将AI伦理和合规意识融入企业文化\n\n#### 执行层面\n\n- **全面盘点**：系统梳理企业所有AI应用场景，建立AI资产目录\n- **风险评估**：依据Annex III标准，识别高风险AI系统，建立风险矩阵\n- **制度建设**：制定合规管理制度、操作流程和应急预案\n- **技术落实**：部署必要的技术工具和平台，支持合规要求的技术实现\n- **培训教育**：针对不同类型的角色，开展分层分类的AI素养培训\n- **供应链管理**：建立供应商合规审查机制，合同明确合规责任\n\n#### 监控层面\n\n- **持续监测**：建立合规指标体系，实时监控合规状态\n- **内部审计**：定期开展合规审计，发现并整改问题\n- **报告机制**：建立内部事件报告和外部监管报告机制\n- **动态更新**：跟踪法规变化和监管动态，及时调整合规策略\n\n---\n\n## 七、行业特别关注\n\n### 7.1 医疗健康行业\n\n- 医疗AI系统属于高风险类别，需进行严格的产品安全评估\n- 需同时满足欧盟医疗设备法规（MDR）和AI Act的双重要求\n- 建议提前与 notified body 沟通合规路径\n\n### 7.2 金融服务行业\n\n- 信贷评分、保险定价等属于高风险应用领域\n- 需特别关注算法透明度和可解释性要求\n- 建议与监管机构保持密切沟通\n\n### 7.3 人力资源行业\n\n- 招聘筛选、绩效评估等属于高风险应用\n- 需注意避免算法歧视和偏见\n- 建议建立人工复核机制\n\n### 7.4 科技与云计算行业\n\n- GPAI模型提供商面临额外的合规义务\n- 建议建立系统性的风险管理框架\n- 关注欧盟AI办公室的最新指导文件\n\n---\n\n## 八、结论与建议\n\n欧盟《人工智能法案》标志着全球AI监管进入新阶段，对企业AI应用的合规管理提出了系统性要求。尽管AI Omnibus修正案延长了部分合规截止日期，为企业争取了更多准备时间，但合规工作仍需尽早启动、稳步推进。\n\n### 核心建议\n\n1. **立即行动，不等不靠**：即使截止日期有所延长，企业也应抓紧当前窗口期，快速启动合规工作\n2. **系统规划，分步实施**：建立总体合规路线图，按风险等级和时间节点有序推进\n3. **全员参与，协同推进**：合规不仅是法务部门的责任，需要业务、技术、管理层共同参与\n4. **技术赋能，工具支撑**：投资建设必要的合规技术和平台，提高合规效率\n5. **持续跟踪，动态调整**：密切关注法规变化和监管动态，及时调整合规策略\n\n### 下一步行动\n\n1. 召开企业AI合规启动会议，明确责任分工\n2. 开展AI系统全面盘点，识别高风险应用\n3. 制定详细的合规实施计划和时间表\n4. 启动员工AI素养培训计划\n5. 与专业法律顾问建立合作关系\n\n---\n\n## 九、免责声明\n\n本报告基于公开信息整理，仅供参考，不构成法律建议。企业应以欧盟官方最新发布为准，并咨询专业法律顾问获取针对性的合规指导。法规可能随时更新，建议持续关注欧盟委员会、AI办公室和各成员国主管机构的官方公告。\n\n---\n\n## 【参考来源】\n\n1. Alice Labs - EU AI Act Timeline 2026: Aug 2 Milestone & Next Deadlines - https://alicelabs.ai/en/insights/eu-ai-act-timeline-2026\n2. Privacy & Civil Liberties - The AI Act Implementation Timeline: What Changes Under the AI Omnibus - https://fpf.org/blog/the-ai-act-implementation-timeline-what-changes-under-the-ai-omnibus\n3. 人工智能法案官方实施时间表 - https://artificialintelligenceact.eu/implementation-timeline\n4. 欧盟委员会数字战略 - AI Act监管框架 - https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai\n5. AI Act Service Desk - Timeline for Implementation - https://ai-act-service-desk.ec.europa.eu/en/ai-act/timeline/timeline-implementation-eu-ai-act\n6. Protiviti - 《欧盟AI法案》合规解读：机遇与挑战并存 - https://www.protiviti.com/sites/default/files/2025-04/interpretation-of-eu-ai-act_cn.pdf\n7. 知乎 - 独家｜欧盟《人工智能法案》解读 - https://zhuanlan.zhihu.com/p/30977784715\n8. Two Birds - 欧盟人工智能法案指南 - https://www.twobirds.com/-/media/new-website-content/pdfs/capabilities/artificial-intelligence/eu-ai-act-guide-chinese-version.pdf\n9. Foley & Lardner - 全球AI监管中的合规与执法：EU AI Act风险 - https://www.foley.com/zh/insights/publications/2026/07/compliance-and-enforcement-in-global-ai-regulation-eu-ai-act-risks-and-international-regulatory-challenges\n10. Sheffield Haworth - 欧盟人工智能法案如何影响您所在的行业以及关键日期 - https://www.sheffieldhaworth.com/zh-hans/欧盟人工智能法案如何影响您所在的行业以及关键\n11. DataGuidance - EU: AI Act provisions on prohibited AI practices and AI literacy became applicable - https://www.dataguidance.com/news/eu-ai-act-provisions-prohibited-ai-practices-and-ai\n12. CEE Legal Matters - Hungary: AI Act Provisions Applicable from February 2025 - https://ceelegalmatters.com/briefings/28668-hungary-ai-act-provisions-applicable-from-february-2025\n13. AI Governance - EU AI Act: AI Literacy and Prohibited AI Systems Provisions - https://aigovernance.com/policy/eu-ai-act-literacy-prohibited-ai-february-2026\n14. Hunton - Rules on AI Literacy and Prohibited Systems Under the EU AI Act Become Applicable - https://www.hunton.com/privacy-and-information-security-law/rules-on-ai-literacy-and-prohibited-systems-under-the-eu-ai-act-become-applicable\n15. Adherent - EU AI Act Compliance Requirements for Companies What to Prepare for 2026 - https://www.adherent.com/blog/eu-ai-act-compliance-requirements-for-companies-what-to-prepare-for-2026\n16. MDD International - What Companies Need to Know About EU AI Act Compliance - https://www.mddionline.com/artificial-intelligence/eu-ai-act-compliance-what-companies-need-to-know-about-penalties\n17. Aqua Cloud - EU AI Act Penalties Explained: Avoid Costly Non-Compliance - https://aqua-cloud.io/eu-ai-act-penalties-non-compliance\n18. EU AI Act Official Site - Key Issue 1: Fines/Penalties - https://www.euaiact.com/key-issue/1\n19. EU AI Act Official Site - Article 99: Penalties - https://artificialintelligenceact.eu/article/99\n20. ModelOp - EU AI Act: Summary & Compliance Requirements - https://www.modelop.com/ai-governance/ai-regulations-standards/eu-ai-act\n21. Cloud Security Alliance - EU AI Act High-Risk Deadline: Enterprise Readiness Gap - https://labs.cloudsecurityalliance.org/research/csa-research-note-eu-ai-act-high-risk-compliance-deadline-20\n22. Morgan Lewis - EU AI Act's Transparency Rules: What Went Into Effect on 2 August - https://www.morganlewis.com/blogs/sourcingatmorganlewis/2026/08/eu-ai-acts-transparency-rules-what-went-into-effect-on-2-august\n\n---\n\n**报告生成日期**：2025年\n\n**引用来源数量**：22条\n",
+  "report_path": "D:\\Project\\deepsearch-agents\\app\\output\\session_eval_baseline-w1_w2-005\\EU_AI_Act_Compliance_Guide_2025-2026.md",
+  "sources": [
+    {
+      "type": "web",
+      "title": "EU AI Act Timeline 2026: Aug 2 Milestone & Next Deadlines",
+      "url_or_ref": "https://alicelabs.ai/en/insights/eu-ai-act-timeline-2026"
+    },
+    {
+      "type": "web",
+      "title": "The AI Act implementation timeline: What changes under ...",
+      "url_or_ref": "https://fpf.org/blog/the-ai-act-implementation-timeline-what-changes-under-the-ai-omnibus"
+    },
+    {
+      "type": "web",
+      "title": "Implementation Timeline | EU Artificial Intelligence Act",
+      "url_or_ref": "https://artificialintelligenceact.eu/implementation-timeline"
+    },
+    {
+      "type": "web",
+      "title": "AI Act | Shaping Europe's digital future - European Union",
+      "url_or_ref": "https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai"
+    },
+    {
+      "type": "web",
+      "title": "Timeline for the Implementation of the EU AI Act | AI Act Service Desk",
+      "url_or_ref": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/timeline/timeline-implementation-eu-ai-act"
+    },
+    {
+      "type": "web",
+      "title": "Code of Practice on Transparency of AI-generated Content",
+      "url_or_ref": "https://digital-strategy.ec.europa.eu/en/policies/code-practice-ai-generated-content"
+    },
+    {
+      "type": "web",
+      "title": "The EU AI Act's Transparency Rules: A Practical Guide to Article 50",
+      "url_or_ref": "https://artificialintelligenceact.eu/transparency-rules-article-50"
+    },
+    {
+      "type": "web",
+      "title": "EU AI Act: Summary & Compliance Requirements",
+      "url_or_ref": "https://www.modelop.com/ai-governance/ai-regulations-standards/eu-ai-act"
+    },
+    {
+      "type": "web",
+      "title": "EU AI Act High-Risk Deadline: Enterprise Readiness Gap – Lab Space",
+      "url_or_ref": "https://labs.cloudsecurityalliance.org/research/csa-research-note-eu-ai-act-high-risk-compliance-deadline-20"
+    },
+    {
+      "type": "web",
+      "title": "EU AI Act's Transparency Rules: What Went Into Effect on 2 ...",
+      "url_or_ref": "https://www.morganlewis.com/blogs/sourcingatmorganlewis/2026/08/eu-ai-acts-transparency-rules-what-went-into-effect-on-2-august"
+    },
+    {
+      "type": "web",
+      "title": "《欧盟AI 法案》合规解读：机遇与挑战并存",
+      "url_or_ref": "https://www.protiviti.com/sites/default/files/2025-04/interpretation-of-eu-ai-act_cn.pdf"
+    },
+    {
+      "type": "web",
+      "title": "独家｜欧盟《人工智能法案》解读",
+      "url_or_ref": "https://zhuanlan.zhihu.com/p/30977784715"
+    },
+    {
+      "type": "web",
+      "title": "欧盟人工智能法案： 指南",
+      "url_or_ref": "https://www.twobirds.com/-/media/new-website-content/pdfs/capabilities/artificial-intelligence/eu-ai-act-guide-chinese-version.pdf"
+    },
+    {
+      "type": "web",
+      "title": "全球人工智能监管中的合规与执法：《欧盟人工智能法案》的风险与国际监管挑战 | Foley & Lardner",
+      "url_or_ref": "https://www.foley.com/zh/insights/publications/2026/07/compliance-and-enforcement-in-global-ai-regulation-eu-ai-act-risks-and-international-regulatory-challenges"
+    },
+    {
+      "type": "web",
+      "title": "欧盟人工智能法案如何影响您所在的行业以及关键日期 - Sheffield Haworth",
+      "url_or_ref": "https://www.sheffieldhaworth.com/zh-hans/%E6%AC%A7%E7%9B%9F%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E6%B3%95%E6%A1%88%E5%A6%82%E4%BD%95%E5%BD%B1%E5%93%8D%E6%82%A8%E6%89%80%E5%9C%A8%E7%9A%84%E8%A1%8C%E4%B8%9A%E4%BB%A5%E5%8F%8A%E5%85%B3%E9%94%AE"
+    },
+    {
+      "type": "web",
+      "title": "EU AI Act Compliance Requirements for Companies",
+      "url_or_ref": "https://www.adherent.com/blog/eu-ai-act-compliance-requirements-for-companies-what-to-prepare-for-2026"
+    },
+    {
+      "type": "web",
+      "title": "What Companies Need to Know About EU AI Act Compliance",
+      "url_or_ref": "https://www.mddionline.com/artificial-intelligence/eu-ai-act-compliance-what-companies-need-to-know-about-penalties"
+    },
+    {
+      "type": "web",
+      "title": "EU AI Act Penalties Explained: Avoid Costly Non-Compliance",
+      "url_or_ref": "https://aqua-cloud.io/eu-ai-act-penalties-non-compliance"
+    },
+    {
+      "type": "web",
+      "title": "Key Issue 1: Fines/Penalties - EU AI Act",
+      "url_or_ref": "https://www.euaiact.com/key-issue/1"
+    },
+    {
+      "type": "web",
+      "title": "Article 99: Penalties | EU Artificial Intelligence Act",
+      "url_or_ref": "https://artificialintelligenceact.eu/article/99"
+    },
+    {
+      "type": "web",
+      "title": "EU: AI Act provisions on prohibited AI practices and AI literacy became applicable | News | DataGuidance",
+      "url_or_ref": "https://www.dataguidance.com/news/eu-ai-act-provisions-prohibited-ai-practices-and-ai"
+    },
+    {
+      "type": "web",
+      "title": "Hungary: AI Act Provisions Applicable from February 2025",
+      "url_or_ref": "https://ceelegalmatters.com/briefings/28668-hungary-ai-act-provisions-applicable-from-february-2025"
+    },
+    {
+      "type": "web",
+      "title": "EU AI Act: AI Literacy and Prohibited AI Systems Provisions (Applicable 2 February 2026) — Requirements & Compliance Guide",
+      "url_or_ref": "https://aigovernance.com/policy/eu-ai-act-literacy-prohibited-ai-february-2026"
+    },
+    {
+      "type": "web",
+      "title": "Hungary: AI Act Provisions Applicable from February 2025",
+      "url_or_ref": "https://ceelegalmatters.com/hungary/28668-hungary-ai-act-provisions-applicable-from-february-2025"
+    },
+    {
+      "type": "web",
+      "title": "Rules on AI Literacy and Prohibited Systems Under the EU AI Act Become Applicable",
+      "url_or_ref": "https://www.hunton.com/privacy-and-information-security-law/rules-on-ai-literacy-and-prohibited-systems-under-the-eu-ai-act-become-applicable"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 132995,
+    "output_tokens": 12775,
+    "total_tokens": 145770
+  },
+  "duration_s": 124.07,
+  "status": "completed",
+  "error": null,
+  "started_at": "2026-09-25T15:16:24.026128",
+  "finished_at": "2026-09-25T15:18:28.095556"
+}

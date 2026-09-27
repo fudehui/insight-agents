@@ -1,0 +1,39 @@
+{
+  "case_id": "case-001",
+  "query": "查询药品行业销售与库存情况并生成报告",
+  "session_id": "eval-session-001",
+  "report_path": "evals/results/run-fixture/report_case-001.md",
+  "report_md": "# 药品行业分析报告\n\n2025 年全球药品销售额 TOP100 榜单显示创新药持续领跑 [1]。实体药店渠道增长显著 [2]。\n\n白皮书第 3 页的渠道结构数据 [3] 支持上述结论。数据库查询的库存明细见附录。\n\n补充阅读：[2026] 年行业年鉴（方括号年份不应计为引用）。\n\n## 【参考来源】\n\n1. [2024、2025年全球药物销售榜Top10排名预测](https://www.phirda.com/artilce_35201.html)\n2. [2025实体药店销售TOP10药品+企业榜单](https://www.pharnexcloud.com/zixun/sd_114823)\n3. 《药品销售白皮书.pdf》第3页\n",
+  "sources": [
+    {
+      "type": "web",
+      "title": "2024、2025年全球药物销售榜Top10排名预测",
+      "url_or_ref": "https://www.phirda.com/artilce_35201.html"
+    },
+    {
+      "type": "web",
+      "title": "2025实体药店销售TOP10药品+企业榜单",
+      "url_or_ref": "https://www.pharnexcloud.com/zixun/sd_114823"
+    },
+    {
+      "type": "docs",
+      "title": "药品销售白皮书.pdf",
+      "url_or_ref": "药品销售白皮书.pdf"
+    },
+    {
+      "type": "sql",
+      "title": "",
+      "url_or_ref": "SELECT drug_name, SUM(quantity_on_hand) AS total FROM inventory GROUP BY drug_name ORDER BY total DESC LIMIT 10"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 120000,
+    "output_tokens": 8000,
+    "total_tokens": 128000
+  },
+  "duration_s": 150.0,
+  "status": "completed",
+  "error": null,
+  "started_at": "2026-09-13T10:00:00",
+  "finished_at": "2026-09-13T10:02:30"
+}

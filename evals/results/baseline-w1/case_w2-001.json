@@ -1,0 +1,194 @@
+{
+  "case_id": "w2-001",
+  "query": "检索并总结 2025-2026 年开源大模型的生态格局与主要模型家族的版本演进， 生成一份开源大模型生态研究报告",
+  "session_id": "eval_baseline-w1_w2-001",
+  "report_md": null,
+  "report_path": null,
+  "sources": [
+    {
+      "type": "web",
+      "title": "模型上下架与更新 - 阿里云文档",
+      "url_or_ref": "https://help.aliyun.com/zh/model-studio/newly-released-models"
+    },
+    {
+      "type": "web",
+      "title": "Qwen 家族技术路线图：从 2023-08 Qwen-1 到 2026-05 Qwen-3.7-Max 的近三年完整演进史（Qwen 专题系列 · 序章）",
+      "url_or_ref": "https://yudonglee.me/qwen-roadmap"
+    },
+    {
+      "type": "web",
+      "title": "一文通透Qwen LLM系列——从Qwen、Qwen1.5、Qwen2、Qwen2.5到Qwen3(融合了chat和推理)、Qwen3 MoE",
+      "url_or_ref": "https://blog.csdn.net/v_JULY_v/article/details/150444999"
+    },
+    {
+      "type": "web",
+      "title": "【2026最新】阿里通義千問 Qwen 全解析：Qwen3.5 震撼發布、Qwen3 功能亮點與香港本地部署實戰 - LeadAdds",
+      "url_or_ref": "https://www.leadadds.com/learning-centre/qwen3-full-guide"
+    },
+    {
+      "type": "web",
+      "title": "Qwen3.5",
+      "url_or_ref": "https://qwen.ai/research"
+    },
+    {
+      "type": "web",
+      "title": "Best Open Source LLM 2026: DeepSeek, Kimi, Qwen Ranked",
+      "url_or_ref": "https://tech-insider.org/best-open-source-llm-2026"
+    },
+    {
+      "type": "web",
+      "title": "开源大模型全球洗牌！阿里千问累计下载量近10亿：美国份额被挤压_新浪科技_新浪网",
+      "url_or_ref": "https://finance.sina.com.cn/tech/roll/2026-04-11/doc-inhuauvf9648437.shtml"
+    },
+    {
+      "type": "web",
+      "title": "大模型 LLM 架构对比，DeepSeek、Llama、Qwen、Kimi、Mistral、Gemma-腾讯云开发者社区-腾讯云",
+      "url_or_ref": "https://cloud.tencent.com/developer/article/2551575"
+    },
+    {
+      "type": "web",
+      "title": "谁是开源大模型之王？Llama、DeepSeek还是Qwen？",
+      "url_or_ref": "https://zhuanlan.zhihu.com/p/1928899343265538929"
+    },
+    {
+      "type": "web",
+      "title": "2026 最佳开放权重 LLM 对比 | Wavect",
+      "url_or_ref": "https://wavect.io/zh/blog/open-weight-llm-comparison-2026"
+    },
+    {
+      "type": "web",
+      "title": "DeepSeek：开源大模型探索 | 企业级 AI 应用前沿 | IBM",
+      "url_or_ref": "https://www.ibm.com/cn-zh/think/topics/deepseek"
+    },
+    {
+      "type": "web",
+      "title": "用于科研写作的免费AI 模型（DeepSeek、Qwen、Llama）",
+      "url_or_ref": "https://proofreaderpro.ai/zh/blog/free-ai-models-research-writing-humanize"
+    },
+    {
+      "type": "web",
+      "title": "老外给中国AI 开源厂商打分：第一梯队是DeepSeek 和Qwen。",
+      "url_or_ref": "https://developer.volcengine.com/articles/7540544886534864939"
+    },
+    {
+      "type": "web",
+      "title": "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs ...",
+      "url_or_ref": "https://arxiv.org/abs/2501.12948"
+    },
+    {
+      "type": "web",
+      "title": "DeepSeek-R1",
+      "url_or_ref": "https://github.com/deepseek-ai/deepseek-r1"
+    },
+    {
+      "type": "web",
+      "title": "3年，从0到全球领跑：万字长文拆解DeepSeek大模型技术演进",
+      "url_or_ref": "https://zhuanlan.zhihu.com/p/2005299877626794583"
+    },
+    {
+      "type": "web",
+      "title": "DeepSeek-V3",
+      "url_or_ref": "https://baike.baidu.com/item/DeepSeek-V3/65348724"
+    },
+    {
+      "type": "web",
+      "title": "The Complete Guide to DeepSeek Models: V3, R1, V4 and ...",
+      "url_or_ref": "https://www.bentoml.com/blog/the-complete-guide-to-deepseek-models-from-v3-to-r1-and-beyond"
+    },
+    {
+      "type": "web",
+      "title": "DeepSeek",
+      "url_or_ref": "https://en.wikipedia.org/wiki/DeepSeek"
+    },
+    {
+      "type": "web",
+      "title": "更新日志 - DeepSeek API Docs",
+      "url_or_ref": "https://api-docs.deepseek.com/zh-cn/updates"
+    },
+    {
+      "type": "web",
+      "title": "Llama Versions — every Meta Llama model from LLaMA 1 through Llama 4 (and the Muse line), with HuggingFace ids, parameter counts, license terms, and ship dates",
+      "url_or_ref": "https://mungomash.com/ai/llama/versions"
+    },
+    {
+      "type": "web",
+      "title": "Meta Llama 3深度解析：2025年开源大语言模型的里程碑-腾讯云开发者社区-腾讯云",
+      "url_or_ref": "https://cloud.tencent.com/developer/article/2586967"
+    },
+    {
+      "type": "web",
+      "title": "Llama (language model) - Wikipedia",
+      "url_or_ref": "https://en.wikipedia.org/wiki/Llama_(language_model)"
+    },
+    {
+      "type": "web",
+      "title": "Meta，重磅发布！",
+      "url_or_ref": "https://stcn.com/article/detail/1641531.html"
+    },
+    {
+      "type": "web",
+      "title": "中信证券：LLaMA3开源发布 喂入海量训练数据效果远超预期",
+      "url_or_ref": "https://cn.investing.com/news/stock-market-news/article-2352437"
+    },
+    {
+      "type": "web",
+      "title": "[36氪研究院]：2025年中国大模型行业发展研究报告 - 发现报告",
+      "url_or_ref": "https://www.fxbaogao.com/detail/5133962"
+    },
+    {
+      "type": "web",
+      "title": "AI大模型最新动态研究报告（2025年11月报） - 文章 - 开发者社区 - 火山引擎",
+      "url_or_ref": "https://developer.volcengine.com/articles/7577300596110295078"
+    },
+    {
+      "type": "web",
+      "title": "鏖战2025年，大模型围着开源转 | 人人都是产品经理",
+      "url_or_ref": "https://www.woshipm.com/ai/6312197.html"
+    },
+    {
+      "type": "web",
+      "title": "2025 AI大模型开发生态白皮书_人工智能_互联互通社区-智能体开发者社区",
+      "url_or_ref": "https://adg.csdn.net/696f2dba437a6b403369976d.html"
+    },
+    {
+      "type": "web",
+      "title": "36氪研究院：2025年中国大模型行业发展研究报告——2026年中国大模型市场规模将突破700亿元，CBDG四维生态成为中国大模型发展新范式，大模型第一梯队已经形成并逐渐稳定（文末附下载） – 智慧城市行业分析",
+      "url_or_ref": "https://www.smartcity.team/reports/36kr_ai_model_report"
+    },
+    {
+      "type": "web",
+      "title": "【行业深度】洞察2025：中国多模态大模型行业竞争格局及市场份额（附市场竞争梯队、行业战略集群分析等） 提供者 前瞻网",
+      "url_or_ref": "https://cn.investing.com/news/economy-news/article-2809606"
+    },
+    {
+      "type": "web",
+      "title": "计算机行业深度：大模型研究框架（2025）",
+      "url_or_ref": "https://www.cdut.edu.cn/__local/B/C9/05/896CBAE72E2A419A08AAF975969_8205A63A_649BA8.pdf"
+    },
+    {
+      "type": "web",
+      "title": "《中国开源发展深度报告（2025）》发布：AI重塑开源产业发展格局，中国开源生态加速迈向高质量发展新阶段 - OpenAtom Foundation",
+      "url_or_ref": "https://www.openatom.org/journalism/detail/bdPGZ0UY6bn5"
+    },
+    {
+      "type": "web",
+      "title": "AI下半场竞争，阿里凭什么当“链主”？",
+      "url_or_ref": "https://cn.investing.com/news/stock-market-news/article-2926064"
+    },
+    {
+      "type": "web",
+      "title": "中国大模型密集开源的原因及可能影响",
+      "url_or_ref": "https://paper.people.com.cn/rmlt/pc/content/202506/18/content_30086963.html"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 231760,
+    "output_tokens": 29670,
+    "total_tokens": 261430
+  },
+  "duration_s": 252.07,
+  "status": "failed",
+  "error": "执行主智能发生异常信息：Error code: 429 - {'error': {'code': '', 'message': 'You’ve reached the API rate limit for free users. Upgrade to a Token Plan to unlock higher limits and continue using the API without interruption. (request id: 20260925060833497842600Cm25kdBj)', 'type': 'AgnesAI_error'}}",
+  "started_at": "2026-09-25T14:04:23.083946",
+  "finished_at": "2026-09-25T14:08:35.156733"
+}

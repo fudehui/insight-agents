@@ -1,0 +1,34 @@
+# 轻量冒烟批次（W4）：用户指示"用简单的问题进行测试即可"——
+# 每条 1-2 次工具调用、短报告，用于免费档配额受限时的管线验证与
+# LLM-as-Judge 样本补充；不并入 baseline 统计口径（README 已注明）
+cases:
+  - id: smoke-001
+    query: 检索 2026 年春节的放假安排，用一段话总结，并生成一份简短的 markdown 报告（不超过 300 字）。
+    expected_points:
+      - 报告包含 2026 年春节放假的具体日期范围
+      - 报告简短（正文不超过 300 字）
+      - 报告末尾带【参考来源】章节且引用网络链接
+    expected_tools: [internet_search, generate_markdown]
+    expected_source_types: [web]
+    tags: [smoke, web]
+    notes: 轻量验证用例：单次检索即可完成
+  - id: smoke-002
+    query: 查询数据库中一共有多少种药品，生成一份简短的 markdown 报告说明统计口径（不超过 200 字）。
+    expected_points:
+      - 报告给出药品总数 50 种
+      - 报告说明统计口径（drugs 表全量计数）
+      - 报告末尾带【参考来源】或数据来源说明
+    expected_tools: [execute_sql_query, generate_markdown]
+    expected_source_types: [sql]
+    tags: [smoke, db]
+    notes: 轻量验证用例：真值 50（drugs 表 COUNT(*)）
+  - id: smoke-003
+    query: 查询库存总量最多的药品名称及其库存数量，生成一份简短的 markdown 报告（不超过 200 字）。
+    expected_points:
+      - 报告给出药品名称"连花清瘟胶囊"
+      - 报告给出库存数量 160000
+      - 报告末尾带【参考来源】或数据来源说明
+    expected_tools: [execute_sql_query, generate_markdown]
+    expected_source_types: [sql]
+    tags: [smoke, db]
+    notes: 轻量验证用例：真值 连花清瘟胶囊/160000（inventory 按 drug_id 聚合最大值）

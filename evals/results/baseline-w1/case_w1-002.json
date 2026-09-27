@@ -1,0 +1,144 @@
+{
+  "case_id": "w1-002",
+  "query": "调研 LangGraph 与 DeepAgents 两个框架 2025-2026 年的主要版本演进与特性差异， 对比二者在多智能体深度研究任务中的适用场景，输出一份对比报告",
+  "session_id": "eval_baseline-w1_w1-002",
+  "report_md": "# LangGraph 与 DeepAgents 框架对比报告（2025-2026 年版）\n\n> 调研时间：2026年  \n> 工作目录：output/session_eval_baseline-w1_w1-002\n\n---\n\n## 一、框架定位概述\n\nLangGraph 与 DeepAgents 同属 LangChain 生态体系，但在抽象层级和设计理念上存在显著差异。理解这一差异是进行对比分析的前提。\n\n| 维度 | LangGraph | DeepAgents |\n|------|-----------|------------|\n| **框架层级** | Layer 2 — Agent Runtime（代理运行时） | Layer 4 — Agent Harness（代理 Harness） |\n| **控制程度** | 最大化确定性，手动定义工作流拓扑 | 最大化代理自主性，模型自动决策 |\n| **核心理念** | \"encode domain knowledge directly into the graph's topology\" | \"trust the LLM\" — 提供工具和提示，让模型自行决策 |\n| **适用开发模式** | 适合需要精确控制和可重复性的生产环境 | 适合探索性、需要自主决策的任务 |\n\n> 【来源1】LangChain Blog - Deep Agents vs LangChain vs LangGraph: https://www.langchain.com/blog/deep-agents-vs-langchain-vs-langgraph\n\n---\n\n## 二、版本演进历程\n\n### 2.1 LangGraph 版本演进（2025-2026）\n\n#### 里程碑：LangGraph 1.0 正式发布（2025年10月）\n\nLangGraph 1.0 的发布是该框架发展史上的分水岭事件，标志着从预览版正式走向生产就绪状态。同期 LangChain 1.0 也同步发布，官方承诺 API 稳定性延续至 2.0 版本，为企业级采用提供了明确保障。发布后一个月内，LangGraph 月下载量达到 **617 万次**，显示出强大的市场认可度。\n\n> 【来源2】LangChain Forum 公告 - We launched 1.0 versions of LangChain and LangGraph!: https://forum.langchain.com/t/we-launched-1-0-versions-of-langchain-and-langgraph/1904\n\n#### 主要版本序列\n\n| 版本 | 发布时间 | 关键更新内容 |\n|------|----------|--------------|\n| **1.0.x** | 2025年10月-12月 | 稳定版发布，包含 resumable streams、toolsCondition 保留等生产级修复 |\n| **1.1.0** | 2026年1月 | 新增 TypeScript 类型工具（graph nodes 类型、conditional edges），显著改善 TypeScript 开发者体验 |\n| **1.2.7 - 1.2.9** | 2026年中 | 持续迭代，修复 checkpoint 相关 bug，增强系统稳定性 |\n| **checkpoint 3.1.1** | 2026年 | Checkpoint 系统优化，提升任务持久化与恢复能力 |\n\n> 【来源3】GitHub - Releases · langchain-ai/langgraph: https://github.com/langchain-ai/langgraph/releases  \n> 【来源4】LangChain Docs - Agent Server changelog: https://docs.langchain.com/langsmith/agent-server-changelog\n\n### 2.2 DeepAgents 版本演进（2025-2026）\n\n| 版本 | 发布时间 | 核心更新内容 |\n|------|----------|--------------|\n| **v0.4** | 2026年2月 | 深化 agent 推理与决策能力；改进长对话和多轮交互的上下文管理；增强 trace 预览和调试功能 |\n| **v0.6** | 2026年5月 | 新增多 agent 协作能力；改进 checkpointing 和持久化执行机制；加强对 MCP (Model Context Protocol) 的原生支持 |\n| **v0.7.x** | 2026年中后期 | 解决 MCP 工具名称长度限制问题；引入并行 task 失败隔离机制；增强 Auto-approval 网关路径扩展保护 |\n\n> 【来源5】New in Deep Agents v0.6 - LangChain Blog: https://www.langchain.com/blog/deep-agents-0-6  \n> 【来源6】GitHub - langchain-ai/deepagents Releases: https://github.com/langchain-ai/deepagents/releases\n\n---\n\n## 三、核心特性对比\n\n### 3.1 状态管理与 Checkpoint 系统\n\n| 特性 | LangGraph | DeepAgents |\n|------|-----------|------------|\n| **Checkpoint 机制** | RemoteCheckpointer 支持子图检查点；Resumable Streams 支持远程图表可恢复流 | 改进的 checkpointing 和持久化执行机制 |\n| **状态持久化** | 成熟的图状态持久化，支持断点续跑 | 面向 agent 任务的持久化策略 |\n| **API 稳定性** | 承诺 API 稳定至 2.0，适合长期维护项目 | 仍处于 v0.x 阶段，API 变动相对频繁 |\n\n### 3.2 多智能体（Multi-Agent）架构支持\n\n#### LangGraph 多智能体能力\n\nLangGraph 在 2025 年重点强化了多智能体协作能力，形成了丰富的多 agent 编排模式：\n\n- **Swarm（群体）架构**：2025年2月发布，每个 agent 可与用户交互并相互交接请求，区别于传统的 supervisor 模式\n- **Supervisor 模式**：中央控制器协调多个专项 agent\n- **Handoff 模式**：agent 间明确的任务转移机制\n- **Planner + Subagents 模式**：规划器分解任务，子 agent 隔离上下文执行\n- **条件路由（Conditional Routing）**：根据状态动态路由到不同 agent\n- **共享状态读写**：多个 agent 可访问和修改共享状态\n\n> 【来源7】YouTube - Multi-agent swarms with LangGraph: https://www.youtube.com/watch?v=JeyDrn1dSUQ  \n> 【来源8】Medium - LangGraph — Multi-Agent Systems (MAS): https://medium.com/@shuv.sdr/langgraph-multi-agent-systems-mas-a30166b07691\n\n#### DeepAgents 多智能体能力\n\nDeepAgents 在多智能体方面的演进更为聚焦于 deep research 场景：\n\n- **Agent-to-Agent 协议**：支持 agent 间通信与任务委派\n- **多 Agent 协作编排**：v0.6 版本新增复杂 multi-agent 编排模式\n- **远程图执行**：支持跨 agent 的状态共享和任务分发\n- **LangSmith 集成**：通过 LangSmith 平台实现多 agent 的调试、评估和生产部署\n\n> 【来源5】New in Deep Agents v0.6 - LangChain Blog\n\n### 3.3 关键生产案例：Exa Deep Research\n\nExa 公司在 2025年6月展示了 LangGraph 在生产环境中的深度应用能力。该系统使用 LangGraph 构建深度研究多智能体系统，日处理数百个研究查询，响应时间为 15秒至3分钟（取决于研究复杂度）。该案例验证了 LangGraph 在复杂多智能体工作流中的实际工程可行性。\n\n> 【来源9】LangChain Blog - How Exa built a Web Research Multi-Agent System: https://www.langchain.com/blog/exa\n\n### 3.4 长期记忆与可观测性\n\n| 能力 | LangGraph | DeepAgents |\n|------|-----------|------------|\n| **长期记忆** | Mem0 集成；DeepLearning.AI 专门课程 \"Long-Term Agentic Memory with LangGraph\" | 改进的长对话上下文管理 |\n| **可观测性** | LangSmith Insights Agent、Agent Trajectory 追踪、语义结果评估 | trace 预览和调试功能增强 |\n| **评估体系** | Multi-turn Evals 功能 | 持续优化中 |\n\n> 【来源10】LangChain Forum - Introducing Insights Agent & Multi-turn Evals: https://forum.langchain.com/t/introducing-insights-agent-multi-turn-evals-new-features-in-langsmith/1914  \n> 【来源11】DeepLearning.AI Community - New course: Long-Term Agentic Memory with LangGraph: https://community.deeplearning.ai/t/new-course-enroll-in-long-term-agentic-memory-with-langgraph/786723\n\n### 3.5 安全与漏洞修复（2025-2026）\n\n2025-2026 年间，LangChain 生态发布了多个关键安全补丁：\n\n| 漏洞编号 | 影响组件 | 问题描述 | 修复版本 |\n|----------|----------|----------|----------|\n| CVE-2025-68664 | langchain-core | 序列化注入漏洞 | >= 1.2.22 |\n| CVE-2025-64439 | langgraph-checkpoint | 远程代码执行（RCE）漏洞 | >= 3.0.1 |\n| CVE-2026-34070 | 相关文件和数据 | 数据暴露风险 | >= 1.2.22 |\n| - | DeepAgents | Auto-approval 网关路径扩展保护增强 | v0.7.x |\n\n> 【来源12】CSA Research - LangChain and LangGraph: Critical Vulnerabilities in AI Agents: https://labs.cloudsecurityalliance.org/research/csa-research-note-langchain-langgraph-vulnerabilities-202603\n\n---\n\n## 四、成本与效率对比\n\n### 4.1 Token 消耗差异\n\n根据独立评测数据，DeepAgents 因内置自主规划能力，其 Token 消耗约为 LangGraph 的 **20 倍**。这一差异源于：\n\n- DeepAgents 需要模型自主进行任务分解、路径规划和决策\n- LangGraph 的工作流由开发者预先定义，模型仅需执行既定路径\n\n> 【来源13】Medium - LangGraph vs DeepAgents: What if the cost of convenience is 20x?: https://medium.com/@kylas.kai/langgraph-vs-deepagents-what-if-the-cost-of-convenience-is-20x-24e0d1859ba2\n\n### 4.2 开发效率对比\n\n| 维度 | LangGraph | DeepAgents |\n|------|-----------|------------|\n| **上手难度** | 较高，需掌握图论与状态机概念 | 较低，面向高级用户的开箱即用体验 |\n| **开发周期** | 较长（需手动设计拓扑结构） | 较短（声明式配置即可启动） |\n| **调试复杂度** | 高（需追踪图执行路径） | 中等（内置 trace 功能辅助） |\n| **适用团队** | 有成熟 ML 工程能力的团队 | 追求快速迭代的研究型团队 |\n\n---\n\n## 五、多智能体深度研究任务适用场景分析\n\n### 5.1 LangGraph 适用场景\n\n**优势领域：**\n1. **确定性要求高的生产环境**：API 稳定承诺 + 成熟的 checkpoint 系统，适合需要 SLA 保障的生产部署\n2. **复杂工作流编排**：条件路由、循环、分支等高级图结构支持，可精确控制任务执行流程\n3. **高并发批量处理**：Exa 案例证明其可扩展至日处理数百个查询\n4. **可重复性要求严格的场景**：图的确定性执行保证结果可复现\n5. **企业级定制需求**：可深度定制每个节点的行为，融入企业现有系统\n\n**局限性：**\n- 多 agent 协作模式需要开发者自行设计编排逻辑\n- 初始开发成本较高\n\n### 5.2 DeepAgents 适用场景\n\n**优势领域：**\n1. **探索性研究任务**：内置自主规划能力，适合研究目标不明确的深度调研\n2. **快速原型开发**：声明式配置减少编码工作量，加速迭代\n3. **单 agent 深度研究**：内置文件系统抽象、上下文管理、任务分解等 best practices\n4. **MCP 生态集成**：原生支持 Model Context Protocol，可与丰富的工具生态连接\n5. **低代码/无代码倾向场景**：最小化编码工作量，依赖模型智能完成复杂任务\n\n**局限性：**\n- Token 消耗约为 LangGraph 的 20 倍，运营成本较高\n- API 仍处于 v0.x 阶段，长期维护风险相对较大\n- 自主决策可能导致结果不可预测，不适合需要严格一致性的场景\n\n### 5.3 对比总结矩阵\n\n| 评估维度 | LangGraph | DeepAgents | 胜出方 |\n|----------|-----------|------------|--------|\n| 生产稳定性 | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | LangGraph |\n| API 成熟度 | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | LangGraph |\n| 开发效率 | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | DeepAgents |\n| 多 agent 编排灵活性 | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | LangGraph |\n| 深度研究自动化程度 | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | DeepAgents |\n| Token 成本控制 | ⭐⭐⭐⭐⭐ | ⭐⭐ | LangGraph |\n| 生态丰富度 | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | LangGraph |\n| 学习曲线 | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | DeepAgents |\n| 企业级安全性 | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | LangGraph |\n\n---\n\n## 六、推荐选型建议\n\n### 选择 LangGraph 的场景\n- 生产环境部署，需要严格的 SLA 保障和 API 稳定性承诺\n- 需要精确控制多 agent 协作流程和状态流转\n- 对 Token 成本和运营效率有严格要求\n- 需要与企业现有系统深度集成\n- 团队具备较强的工程能力和图结构建模经验\n\n### 选择 DeepAgents 的场景\n- 研究探索阶段，需要快速验证想法\n- 单 agent 深度研究任务，自动化程度要求高\n- 团队资源有限，追求快速上线\n- 充分利用 MCP 工具生态\n- 对结果的确定性要求相对较低\n\n### 混合使用策略\n根据 LangChain 官方定义，三层架构（LangGraph → LangChain → DeepAgents）完全可组合。建议采用以下分层策略：\n- **底层**：使用 LangGraph 构建稳定可靠的多 agent 编排基础设施\n- **上层**：在 LangGraph 基础上，针对特定深度研究场景使用 DeepAgents 的抽象能力\n- **数据层**：通过 LangSmith 实现统一的观测、评估和调试\n\n> 【来源14】Langfuse Blog - Comparing Open-Source AI Agent Frameworks: https://langfuse.com/blog/2025-03-19-ai-agent-comparison\n\n---\n\n## 七、版本演进时间线总结\n\n### LangGraph 2025-2026 发展主线\n1. **从预览到生产**：1.0 稳定版发布（2025年10月），API 承诺至 2.0\n2. **多智能体成熟**：Swarm 架构、Exa 案例验证、教程体系完善\n3. **生态扩展**：TypeScript 支持、长期记忆集成、可观测性增强\n4. **安全加固**：多个关键漏洞修复，企业级安全能力完善\n\n### DeepAgents 2025-2026 发展主线\n1. **智能深化**：v0.4 强化 agent 推理决策能力\n2. **协作增强**：v0.6 支持多 agent 复杂协作编排\n3. **生态融合**：v0.7.x 加强 MCP 支持和安全加固\n4. **工程完善**：持续修复 bug，提升生产可用性\n\n---\n\n## 八、结论\n\nLangGraph 与 DeepAgents 在 LangChain 生态中分别承担不同的角色：LangGraph 作为底层运行时框架，提供确定性强、可控性高的多 agent 编排能力，适合生产级应用；DeepAgents 作为高层抽象框架，通过模型的自主决策简化开发流程，适合探索性和研究性任务。\n\n对于多智能体深度研究任务，建议根据项目的确定性要求、成本约束和团队工程能力进行选择。对于需要长期维护和高可靠性的生产系统，LangGraph 是更稳妥的选择；对于快速迭代和探索性研究，DeepAgents 能显著提升开发效率。两者并非互斥关系，可在同一系统中分层组合使用，发挥各自优势。\n\n---\n\n## 【参考来源】\n\n1. LangChain Blog - Deep Agents vs LangChain vs LangGraph: https://www.langchain.com/blog/deep-agents-vs-langchain-vs-langgraph\n2. LangChain Forum - We launched 1.0 versions of LangChain and LangGraph!: https://forum.langchain.com/t/we-launched-1-0-versions-of-langchain-and-langgraph/1904\n3. GitHub - Releases · langchain-ai/langgraph: https://github.com/langchain-ai/langgraph/releases\n4. LangChain Docs - Agent Server changelog: https://docs.langchain.com/langsmith/agent-server-changelog\n5. New in Deep Agents v0.6 - LangChain Blog: https://www.langchain.com/blog/deep-agents-0-6\n6. GitHub - langchain-ai/deepagents Releases: https://github.com/langchain-ai/deepagents/releases\n7. YouTube - Multi-agent swarms with LangGraph: https://www.youtube.com/watch?v=JeyDrn1dSUQ\n8. Medium - LangGraph — Multi-Agent Systems (MAS): https://medium.com/@shuv.sdr/langgraph-multi-agent-systems-mas-a30166b07691\n9. LangChain Blog - How Exa built a Web Research Multi-Agent System: https://www.langchain.com/blog/exa\n10. LangChain Forum - Introducing Insights Agent & Multi-turn Evals: https://forum.langchain.com/t/introducing-insights-agent-multi-turn-evals-new-features-in-langsmith/1914\n11. DeepLearning.AI Community - New course: Long-Term Agentic Memory with LangGraph: https://community.deeplearning.ai/t/new-course-enroll-in-long-term-agentic-memory-with-langgraph/786723\n12. CSA Research - LangChain and LangGraph: Critical Vulnerabilities in AI Agents: https://labs.cloudsecurityalliance.org/research/csa-research-note-langchain-langgraph-vulnerabilities-202603\n13. Medium - LangGraph vs DeepAgents: What if the cost of convenience is 20x?: https://medium.com/@kylas.kai/langgraph-vs-deepagents-what-if-the-cost-of-convenience-is-20x-24e0d1859ba2\n14. Langfuse Blog - Comparing Open-Source AI Agent Frameworks: https://langfuse.com/blog/2025-03-19-ai-agent-comparison\n",
+  "report_path": "D:\\Project\\deepsearch-agents\\app\\output\\session_eval_baseline-w1_w1-002\\LangGraph_vs_DeepAgents_对比报告.md",
+  "sources": [
+    {
+      "type": "web",
+      "title": "Comparing Open-Source AI Agent Frameworks - Langfuse",
+      "url_or_ref": "https://langfuse.com/blog/2025-03-19-ai-agent-comparison"
+    },
+    {
+      "type": "web",
+      "title": "Medium",
+      "url_or_ref": "https://medium.com/@kylas.kai/langgraph-vs-deepagents-what-if-the-cost-of-convenience-is-20x-24e0d1859ba2"
+    },
+    {
+      "type": "web",
+      "title": "Deep Agents vs LangChain vs LangGraph",
+      "url_or_ref": "https://www.langchain.com/blog/deep-agents-vs-langchain-vs-langgraph"
+    },
+    {
+      "type": "web",
+      "title": "Deep Agents or LangGraph? The LangChain agentic ecosystem ...",
+      "url_or_ref": "https://www.youtube.com/watch?v=6VquSiCBVJs"
+    },
+    {
+      "type": "web",
+      "title": "Choosing an agent framework: LangChain vs LangGraph vs CrewAI ...",
+      "url_or_ref": "https://www.speakeasy.com/blog/ai-agent-framework-comparison"
+    },
+    {
+      "type": "web",
+      "title": "Releases · langchain-ai/langgraph",
+      "url_or_ref": "https://github.com/langchain-ai/langgraph/releases"
+    },
+    {
+      "type": "web",
+      "title": "Lag between providers, docs and Python Langchain package releases",
+      "url_or_ref": "https://forum.langchain.com/t/lag-between-providers-docs-and-python-langchain-package-releases/3046"
+    },
+    {
+      "type": "web",
+      "title": "Agent Server changelog - Docs by LangChain",
+      "url_or_ref": "https://docs.langchain.com/langsmith/agent-server-changelog"
+    },
+    {
+      "type": "web",
+      "title": "LangChain and LangGraph: Critical Vulnerabilities in AI ...",
+      "url_or_ref": "https://labs.cloudsecurityalliance.org/research/csa-research-note-langchain-langgraph-vulnerabilities-202603"
+    },
+    {
+      "type": "web",
+      "title": "LangChain and LangGraph v1.0: Beyond Release Notes, Into ...",
+      "url_or_ref": "https://agentnativedev.medium.com/langchain-and-langgraph-v1-0-beyond-release-notes-into-real-roi-7538fc02ff83"
+    },
+    {
+      "type": "web",
+      "title": "Multi-agent swarms with LangGraph",
+      "url_or_ref": "https://www.youtube.com/watch?v=JeyDrn1dSUQ"
+    },
+    {
+      "type": "web",
+      "title": "LangGraph — Multi-Agent Systems (MAS)",
+      "url_or_ref": "https://medium.com/@shuv.sdr/langgraph-multi-agent-systems-mas-a30166b07691"
+    },
+    {
+      "type": "web",
+      "title": "Multi-Agent System Tutorial with LangGraph",
+      "url_or_ref": "https://blog.futuresmart.ai/multi-agent-system-with-langgraph"
+    },
+    {
+      "type": "web",
+      "title": "Build a LangGraph multi-agent system in 20 minutes with LaunchDarkly AgentControl | LaunchDarkly | Documentation",
+      "url_or_ref": "https://launchdarkly.com/docs/tutorials/agents-langgraph"
+    },
+    {
+      "type": "web",
+      "title": "How Exa built a Web Research Multi-Agent System ...",
+      "url_or_ref": "https://www.langchain.com/blog/exa"
+    },
+    {
+      "type": "web",
+      "title": "LangGraph vs CrewAI: Let’s Learn About the Differences - ZenML Blog",
+      "url_or_ref": "https://zenml.io/blog/langgraph-vs-crewai"
+    },
+    {
+      "type": "web",
+      "title": "Introducing Insights Agent & Multi-turn Evals, new features in LangSmith! - Announcements - LangChain Forum",
+      "url_or_ref": "https://forum.langchain.com/t/introducing-insights-agent-multi-turn-evals-new-features-in-langsmith/1914"
+    },
+    {
+      "type": "web",
+      "title": "LangChain 2025: New Features & LangGraph Integration",
+      "url_or_ref": "https://blog.thecgaigroup.com/langchain-2025-new-features-langgraph-integration"
+    },
+    {
+      "type": "web",
+      "title": "✨ New course! Enroll in Long-Term Agentic Memory with LangGraph - News and Announcements - DeepLearning.AI",
+      "url_or_ref": "https://community.deeplearning.ai/t/new-course-enroll-in-long-term-agentic-memory-with-langgraph/786723"
+    },
+    {
+      "type": "web",
+      "title": "We launched 1.0 versions of LangChain and LangGraph!",
+      "url_or_ref": "https://forum.langchain.com/t/we-launched-1-0-versions-of-langchain-and-langgraph/1904"
+    },
+    {
+      "type": "web",
+      "title": "New in Deep Agents v0.6",
+      "url_or_ref": "https://www.langchain.com/blog/deep-agents-0-6"
+    },
+    {
+      "type": "web",
+      "title": "March 2026 Release Notes",
+      "url_or_ref": "https://docs.rapid7.com/insight/release-notes-2026-march"
+    },
+    {
+      "type": "web",
+      "title": "Medium",
+      "url_or_ref": "https://anudeepsri.medium.com/the-langchain-ecosystem-6a167c4ae63f"
+    },
+    {
+      "type": "web",
+      "title": "Releases · langchain-ai/deepagents · GitHub",
+      "url_or_ref": "https://github.com/langchain-ai/deepagents/releases"
+    },
+    {
+      "type": "web",
+      "title": "Introducing Managed Deep Agents | Interrupt 26",
+      "url_or_ref": "https://www.youtube.com/watch?v=LdQpoK2TzSo"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 158613,
+    "output_tokens": 14812,
+    "total_tokens": 173425
+  },
+  "duration_s": 176.36,
+  "status": "completed",
+  "error": null,
+  "started_at": "2026-09-15T16:21:23.639140",
+  "finished_at": "2026-09-15T16:24:19.992689"
+}

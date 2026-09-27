@@ -1,0 +1,79 @@
+{
+  "case_id": "smoke-001",
+  "query": "检索 2026 年春节的放假安排，用一段话总结，并生成一份简短的 markdown 报告（不超过 300 字）。",
+  "session_id": "eval_smoke-lite_smoke-001",
+  "report_md": "# 2026 年春节放假安排\n\n## 一、放假时间\n2026 年春节放假 **9 天**，从 **2 月 15 日（农历腊月二十八，周日）** 开始，至 **2 月 23 日（农历正月初七，周一）** 结束。\n\n## 二、调休安排\n- **2 月 14 日（周六）**：春节前一天调休上班\n- **2 月 28 日（周六）**：春节假期后补班\n\n## 三、假期明细\n| 日期 | 农历 | 星期 | 类型 |\n|------|------|------|------|\n| 2 月 15 日 | 腊月二十八 | 周日 | 放假 |\n| 2 月 16 日 | 除夕 | 周一 | **法定节假日** |\n| 2 月 17 日 | 正月初一 | 周二 | **法定节假日** |\n| 2 月 18 日 | 正月初二 | 周三 | **法定节假日** |\n| 2 月 19 日 | 正月初三 | 周四 | **法定节假日** |\n| 2 月 20 日 | 正月初四 | 周五 | 放假 |\n| 2 月 21 日 | 正月初五 | 周六 | 放假 |\n| 2 月 22 日 | 正月初六 | 周日 | 放假 |\n| 2 月 23 日 | 正月初七 | 周一 | 放假 |\n\n## 四、加班费说明\n- **法定节假日（3 倍工资）**：2 月 16 日–19 日（除夕至初三）\n- **休息日（2 倍工资）**：2 月 15 日、2 月 20 日–23 日\n\n## 五、总结\n2026 年春节假期长达 **9 天**，创下近年春节假期最长纪录。除夕首次被列入法定节假日，是本次放假安排的一大亮点。公众可在除夕至初三大假基础上，通过调休拼接出连续 9 天的长假，适合安排长途旅行或返乡团聚。\n\n---\n【参考来源】\n1. [国务院办公厅关于 2026 年部分节假日安排的通知](http://politics.people.com.cn/n1/2025/1104/c1001-40596715.html)\n2. [中国政府网 - 国务院办公厅关于 2026 年部分节假日安排的通知](http://big5.www.gov.cn/gate/big5/www.gov.cn/gongbao/2025/issue_12406/202511/content_7048922.html)\n3. [新华网 - 春节调休 9 天！2026 年放假安排来了](https://www.news.cn/politics/20251104/37410b5829274623a8b98cca50cf640d/c.html)\n",
+  "report_path": "D:\\Project\\deepsearch-agents\\app\\output\\session_eval_smoke-lite_smoke-001\\2026年春节放假安排.md",
+  "sources": [
+    {
+      "type": "web",
+      "title": "国务院办公厅关于2026年部分节假日安排的通知_信息提示_首都之窗_北京市人民政府门户网站",
+      "url_or_ref": "https://www.beijing.gov.cn/fuwu/bmfw/sy/jrts/202511/t20251104_4258838.html"
+    },
+    {
+      "type": "web",
+      "title": "春节放假9天，2026年放假日历来了",
+      "url_or_ref": "https://www.cls.cn/detail/2190813"
+    },
+    {
+      "type": "web",
+      "title": "哪天放假、怎么调休？2026年放假日历来了_央广网",
+      "url_or_ref": "https://news.cnr.cn/native/gd/kx/20251104/t20251104_527418835.shtml"
+    },
+    {
+      "type": "web",
+      "title": "新华社权威快报丨春节调休9天！2026年放假安排来了-新华网",
+      "url_or_ref": "https://www.news.cn/politics/20251104/37410b5829274623a8b98cca50cf640d/c.html"
+    },
+    {
+      "type": "web",
+      "title": "明确了！2026年这些天发3倍工资！_腾讯新闻",
+      "url_or_ref": "https://news.qq.com/rain/a/20260106A077ZK00"
+    },
+    {
+      "type": "web",
+      "title": "2026春节假期调休时间表/2026年放假安排时间表_中公网校",
+      "url_or_ref": "http://eoffcn.com/kszx/detail/1889250.html"
+    },
+    {
+      "type": "web",
+      "title": "国务院办公厅关于2026年部分节假日安排的通知 - 时政- 人民网",
+      "url_or_ref": "http://politics.people.com.cn/n1/2025/1104/c1001-40596715.html"
+    },
+    {
+      "type": "web",
+      "title": "放假安排",
+      "url_or_ref": "https://tool.lu/holiday"
+    },
+    {
+      "type": "web",
+      "title": "國務院辦公廳關於2026年部分節假日安排的通知 - 中國政府網",
+      "url_or_ref": "http://big5.www.gov.cn/gate/big5/www.gov.cn/gongbao/2025/issue_12406/202511/content_7048922.html"
+    },
+    {
+      "type": "web",
+      "title": "2026年放假日历: 2026年全年放假安排- 2026年节日放假安排时间表",
+      "url_or_ref": "https://fangjia.bmcx.com"
+    },
+    {
+      "type": "web",
+      "title": "2026年全年放假安排通知 - 驻圣克鲁斯总领事馆",
+      "url_or_ref": "https://santacruz.china-consulate.gov.cn/gdxw/202512/t20251204_11766270.htm"
+    },
+    {
+      "type": "web",
+      "title": "中国假期、国定假日2026年节日表",
+      "url_or_ref": "https://holidays-calendar.net/calendar_zh_cn/china_zh_cn.html"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 60021,
+    "output_tokens": 2995,
+    "total_tokens": 63016
+  },
+  "duration_s": 50.99,
+  "status": "completed",
+  "error": null,
+  "started_at": "2026-09-25T20:11:50.874545",
+  "finished_at": "2026-09-25T20:12:41.868492"
+}

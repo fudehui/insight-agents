@@ -1,0 +1,74 @@
+{
+  "case_id": "w2-016",
+  "query": "先从数据库查询当前库存量最低的药品及其库存明细（用 SQL 确认），再检索 该药品的适应症与市场供应情况，生成一份库存紧张的单一药品分析报告",
+  "session_id": "eval_baseline-w1_w2-016",
+  "report_md": null,
+  "report_path": null,
+  "sources": [
+    {
+      "type": "web",
+      "title": "富马酸替诺福韦二异吡咯酯| 阿波罗医院",
+      "url_or_ref": "https://www.apollohospitals.com/zh-CN/medicines/tenofovirdisoproxilfumarate"
+    },
+    {
+      "type": "web",
+      "title": "抗病毒_正大天晴药业集团股份有限公司",
+      "url_or_ref": "https://www.cttq.com/product/bingdu-detail-24068.htm"
+    },
+    {
+      "type": "web",
+      "title": "治疗成人慢性乙型肝炎新药——富马酸替诺福韦艾拉酚胺(Vemlidy<sup>®</sup>)",
+      "url_or_ref": "https://www.yydbzz.com/CN/10.3870/j.issn.1004-0781.2017.04.027"
+    },
+    {
+      "type": "web",
+      "title": "2023年国家医保药品目录调整申报材料（公示版）",
+      "url_or_ref": "https://www.nhsa.gov.cn/attach/Ypsn2023/YPSW202300334/YPSW202300334-W1.pdf"
+    },
+    {
+      "type": "web",
+      "title": "最新乙肝新药获批 抗乙肝病毒150亿市场格局重塑",
+      "url_or_ref": "https://www.lcgdbzz.org/news/hyzx/9529.htm"
+    },
+    {
+      "type": "web",
+      "title": "韦瑞德说明书(富马酸替诺福韦二吡呋酯片) 韦瑞德副作用@用药助手",
+      "url_or_ref": "https://drugs.dxy.cn/business/drug/94066.htm"
+    },
+    {
+      "type": "web",
+      "title": "富马酸替诺福韦二吡呋酯片致范可尼综合征伴严重肌痛1例",
+      "url_or_ref": "https://www.yydbzz.com/article/2022/1004-0781/1004-0781-41-1-123.shtml"
+    },
+    {
+      "type": "web",
+      "title": "抗肝炎病毒药物——市场研究专题报告（附下载）_摩熵医药",
+      "url_or_ref": "https://www.pharnexcloud.com/zixun/sd_37686"
+    },
+    {
+      "type": "web",
+      "title": "[PDF] 2024年中国肝炎用药行业概览",
+      "url_or_ref": "https://pdf.dfcfw.com/pdf/H3_AP202405151633181525_1.pdf"
+    },
+    {
+      "type": "web",
+      "title": "流感高峰将至！奥司他韦销量环比大涨4.5倍，国产流感新药密集上市 提供者 时代周报",
+      "url_or_ref": "https://cn.investing.com/news/stock-market-news/article-3104907"
+    },
+    {
+      "type": "sql",
+      "title": "SQL 查询记录",
+      "url_or_ref": "WITH drug_total_inventory AS (\n  SELECT \n    d.drug_id,\n    d.generic_name,\n    d.brand_name,\n    SUM(i.quantity_on_hand) as total_quantity\n  FROM drugs d\n  JOIN inventory i ON d.drug_id = i.drug_id\n  GROUP BY d.drug_id, d.generic_name, d.brand_name\n),\nmin_inventory AS (\n  SELECT MIN(total_quantity) as min_qty FROM drug_total_inventory\n)\nSELECT \n  dti.generic_name,\n  dti.brand_name,\n  dti.total_quantity,\n  i.batch_number,\n  i.quantity_on_hand,\n  i.warehouse_location,\n  i.production_date,\n  i.expiry_date\nFROM drug_total_inventory dti\nJOIN min_inventory mi ON dti.total_quantity = mi.min_qty\nJOIN inventory i ON dti.drug_id = i.drug_id\nORDER BY dti.generic_name, i.warehouse_location"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 82018,
+    "output_tokens": 2592,
+    "total_tokens": 84610
+  },
+  "duration_s": 32.57,
+  "status": "failed",
+  "error": "执行主智能发生异常信息：Error code: 429 - {'error': {'code': '', 'message': 'You’ve reached the API rate limit for free users. Upgrade to a Token Plan to unlock higher limits and continue using the API without interruption. (request id: 20260925103456235870203TZbdTXWm)', 'type': 'AgnesAI_error'}}",
+  "started_at": "2026-09-25T18:34:24.917983",
+  "finished_at": "2026-09-25T18:34:57.483956"
+}

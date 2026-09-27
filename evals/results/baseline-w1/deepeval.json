@@ -1,0 +1,216 @@
+{
+  "judge_model": "agnes-2.5-flash",
+  "threshold": 0.5,
+  "cases": [
+    {
+      "case_id": "w1-001",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "judge_model": "agnes-2.5-flash",
+      "error": null
+    },
+    {
+      "case_id": "w1-002",
+      "faithfulness": 0.9661,
+      "answer_relevancy": 1.0,
+      "judge_model": "agnes-2.5-flash",
+      "error": null
+    },
+    {
+      "case_id": "w1-003",
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.9153,
+      "judge_model": "agnes-2.5-flash",
+      "error": null
+    },
+    {
+      "case_id": "w1-004",
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.913,
+      "judge_model": "agnes-2.5-flash",
+      "error": null
+    },
+    {
+      "case_id": "w1-005",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "judge_model": "agnes-2.5-flash",
+      "error": null
+    },
+    {
+      "case_id": "w1-006",
+      "faithfulness": 0.8723,
+      "answer_relevancy": 0.8519,
+      "judge_model": "agnes-2.5-flash",
+      "error": null
+    },
+    {
+      "case_id": "w1-007",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "judge_model": "agnes-2.5-flash",
+      "error": null
+    },
+    {
+      "case_id": "w1-008",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "judge_model": "agnes-2.5-flash",
+      "error": null
+    },
+    {
+      "case_id": "w1-009",
+      "faithfulness": null,
+      "answer_relevancy": 0.9938,
+      "judge_model": "agnes-2.5-flash",
+      "error": "ValueError: Evaluation LLM outputted an invalid JSON. Please use a better evaluation model."
+    },
+    {
+      "case_id": "w1-010",
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_model": "agnes-2.5-flash",
+      "error": "跳过：report_md 为空"
+    },
+    {
+      "case_id": "w2-001",
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_model": "agnes-2.5-flash",
+      "error": "跳过：status=failed"
+    },
+    {
+      "case_id": "w2-002",
+      "faithfulness": 0.8471,
+      "answer_relevancy": 1.0,
+      "judge_model": "agnes-2.5-flash",
+      "error": null
+    },
+    {
+      "case_id": "w2-003",
+      "faithfulness": null,
+      "answer_relevancy": 0.9355,
+      "judge_model": "agnes-2.5-flash",
+      "error": "ValueError: Evaluation LLM outputted an invalid JSON. Please use a better evaluation model."
+    },
+    {
+      "case_id": "w2-004",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "judge_model": "agnes-2.5-flash",
+      "error": null
+    },
+    {
+      "case_id": "w2-005",
+      "faithfulness": 0.9815,
+      "answer_relevancy": 1.0,
+      "judge_model": "agnes-2.5-flash",
+      "error": null
+    },
+    {
+      "case_id": "w2-006",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "judge_model": "agnes-2.5-flash",
+      "error": null
+    },
+    {
+      "case_id": "w2-007",
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_model": "agnes-2.5-flash",
+      "error": "跳过：status=failed"
+    },
+    {
+      "case_id": "w2-008",
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.9452,
+      "judge_model": "agnes-2.5-flash",
+      "error": null
+    },
+    {
+      "case_id": "w2-009",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "judge_model": "agnes-2.5-flash",
+      "error": null
+    },
+    {
+      "case_id": "w2-010",
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_model": "agnes-2.5-flash",
+      "error": "跳过：status=failed"
+    },
+    {
+      "case_id": "w2-011",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "judge_model": "agnes-2.5-flash",
+      "error": null
+    },
+    {
+      "case_id": "w2-012",
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_model": "agnes-2.5-flash",
+      "error": "跳过：status=failed"
+    },
+    {
+      "case_id": "w2-013",
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_model": "agnes-2.5-flash",
+      "error": "跳过：status=failed"
+    },
+    {
+      "case_id": "w2-014",
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_model": "agnes-2.5-flash",
+      "error": "跳过：status=failed"
+    },
+    {
+      "case_id": "w2-015",
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_model": "agnes-2.5-flash",
+      "error": "跳过：report_md 为空"
+    },
+    {
+      "case_id": "w2-016",
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_model": "agnes-2.5-flash",
+      "error": "跳过：status=failed"
+    },
+    {
+      "case_id": "w2-017",
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_model": "agnes-2.5-flash",
+      "error": "跳过：status=failed"
+    },
+    {
+      "case_id": "w2-018",
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_model": "agnes-2.5-flash",
+      "error": "跳过：status=failed"
+    },
+    {
+      "case_id": "w2-019",
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_model": "agnes-2.5-flash",
+      "error": "跳过：status=failed"
+    },
+    {
+      "case_id": "w2-020",
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_model": "agnes-2.5-flash",
+      "error": "跳过：status=failed"
+    }
+  ]
+}

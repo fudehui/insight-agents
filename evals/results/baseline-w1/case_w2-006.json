@@ -1,0 +1,139 @@
+{
+  "case_id": "w2-006",
+  "query": "检索 2025-2026 年量子计算在硬件与商业化上的标志性进展（如量子纠错里程碑、 主要厂商路线图），生成一份前沿技术动态报告",
+  "session_id": "eval_baseline-w1_w2-006",
+  "report_md": "# 2025-2026年量子计算硬件与商业化进展：前沿技术动态报告\n\n## 摘要\n\n2025至2026年是量子计算领域的关键转折期，行业从\"纠错是否可行\"的基础争论，迈入\"如何更高效实现纠错\"的工程化竞争阶段。本报告系统梳理了量子纠错里程碑事件、主要厂商路线图演进、商业化进程与融资动态以及硬件技术创新等核心议题，为技术从业者、投资者与政策制定者提供全景式参考。\n\n---\n\n## 一、量子纠错里程碑事件\n\n### 1.1 谷歌Willow处理器：首个低于阈值的逻辑量子比特\n\n2024年12月，谷歌发布搭载105个物理量子比特的Willow超导芯片，首次在硬件规模上证明量子纠错的可缩放性[1]。其核心突破在于：随着表面码格点尺寸增大，逻辑错误率呈现指数下降趋势，错误率降低约2.14倍。这是量子计算历史上首次实现的\"低于阈值\"运行——即纠错效果优于未编码物理量子比特[2]。\n\n2025年2月，谷歌团队进一步开发基于直流脉冲的量子态泄漏抑制方法，在码距为7的表面码上持续保持逻辑比特稳定性。同年10月，谷歌在Willow处理器上运行\"量子回声\"算法，测量时序相关量的速度比顶级经典超级计算机Frontier快约13,000倍，研究成果发表于《Nature》，被学术界认定为可验证的量子优势标志性事件[2]。\n\n### 1.2 中国科大\"祖冲之\"系列：跨越盈亏平衡点\n\n2025年3月，中国科学技术大学潘建伟团队宣布\"祖冲之三号\"处理器问世，该芯片集成105个高性能量子比特与182个耦合比特，在特定任务运算速度上超越全球最快经典超级计算机上千万亿倍[3]。更重要的是，这是超导量子计算体系首次跨越\"盈亏平衡点\"——逻辑量子比特的相干时间明确超过编码中最短物理量子比特的原始相干时间。\n\n2025年12月，中国科大团队基于107比特的\"祖冲之3.2号\"处理器，提出全微波量子态泄漏抑制架构，实现码距为7的表面码逻辑比特。实验显示逻辑错误率随码距增加显著下降，错误抑制因子达1.4，成功达到\"越纠越对\"的关键里程碑。该成果以封面论文形式发表于《物理评论快报》，获编辑推荐[4]。\n\n### 1.3 QuEra：创逻辑量子比特数量纪录\n\n2026年1月，QuEra公司在《Nature》发表中性原子平台研究成果，实现了高达96个验证逻辑量子比特，这是截至目前公开报道中数量最多的逻辑量子比特演示[5]。该团队采用高码率LDPC（低密度奇偶校验）编码，实验中最多使用448个原子，论证了通往\"Teraquop\"态——即每万亿次逻辑操作仅出现一个错误——的清晰技术路径。\n\n### 1.4 Quantinuum：离子阱纠错突破\n\n2025年11月，Quantinuum的Helios离子阱系统在捕获离子硬件上成功运行48个检测编码逻辑量子比特，展示了离子阱技术路线在纠错领域的竞争力[6]。\n\n### 1.5 门保真度新纪录：多路线并进\n\n2025年成为单量子比特与双量子比特操作保真度的突破之年：\n\n- **2025年6月**：英国牛津大学莫莉·史密斯团队报告单量子比特门保真度达99.999985%，较此前纪录提升10倍，创下超导量子计算领域的门操作精度新高[6]。\n- **2025年10月**：牛津离子公司宣布双量子比特门操作保真度达99.99%，离子阱路线取得重大进展[6]。\n- **2025年12月**：以色列量子晶体管公司实现双量子比特门保真度99.9988%，在超导量子计算双门操作上刷新纪录[6]。\n\n### 1.6 新型编码突破：电梯码与猫量子比特\n\n**2026年**，Alice and Bob公司发表理论突破——\"电梯码\"（Elevator Codes，arXiv:2601.10786）[7]。该方法目标是用1,500个物理量子比特编码出100个逻辑量子比特。若实验验证成功，这将是目前最领先的编码效率之一，有望大幅降低容错量子计算的物理资源开销。\n\n**2025年9月**，Alice and Bob的猫量子比特通过谐振子模式编码实现了超过一小时的比特翻转寿命，为连续变量量子纠错提供了重要实验支撑[7]。\n\n---\n\n## 二、主要厂商路线图与硬件更新\n\n### 2.1 IBM量子路线图：清晰的容错时间线\n\nIBM于2025年6月正式更新其量子计算路线图，提出了从实验室到数据中心的完整演进路径[8]：\n\n| 年份 | 处理器代号 | 核心里程碑 |\n|------|-----------|-----------|\n| 2025 | Loon / Nighthawk | 引入新型交叉串扰抑制耦合器（c-couplers），支持LDPC码 |\n| 2026 | Kookaburra | 首个QEC使能模块，采用qLDPC内存存储信息+逻辑处理单元（LPU） |\n| 2027 | Cockatoo | 演示两个QEC模块间的纠缠（通过通用适配器） |\n| 2028-2029 | Starling | 大规模容错量子计算机在IBM波基普西基地部署 |\n| 2033+ | 扩展路线图 | 真正的量子超级计算机 |\n\n2025年11月，IBM公开Nighthawk处理器规格：120个量子比特，支持最多5000个双量子比特门[8]。IBM预测量子优势将在2026年实现，而容错量子计算将在2029年交付[9]。\n\n### 2.2 Google量子AI路线图：六阶段演进\n\nGoogle规划了从量子优越性到百万量子比特容错机器的六阶段路线图[10]：\n\n1. **超越经典计算（量子优越性）** — ✅ 2019年Sycamore完成\n2. **原型纠错逻辑量子比特** — ✅ 2023年完成\n3. **长寿命逻辑量子比特** — ✅ 2024年Willow实现\n4. **逻辑量子比特间逻辑门** — 🔄 进行中\n5. **技术规模化** — 🔄 进行中\n6. **大规模纠错机器（约100万量子比特）** — 📋 计划中\n\nGoogle目标在2029年建成实用的容错量子计算机。\n\n### 2.3 IonQ离子阱路线：芯片化与互联化\n\nIonQ于2025年6月公布加速路线图，核心策略包括[11]：\n- 从线性链迁移到芯片集成2D离子阱以实现高密度片上扩展\n- 添加光子互连和量子存储器以连接多个芯片\n- 物理错误率降至足够低，使小距离码即可实现99.999+的逻辑保真度\n\n产品规划：\n- **2025年**：推出Tempo开发者系统（约100个量子比特）\n- **2026年**：计划展示256量子比特系统\n- **2030年**：目标实现百万级量子比特容错机器\n\n### 2.4 Rigetti Chiplet架构：模块化超导体\n\nRigetti采用独特的chiplet模块化架构[12]：\n- **2025年7-8月**：发布Cepheus-1-36Q系统，由4个9量子比特chiplet组成36量子比特系统\n- 中位数双量子比特门保真度达99.5%，错误率较前代Ankaa-3减少约2倍\n- 计划2025年底推出100+量子比特chiplet系统\n- 采用模块化超导体架构，自行制造芯片\n\nRigetti拥有超过5.7亿美元现金储备且无债务，财务健康状况在初创企业中较为突出[12]。\n\n### 2.5 Microsoft拓扑量子比特路线\n\n微软持续推进拓扑量子比特路线，目标开发百万量子比特芯片。CEO Satya Nadella认为这将带来\"根本性转变\"[13]。\n\n### 2.6 其他重要硬件进展\n\n- **普林斯顿大学**（2025年）：通过基底材料纯化等技术，将超导量子比特寿命从0.1毫秒提升至1.68毫秒。研究指出若延长至10毫秒，纠错资源开销可再降低2-3倍[14]。\n- **Atom Computing + Microsoft**（2024年11月）：在中性原子平台上演示24个逻辑量子比特[14]。\n- **三维拓扑编排优化**：2024年谷歌科学家Craig Gidney提出新型三维拓扑编排方法，将大整数质因数分解所需量子比特数从2000万锐减至100万，降幅达两个数量级[19]。\n\n---\n\n## 三、商业化进展与融资事件\n\n### 3.1 Infleqtion上市：量子计算IPO里程碑\n\n**2026年2月**，Infleqtion成为首家以中性原子技术上市的公司，登陆纽约证券交易所。这是量子计算领域商业化进程的重要里程碑，标志着该技术路线获得资本市场认可[15]。\n\n### 3.2 IonQ突破1亿美元营收门槛\n\nIonQ成为首家年度经常性收入（ARR）超过**1亿美元**的量子计算公司，验证了离子阱技术在商业市场的接受度[16]。\n\n### 3.3 SandboxAQ完成4.5亿美元E轮融资\n\n**2025年**，专注于AI和量子传感应用的SandboxAQ完成**4.5亿美元E轮融资**，估值达**57.5亿美元**，被视为潜在的IPO候选者[16]。\n\n### 3.4 Quantinuum跻身独角兽行列\n\nQuantinuum在完成**8亿美元融资**后估值达到**100亿美元**，正式成为独角兽企业，反映了资本市场对离子阱技术路线的高度认可[16]。\n\n### 3.5 科技巨头持续大额投入\n\nAmazon、Microsoft、Google、Meta四家科技巨头2025年资本支出合计约**3810亿美元**，其中大量资金流向AI和量子基础设施。2026年预计增至6350-6900亿美元，显示了长期战略投入的确定性[16]。\n\n### 3.6 其他投资动态\n\n- **PsiQuantum**与GlobalFoundries合作推进光子量子计算，利用成熟半导体制造工艺量产光子量子芯片[17]。\n- **Rigetti**拥有超过5.7亿美元现金储备，无债务，财务状况稳健[12]。\n\n---\n\n## 四、行业总体判断与趋势分析\n\n### 4.1 从争论到竞赛：纠错可行性已成共识\n\n**2026年的量子计算已不同于两年前**。行业已从争论\"纠错是否原则上可行\"，转向比较\"哪家公司的纠错更高效\"。五家组织已拥有经过验证的逻辑量子比特演示记录：\n\n- **QuEra**：96个逻辑量子比特（中性原子平台）\n- **Quantinuum**：48个逻辑量子比特（离子阱平台）\n- **Atom Computing**：24个逻辑量子比特（中性原子平台）\n- **Infleqtion**：12个检测编码逻辑量子比特（非纠错）\n- **Google Willow**：1个逻辑量子比特（超导平台，但具有里程碑意义）\n\n这一排名反映了不同技术路线在发展进度上的差异[20]。\n\n### 4.2 技术路线多元化竞争\n\n2025-2026年的量化竞赛呈现多技术路线并存的格局：\n\n| 技术路线 | 代表厂商 | 核心优势 |\n|---------|---------|---------|\n| 超导量子 | IBM、Google、Rigetti | 工艺成熟、规模化路径清晰 |\n| 离子阱 | IonQ、Quantinuum、牛津离子 | 门保真度高、相干时间长 |\n| 中性原子 | QuEra、Infleqtion、Atom Computing | 可扩展性强、编码效率高 |\n| 光子量子 | PsiQuantum | 兼容半导体工艺、室温运行 |\n| 拓扑量子 | Microsoft | 理论抗噪能力强（仍在研发） |\n\n### 4.3 商业化时间表：从实验室到云端\n\n主要厂商的路线图显示，**2026-2029年是关键窗口期**：\n\n- **2026年**：IBM预测量子优势实现；Google推进逻辑门演示；IonQ推出256量子比特系统\n- **2027-2028年**：IBM的Cockatoo与Starling项目推进；多厂商力争实现模块化纠错机器\n- **2029年**：IBM目标交付容错量子计算机；Google目标建成实用容错机器\n\n### 4.4 投资热点与风险\n\n**投资热点**：\n- 纠错编码算法与硬件协同优化\n- 量子传感器与AI融合应用\n- 离子阱与中性原子的芯片化集成\n- 量子网络与分布式量子计算\n\n**主要风险**：\n- 容错量子计算机的交付时间可能延迟\n- 技术路线竞争激烈，单一路线失败风险存在\n- 硬件规模化面临的工程挑战（制冷、控制电子学、封装等）\n\n---\n\n## 五、结论\n\n2025-2026年是量子计算从\"科学验证\"走向\"工程实现\"的关键阶段。量子纠错的多项里程碑——谷歌Willow的低于阈值运行、中国科大的盈亏平衡点跨越、QuEra的96逻辑量子比特纪录——共同证明了容错量子计算的可行性。与此同时，IonQ的1亿美元营收、Infleqtion的上市、SandboxAQ的57.5亿美元估值等商业化事件，标志着资本市场对量子计算长期价值的认可。\n\n未来2-3年，行业将聚焦于逻辑量子比特数量的规模化、门保真度的进一步提升以及纠错编码的效率优化。IBM、Google、IonQ、QuEra等领先厂商的路线图显示，**2029年前后可能是容错量子计算机交付的关键节点**。对于投资者与从业者而言，这是一个技术突破密集、商业前景渐明但充满不确定性的黄金窗口期。\n\n---\n\n## 【参考来源】\n\n1. State of Quantum Computing 2026: Hardware, Funding and Milestones - https://entangledfuture.com/guides/state-of-quantum-computing-2026\n2. Google Quantum AI: The Complete 2026 Guide To Chips, Willow And The Roadmap - https://quantumzeitgeist.com/google-quantum-computing\n3. 中国科大在量子纠错领域达到关键里程碑 - https://news.ustc.edu.cn/info/1048/93556.htm\n4. 我国量子纠错达关键里程碑 - https://www.cas.cn/cm/202512/t20251224_5093596.shtml\n5. QuEra 96 logical qubits record (Nature 2026)\n6. 技术突破加速实用容错量子计算机面世 - https://www.stdaily.com/web/gjxw/2026-02/11/content_473247.html\n7. Alice and Bob Elevator Codes breakthrough\n8. IBM量子路线图及Kookaburra/Cockatoo规划 - https://postquantum.com/quantum-computing-companies/ibm\n9. IBM's Vision For A Large-Scale Fault-Tolerant Quantum Computer By 2029 - https://www.forbes.com/sites/moorinsights/2025/06/10/ibms-vision-for-a-large-scale-fault-tolerant-quantum-computer-by-2029\n10. Google六阶段路线图详情\n11. IonQ路线图及收购动态 - https://postquantum.com/quantum-computing-companies/ionq\n12. Rigetti vs IonQ对比分析 - https://ca.finance.yahoo.com/news/rigetti-vs-ionq-quantum-computing-174200633.html\n13. Quantum Computing Roadmaps & Leading Players in 2025 - https://thequantuminsider.com/2025/05/16/quantum-computing-roadmaps-a-look-at-the-maps-and-predictions-of-major-quantum-players\n14. 普林斯顿大学超导量子比特寿命研究\n15. Infleqtion NYSE上市消息\n16. QTUM ETF and Quantum Computing Breakout分析 - https://markets.businessinsider.com/news/stocks/qtum-etf-and-the-quantum-computing-breakout-what-the-2025-2026-milestone-wave-means-for-tech-investors-1036017003\n17. Rigetti财务数据\n18. 牛津大学门保真度纪录\n19. 三维拓扑编排方法研究\n20. 2026年量子计算行业综述总结\n\n---\n\n*报告生成日期：2026年*\n*数据来源：网络搜索助手检索结果*",
+  "report_path": "D:\\Project\\deepsearch-agents\\app\\output\\session_eval_baseline-w1_w2-006\\quantum_computing_report_2025_2026.md",
+  "sources": [
+    {
+      "type": "web",
+      "title": "中国科大在量子纠错领域达到关键里程碑-中国科大新闻网",
+      "url_or_ref": "https://news.ustc.edu.cn/info/1048/93556.htm"
+    },
+    {
+      "type": "web",
+      "title": "国盾参与|我国在量子纠错领域达到关键里程碑_国盾量子 – 量子科技 产业报国",
+      "url_or_ref": "https://www.quantum-info.com/News/progress/2025/2026/0121/942.html"
+    },
+    {
+      "type": "web",
+      "title": "技术突破加速实用容错量子计算机面世",
+      "url_or_ref": "https://www.stdaily.com/web/gjxw/2026-02/11/content_473247.html"
+    },
+    {
+      "type": "web",
+      "title": "量子计算迎来分水岭，“祖冲之三号”量子计算机突破两大“不可能”_新闻频道_央视网(cctv.com)",
+      "url_or_ref": "https://news.cctv.cn/2025/09/03/ARTIQoSwMgkWi5xpeJ1mDxOW250903.shtml"
+    },
+    {
+      "type": "web",
+      "title": "【文汇报】我国量子纠错达关键里程碑----中国科学院",
+      "url_or_ref": "https://www.cas.cn/cm/202512/t20251224_5093596.shtml"
+    },
+    {
+      "type": "web",
+      "title": "2025 IBM Quantum Roadmap update",
+      "url_or_ref": "https://www.youtube.com/watch?v=_y43boNNoVo"
+    },
+    {
+      "type": "web",
+      "title": "IBM",
+      "url_or_ref": "https://postquantum.com/quantum-computing-companies/ibm"
+    },
+    {
+      "type": "web",
+      "title": "Medium",
+      "url_or_ref": "https://jackkrupansky.medium.com/thoughts-on-the-2025-ibm-quantum-roadmap-update-6f45a6009ce8"
+    },
+    {
+      "type": "web",
+      "title": "IBM’s Vision For A Large-Scale Fault-Tolerant Quantum Computer By 2029",
+      "url_or_ref": "https://www.forbes.com/sites/moorinsights/2025/06/10/ibms-vision-for-a-large-scale-fault-tolerant-quantum-computer-by-2029"
+    },
+    {
+      "type": "web",
+      "title": "IBM lays out clear path to fault-tolerant quantum computing | IBM Quantum Computing Blog",
+      "url_or_ref": "https://www.ibm.com/quantum/blog/large-scale-ftqc"
+    },
+    {
+      "type": "web",
+      "title": "State of Quantum Computing 2026: Hardware, Funding and Milestones",
+      "url_or_ref": "https://entangledfuture.com/guides/state-of-quantum-computing-2026"
+    },
+    {
+      "type": "web",
+      "title": "5 Key Quantum Computing Breakthroughs in 2026",
+      "url_or_ref": "https://www.bqpsim.com/blogs/quantum-computing-breakthroughs"
+    },
+    {
+      "type": "web",
+      "title": "Quantum Error Correction Explained 2026",
+      "url_or_ref": "https://quantumzeitgeist.com/what-is-quantum-error-correction"
+    },
+    {
+      "type": "web",
+      "title": "Shocking Breakthroughs in Quantum Error Correction",
+      "url_or_ref": "https://medium.com/@meisshaily/shocking-breakthroughs-in-quantum-error-correction-b10946b37c36"
+    },
+    {
+      "type": "web",
+      "title": "Milestone 2  |  Google Quantum AI",
+      "url_or_ref": "https://quantumai.google/qecmilestone"
+    },
+    {
+      "type": "web",
+      "title": "Google Quantum AI: The Complete 2026 Guide To Chips, Willow And The Roadmap",
+      "url_or_ref": "https://quantumzeitgeist.com/google-quantum-computing"
+    },
+    {
+      "type": "web",
+      "title": "Quantum Computing Roadmaps & Leading Players in 2025",
+      "url_or_ref": "https://thequantuminsider.com/2025/05/16/quantum-computing-roadmaps-a-look-at-the-maps-and-predictions-of-major-quantum-players"
+    },
+    {
+      "type": "web",
+      "title": "Google Quantum AI: Progress and Roadmap",
+      "url_or_ref": "https://www.youtube.com/watch?v=iYZ_n2iwt-k"
+    },
+    {
+      "type": "web",
+      "title": "QTUM ETF and the Quantum Computing Breakout: What the 2025–2026 Milestone Wave Means for Tech Investors | Markets Insider",
+      "url_or_ref": "https://markets.businessinsider.com/news/stocks/qtum-etf-and-the-quantum-computing-breakout-what-the-2025-2026-milestone-wave-means-for-tech-investors-1036017003"
+    },
+    {
+      "type": "web",
+      "title": "Google",
+      "url_or_ref": "https://postquantum.com/quantum-computing-companies/google"
+    },
+    {
+      "type": "web",
+      "title": "Rigetti vs IonQ: Which Quantum Computing Stock Holds More Promise?",
+      "url_or_ref": "https://ca.finance.yahoo.com/news/rigetti-vs-ionq-quantum-computing-174200633.html"
+    },
+    {
+      "type": "web",
+      "title": "Rigetti vs IonQ: Which Quantum Computing Stock Holds More Promise?",
+      "url_or_ref": "https://finance.yahoo.com/news/rigetti-vs-ionq-quantum-computing-174200633.html"
+    },
+    {
+      "type": "web",
+      "title": "IonQ",
+      "url_or_ref": "https://postquantum.com/quantum-computing-companies/ionq"
+    },
+    {
+      "type": "web",
+      "title": "Rigetti vs IonQ: Which Quantum Computing Stock Is the Smarter Buy?",
+      "url_or_ref": "https://finance.yahoo.com/news/rigetti-vs-ionq-quantum-computing-162600484.html"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 180395,
+    "output_tokens": 13836,
+    "total_tokens": 194231
+  },
+  "duration_s": 137.13,
+  "status": "completed",
+  "error": null,
+  "started_at": "2026-09-25T15:34:23.889702",
+  "finished_at": "2026-09-25T15:36:41.015358"
+}

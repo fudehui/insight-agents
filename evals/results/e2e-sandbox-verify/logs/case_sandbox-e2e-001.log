@@ -1,0 +1,69 @@
+
+===== [1/1] case=sandbox-e2e-001 session=eval_e2e-sandbox-verify_sandbox-e2e-001 =====
+{'tavily': {'name': '网络搜索助手', 'description': '负责进行网络知识搜索的智能体助手，当需要从网络中查询数据的时候，可以执行数据检索，在检索后会返回一段检索结果。\n注意：在需要进行非内部信息，不是数据库数据和 RAGFlow 知识库数据的公开信息查询时，务必使用此助手进行查询。\n', 'system_prompt': '你是一个专业的网络信息查询助手，你可以根据用户的问题，从互联网中检索相关信息。\n你掌握的工具包括 internet_search 工具，此工具可以根据用户的问题，从互联网中检索非内部的公开信息。\n在检索网络知识的时候，至少检索 3 个角度的该问题，一共最多进行 5 次检索，如果超过 5 次，则不允许继续检索。\n返回结果时必须保留来源：按主题整理信息，每条关键信息标注对应的来源编号；\n并在回答末尾用【来源清单】逐条列出实际引用的来源，格式为"编号. 标题 - URL"。\n不得将多个来源的信息混合陈述而不标注出处；检索结果中没有链接的条目要注明"该来源无链接"。\n'}, 'db': {'name': '数据库查询助手', 'description': '负责进行数据库查询的智能体助手。它可以查看数据库中有哪些表，读取表数据和查看表结构，并执行自定义SQL查询以获取精确的业务数据。\n数据库中包含了企业的药品信息、药品库存信息、以及药品销售具体数据，可以看到所有特定商品的一切详细信息。但是数据库中不包含概括性的知识，只包含具体商品的信息。\n', 'system_prompt': "你是一个专业的数据库查询助手。你可以直接与SQLite数据库交互来检索信息。\n你掌握的工具包括：\n 1. list_sql_tables: 列出数据库中所有可用的表，这是了解数据库结构的第一步。\n 2. get_table_data: 读取指定表的前100行数据，用于快速预览数据内容和表列的信息。\n 3. execute_sql_query: 执行自定义SQL查询。当需要复杂的筛选、联接或聚合时使用此工具。\n通常的工作流程是：先列出可用表(list_sql_tables)，确认表名；如果需要，预览表数据了解字段(get_table_data)；最后编写并执行SQL查询(execute_sql_query)以回答用户问题。\n编写SQL时必须使用SQLite方言：当前时间用 date('now')/strftime()，不支持 MySQL 的 NOW()、DATE_FORMAT()；分页只写 LIMIT n，不支持 LIMIT offset,n；没有 SHOW 语句，查看表结构用 get_table_data。\n"}, 'ragflow': {'name': 'RAGFlow助手', 'description': '负责查询 RAGFlow 内部知识库中的非结构化文档信息，例如 PDF、白皮书、研报、制度文件、产品资料等。\n当任务需要查询企业内部私有文档，而不是互联网公开信息或 SQLite 结构化数据时，使用此助手。\n', 'system_prompt': '你是一个专业的 RAGFlow 知识库助手，负责从企业内部非结构化文档中检索信息。\n\n你掌握的工具包括：\n 1. get_assistant_list: 查询当前可用的 RAGFlow 聊天助手，以及每个助手关联的知识库信息。\n 2. create_ask_delete: 向指定 RAGFlow 聊天助手创建临时会话并提问。\n\n工作流程：\n 1. 必须先调用 get_assistant_list，确认有哪些可用助手、助手描述和关联知识库。\n 2. 根据用户问题选择最匹配的助手；如果没有合适助手，不要强行提问，应说明 RAGFlow 当前没有可用知识库能回答该问题。\n 3. 向助手提问时，问题必须围绕用户原始需求，不要发散到无关主题。\n 4. 对复杂、开放性问题，应采用“先宽后窄”的方式提问：先询问总体结论，再追问关键依据、细节、出处或适用场景。\n 5. 复杂问题至少提问 3 个不同角度的问题；简单事实型问题可以只提问 1 次。\n 6. 返回时不要做最终综合结论，但需要按提问轮次保留原始回答、使用的助手名称、问题和重要来源信息，交给后续主智能体汇总。\n'}, 'code_analysis': {'name': '数据分析助手', 'description': '负责定量分析的智能体助手。当需要对检索或查询到的数据做统计计算、同比/环比、\n聚合对比、趋势分析，或需要生成图表（PNG 图片）时，使用此助手：它会把 Python\n代码写入沙箱中离线执行并返回计算结果与产物文件。注意：此助手不负责信息检索，\n派发前请先从数据库查询助手或网络搜索助手获取原始数据。\n', 'system_prompt': '你是一个专业的数据分析助手，负责编写 Python 代码完成定量分析与图表生成。\n你掌握的工具包括 run_code 工具：它把一段 Python 源码写入当前会话目录的\nsandbox/ 子目录，然后在隔离 Docker 沙箱中执行，返回退出码、stdout/stderr\n和生成的产物文件清单。\n\nrun_code 使用方法：\n 1. 通过 code 参数传入完整的 Python 脚本源码；filename 参数可选（默认按代码内容自动命名）。\n 2. 沙箱预装 pandas 与 matplotlib（Agg 后端），不支持安装其他第三方库。\n 3. 图表必须用相对路径保存到当前工作目录，例如 plt.savefig("sales_trend.png", dpi=150)，\n    产物会自动进入任务产物面板；不要在代码里使用绝对路径。\n 4. 关键计算结果必须用 print() 输出（如 print(f"同比增长率: {rate:.1%}")），\n    stdout 会作为执行结果返回给你；超长输出会被截断，不要打印全量数据。\n 5. 单次执行上限 60 秒，超时会被强制终止；复杂分析拆成多个小脚本分步执行。\n\n代码要求：\n - 使用 pandas 做数据处理、matplotlib 做可视化；中文字段名可直接使用。\n - 每个脚本开头显式 import 所需模块；处理前先检查数据完整性（空值、类型）。\n\n禁止行为：\n - 沙箱无网络权限：禁止任何网络请求（requests/urllib/socket 等），相关代码会直接失败。\n - 禁止读写工作目录之外的路径，禁止尝试修改系统配置或执行系统命令。\n - 禁止在代码中硬编码密钥或敏感信息。\n\n返回时保留原始计算结果：给出关键数值结论、使用的计算口径（公式/列名）和生成的\n图表文件名，交给主智能体汇总进报告；不要自行生成最终报告文档。\n'}}
+[MainAgent] 开始执行会话，session_id=eval_e2e-sandbox-verify_sandbox-e2e-001
+
+[Monitor:task_start] 研究任务已启动: 从数据库查询磷酸奥司他韦胶囊 2025 年各月的销售额，调用 run_code 在沙箱中 计算逐月环比增速，并用 matplotlib 生成一张柱状图，最后生成一份引用该图表的 销售分析 markdown 报告。
+
+[Monitor:session_created] 工作目录已创建: D:/Project/deepsearch-agents/app/output/session_eval_e2e-sandbox-verify_sandbox-e2e-001
+
+[Monitor:token_usage] Token 用量：输入 8968 / 输出 292 / 合计 9260
+
+[Monitor:assistant_call] 正在调用助手: 数据库查询助手
+
+[Monitor:token_usage] Token 用量：输入 4543 / 输出 74 / 合计 4617
+
+[Monitor:tool_start] 开始执行工具: 数据库表名查询工具：list_sql_tables
+
+[Monitor:tool_end] 工具执行结束: 数据库表名查询工具：list_sql_tables（success，9ms）｜结果：可用的表有：drugs, inventory, sales_records
+
+[Monitor:token_usage] Token 用量：输入 4586 / 输出 97 / 合计 4683
+
+[Monitor:tool_start] 开始执行工具: 数据库表数据查询工具：get_table_data
+
+[Monitor:tool_start] 开始执行工具: 数据库表数据查询工具：get_table_data
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：get_table_data（success，2ms）｜结果：sale_id,drug_id,sale_date,quantity_sold,unit_price,total_amount,customer_name,region,sales_rep 1,1,2025-02-15,200,25,5000,北京朝阳医院,华北区,北京朝阳销售部 2,1,2025-08-10,500,24.5,12250,天津大药房,华北区,天津南开销售分部 3,2,2025-0...
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：get_table_data（success，7ms）｜结果：drug_id,generic_name,brand_name,approval_number,specifications,dosage_form,manufacturer,therapeutic_area,description,created_at 1,阿莫西林胶囊,阿莫仙,国药准字H20051234,0.25g*24粒,胶囊剂,本公司制药,抗生素,用于治疗敏感菌引起的上呼吸道感染、泌尿生殖...
+
+[Monitor:token_usage] Token 用量：输入 13044 / 输出 248 / 合计 13292
+
+[Monitor:tool_start] 开始执行工具: 数据库表数据查询工具：execute_sql_query
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：execute_sql_query（success，2ms）｜结果：month,sales_amount 01,200000 11,500000
+
+[Monitor:token_usage] Token 用量：输入 13185 / 输出 253 / 合计 13438
+
+[Monitor:tool_start] 开始执行工具: 数据库表数据查询工具：execute_sql_query
+
+[Monitor:tool_end] 工具执行结束: 数据库表数据查询工具：execute_sql_query（success，10ms）｜结果：month,sales_amount 01,200000 02,0 03,0 04,0 05,0 06,0 07,0 08,0 09,0 10,0 11,500000 12,0
+
+[Monitor:token_usage] Token 用量：输入 13464 / 输出 359 / 合计 13823
+
+[Monitor:token_usage] Token 用量：输入 9571 / 输出 483 / 合计 10054
+
+[Monitor:assistant_call] 正在调用助手: 数据分析助手
+
+[Monitor:token_usage] Token 用量：输入 4769 / 输出 405 / 合计 5174
+
+[Monitor:token_usage] Token 用量：输入 5039 / 输出 241 / 合计 5280
+
+[Monitor:tool_start] 开始执行工具: 沙箱代码执行工具
+
+[Monitor:tool_end] 工具执行结束: 沙箱代码执行工具（success，430ms）｜结果：沙箱脚本执行成功。 [stdout] 目录创建成功: output/session_eval_e2e-sandbox-verify_sandbox-e2e-001/
+
+[Monitor:token_usage] Token 用量：输入 5360 / 输出 1074 / 合计 6434
+
+[Monitor:tool_start] 开始执行工具: 沙箱代码执行工具
+
+[Monitor:tool_end] 工具执行结束: 沙箱代码执行工具（success，1457ms）｜结果：沙箱脚本执行成功。 [stdout] ================================================== 原始数据：  月份  销售额（元）  1月  200000  2月       0  3月       0  4月       0  5月       0  6月       0  7月       0  8月       0  9月       0 10月 ...
+
+[Monitor:error] 执行主智能发生异常信息：Error code: 429 - {'error': {'code': '', 'message': 'You’ve reached the API rate limit for free users. Upgrade to a Token Plan to unlock higher limits and continue using the API without interruption. (request id: 20260926224316101927697GNMBUuV1)', 'type': 'AgnesAI_error'}}
+[MainAgent] astream 结束，开始收尾 thread_id=eval_e2e-sandbox-verify_sandbox-e2e-001 at 06:43:16.596
+
+[Monitor:task_files] 本次任务共生成 3 个文件
+
+[Monitor:task_sources] 本次任务共引用 2 个来源（网络 0 / 文档 0 / 数据库 2）
+[MainAgent] 收尾完成 thread_id=eval_e2e-sandbox-verify_sandbox-e2e-001 at 06:43:16.596
+----- case=sandbox-e2e-001 完成：status=failed duration=57.43s 结果=evals\results\e2e-sandbox-verify\case_sandbox-e2e-001.json

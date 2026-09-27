@@ -1,0 +1,9 @@
+{
+  "scenario": "restart_mid_approval",
+  "mock_llm": true,
+  "runs": 1,
+  "recovery_success_rate": 1.0,
+  "recovery_time_avg_s": 0.116,
+  "recovery_time_p95_s": 0.116,
+  "event_completion_rate_avg": 1.0
+}

@@ -1,0 +1,14 @@
+{
+  "run": 1,
+  "scenario": "restart_mid_approval",
+  "status": "recovered",
+  "recovery_success": true,
+  "recovery_time_s": 0.116,
+  "event_completion_rate": 1.0,
+  "interrupted": true,
+  "stage1_error": null,
+  "stage2_error": null,
+  "started_at": "2026-09-25T11:12:17.632126",
+  "finished_at": "2026-09-25T11:12:22.464008",
+  "events_count": 8
+}

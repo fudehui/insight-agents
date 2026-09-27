@@ -1,0 +1,144 @@
+{
+  "case_id": "w2-017",
+  "query": "查询盐酸二甲双胍片的库存总量与 2025 年销售额（用 SQL 确认），并检索 2026 年口服降糖药市场的价格或竞争动态，生成一份该药品的经营分析报告",
+  "session_id": "eval_baseline-w1_w2-017",
+  "report_md": null,
+  "report_path": null,
+  "sources": [
+    {
+      "type": "web",
+      "title": "諾和諾德如何痛失GLP-1減肥藥市場領先地位 - WSJ",
+      "url_or_ref": "https://cn.wsj.com/articles/%E8%AB%BE%E5%92%8C%E8%AB%BE%E5%BE%B7%E5%A6%82%E4%BD%95%E7%97%9B%E5%A4%B1glp-1%E6%B8%9B%E8%82%A5%E8%97%A5%E5%B8%82%E5%A0%B4%E9%A0%98%E5%85%88%E5%9C%B0%E4%BD%8D-679d790d"
+    },
+    {
+      "type": "web",
+      "title": "诺和诺德如何痛失GLP-1减肥药市场领先地位 - WSJ",
+      "url_or_ref": "https://cn.wsj.com/articles/how-ozempic-maker-novo-nordisk-blew-its-lead-in-glp-1-weight-loss-drugs-can-europe-compete-in-the-high-stakes-global-economy-c1d0d604"
+    },
+    {
+      "type": "web",
+      "title": "集采优化降负担支付改革促创新 - 人民日报",
+      "url_or_ref": "https://paper.people.com.cn/mszk/pc/content/202601/05/content_30132308.html"
+    },
+    {
+      "type": "web",
+      "title": "国家医疗保障局医保动态国家集采中的隐形赢家",
+      "url_or_ref": "http://www.nhsa.gov.cn/art/2026/8/13/art_14_21761.html"
+    },
+    {
+      "type": "web",
+      "title": "2019—2024 年国家医保谈判目录中糖尿病用药的变化分析",
+      "url_or_ref": "https://openurl.ebsco.com/fulltext/gcd:193698318?id=ebsco%3Agcd%3A193698318&crl=f&jrnl=16722124"
+    },
+    {
+      "type": "web",
+      "title": "国家医疗保障局 医保动态 国家医保局2026年上半年例行新闻发布会实录",
+      "url_or_ref": "https://www.nhsa.gov.cn/art/2026/7/9/art_14_21357.html"
+    },
+    {
+      "type": "web",
+      "title": "国家药品集采开展3年为百姓带来哪些“红利”？",
+      "url_or_ref": "https://ybj.wuhan.gov.cn/zwgk_52/ybdt/mtdt/202112/t20211206_1867038.shtml"
+    },
+    {
+      "type": "web",
+      "title": "2026年二甲双胍格列本脲发展趋势分析 - 2025-2031年全球与中国二甲双胍格列本脲市场现状调研及发展趋势分析报告 - 产业调研网",
+      "url_or_ref": "https://www.cir.cn/9/00/ErJiaShuangGuaGeLieBenNiaoFaZhanQuShiFenXi.html"
+    },
+    {
+      "type": "web",
+      "title": "二甲双胍中国市场价格趋势2025-2026 - 药达·isearch",
+      "url_or_ref": "https://isearch.wuxuwang.com/share/44d8ce6f17aa4137a285bd2bb75dba09dd930daf56f24145b0fdda34523c17a5"
+    },
+    {
+      "type": "web",
+      "title": "齐鲁制药斩获国产第4家达格列净二甲双胍缓释片批文，降糖药市场竞争再升级-格隆汇",
+      "url_or_ref": "https://www.gelonghui.com/p/1753418"
+    },
+    {
+      "type": "web",
+      "title": "集采政策下，齐鲁制药入局加剧降糖药市场竞争，达格列净二甲双胍缓释片获批_摩熵医药",
+      "url_or_ref": "https://www.pharnexcloud.com/zixun/zcsp_37713"
+    },
+    {
+      "type": "web",
+      "title": "口服降糖药最新排名公布！曾赢二甲双胍的85亿“神药”难回 ...",
+      "url_or_ref": "https://www.phirda.com/artilce_34628.html?cId=1&module=trackingCodeGenerator"
+    },
+    {
+      "type": "web",
+      "title": "SGLT2 Inhibitors Market Size, Share & Trends 2026-2035",
+      "url_or_ref": "https://www.snsinsider.com/reports/sglt2-inhibitors-market-6948"
+    },
+    {
+      "type": "web",
+      "title": "Type 2 Diabetes Treatment Market Size, Share & 2031 Growth Trends Report",
+      "url_or_ref": "https://www.mordorintelligence.com/industry-reports/type-2-diabetes-treatment-market"
+    },
+    {
+      "type": "web",
+      "title": "SGLT2 Inhibitors Market Size Report, 2025-2033",
+      "url_or_ref": "https://www.grandviewresearch.com/industry-analysis/sglt2-inhibitors-market-report"
+    },
+    {
+      "type": "web",
+      "title": "SGLT2 versus DPP-4 inhibitors in type 2 diabetes - Frontiers",
+      "url_or_ref": "https://www.frontiersin.org/journals/endocrinology/articles/10.3389/fendo.2026.1930813/full"
+    },
+    {
+      "type": "web",
+      "title": "Top 20 Companies Global Dipeptidyl Peptidase-4 (DPP-4) ...",
+      "url_or_ref": "https://www.sphericalinsights.com/blogs/top-20-companies-global-dipeptidyl-peptidase-4-dpp-4-inhibitors-market-in-2026-2035-spherical-insights-analysis"
+    },
+    {
+      "type": "web",
+      "title": "GLP-1RA 开启降糖减重治疗新周期",
+      "url_or_ref": "https://pdf.dfcfw.com/pdf/H3_AP202406061635696477_1.pdf"
+    },
+    {
+      "type": "web",
+      "title": "GLP-1明星药进基药目录，能立刻到基层吗？-虎嗅网",
+      "url_or_ref": "https://www.huxiu.com/article/4876444.html"
+    },
+    {
+      "type": "web",
+      "title": "2024年中国糖尿病用药行业细分产品-胰岛素市场分析 市场增长潜力依旧较大【组图】",
+      "url_or_ref": "https://cn.investing.com/news/economy/article-2295307"
+    },
+    {
+      "type": "web",
+      "title": "北京福元医药股份有限公司2026 年半年度报告",
+      "url_or_ref": "https://stockmc.xueqiu.com/202608/601089_20260815_GCQX.pdf"
+    },
+    {
+      "type": "web",
+      "title": "东阳光药(06887)：核心产品奥洛格列净胶囊获得国家药品监督管理局批准上市 提供者 智通财经",
+      "url_or_ref": "https://cn.investing.com/news/stock-market-news/article-3169396"
+    },
+    {
+      "type": "sql",
+      "title": "SQL 查询记录",
+      "url_or_ref": "SELECT d.brand_name, d.generic_name, d.specifications, \n       SUM(i.quantity_on_hand) AS total_stock,\n       SUM(s.total_amount) AS total_sales_2025\nFROM drugs d\nLEFT JOIN inventory i ON d.drug_id = i.drug_id\nLEFT JOIN sales_records s ON d.drug_id = s.drug_id AND strftime('%Y', s.sale_date) = '2025'\nWHERE d.generic_name = '盐酸二甲双胍片'\nGROUP BY d.drug_id;"
+    },
+    {
+      "type": "sql",
+      "title": "SQL 查询记录",
+      "url_or_ref": "SELECT drug_id, sale_date, quantity_sold, unit_price, total_amount FROM sales_records WHERE drug_id = 3;"
+    },
+    {
+      "type": "sql",
+      "title": "SQL 查询记录",
+      "url_or_ref": "SELECT \n    d.brand_name AS 药品名称,\n    d.generic_name,\n    d.specifications,\n    i.total_stock,\n    s.total_sales_2025\nFROM drugs d\nLEFT JOIN (\n    SELECT drug_id, SUM(quantity_on_hand) AS total_stock\n    FROM inventory\n    GROUP BY drug_id\n) i ON d.drug_id = i.drug_id\nLEFT JOIN (\n    SELECT drug_id, SUM(total_amount) AS total_sales_2025\n    FROM sales_records\n    WHERE strftime('%Y', sale_date) = '2025'\n    GROUP BY drug_id\n) s ON d.drug_id = s.drug_id\nWHERE d.generic_name = '盐酸二甲双胍片';"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 148017,
+    "output_tokens": 5388,
+    "total_tokens": 153405
+  },
+  "duration_s": 56.23,
+  "status": "failed",
+  "error": "执行主智能发生异常信息：Error code: 429 - {'error': {'code': '', 'message': 'You’ve reached the API rate limit for free users. Upgrade to a Token Plan to unlock higher limits and continue using the API without interruption. (request id: 20260925105319422428165QqZxCAnc)', 'type': 'AgnesAI_error'}}",
+  "started_at": "2026-09-25T18:52:23.463898",
+  "finished_at": "2026-09-25T18:53:19.696976"
+}

@@ -1,0 +1,27 @@
+{
+  "judge_model": "agnes-2.5-flash",
+  "threshold": 0.5,
+  "cases": [
+    {
+      "case_id": "smoke-001",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "judge_model": "agnes-2.5-flash",
+      "error": null
+    },
+    {
+      "case_id": "smoke-002",
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.8667,
+      "judge_model": "agnes-2.5-flash",
+      "error": null
+    },
+    {
+      "case_id": "smoke-003",
+      "faithfulness": null,
+      "answer_relevancy": null,
+      "judge_model": "agnes-2.5-flash",
+      "error": "跳过：status=failed"
+    }
+  ]
+}

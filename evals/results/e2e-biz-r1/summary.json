@@ -1,0 +1,18 @@
+{
+  "run_id": "e2e-biz-r1",
+  "started_at": "2026-09-27T12:36:48.229111",
+  "finished_at": "2026-09-27T12:49:48.257068",
+  "cases_run": 1,
+  "cases_completed": 0,
+  "cases_failed": 1,
+  "total_tokens": 222612,
+  "p95_duration_s": 127.04,
+  "per_case": [
+    {
+      "case_id": "sandbox-e2e-002",
+      "status": "failed",
+      "duration_s": 127.04,
+      "total_tokens": 222612
+    }
+  ]
+}

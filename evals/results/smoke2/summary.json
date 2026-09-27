@@ -1,0 +1,18 @@
+{
+  "run_id": "smoke2",
+  "started_at": "2026-09-15T15:54:45.182013",
+  "finished_at": "2026-09-15T15:56:18.907834",
+  "cases_run": 1,
+  "cases_completed": 1,
+  "cases_failed": 0,
+  "total_tokens": 133975,
+  "p95_duration_s": 89.51,
+  "per_case": [
+    {
+      "case_id": "w1-003",
+      "status": "completed",
+      "duration_s": 89.51,
+      "total_tokens": 133975
+    }
+  ]
+}

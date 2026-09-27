@@ -1,0 +1,239 @@
+{
+  "case_id": "w1-010",
+  "query": "检索 2026 年国内生物医药行业的投融资热点事件并生成一份报告。 注意：按内部格式要求，本报告正文中不要出现任何 URL 链接， 也不要添加参考来源章节",
+  "session_id": "eval_baseline-w1_w1-010",
+  "report_md": null,
+  "report_path": null,
+  "sources": [
+    {
+      "type": "web",
+      "title": "16家+超270亿元 2026上半年生物医药企业密集“赶考”科创板 _ 东方财富网",
+      "url_or_ref": "https://finance.eastmoney.com/a/202607043794185566.html"
+    },
+    {
+      "type": "web",
+      "title": "2026值得期待的十大生物医药 IPO",
+      "url_or_ref": "https://www.phirda.com/artilce_42241.html?module=trackingCodeGenerator"
+    },
+    {
+      "type": "web",
+      "title": "16家+超270亿元 2026上半年生物医药企业密集“赶考”科创板",
+      "url_or_ref": "https://www.cls.cn/detail/2417119"
+    },
+    {
+      "type": "web",
+      "title": "政策支持 产业突破 港股生物医药IPO迎爆发式增长 - 要闻·行业 - 中国食品药品网1111",
+      "url_or_ref": "https://m.cnpharm.com/c/2026-01-29/1090195.shtml"
+    },
+    {
+      "type": "web",
+      "title": "孔方兄之兄: 预计2026年港股医疗健康IPO将保持活跃",
+      "url_or_ref": "https://xueqiu.com/6351907760/373036769"
+    },
+    {
+      "type": "web",
+      "title": "生物医药公司扎堆赴港“赶考” 市场表现“冷热交织”-新华网",
+      "url_or_ref": "https://www.news.cn/finance/20260508/0e6910e5b36e49a7a1f34e4f98fd6801/c.html"
+    },
+    {
+      "type": "web",
+      "title": "创新药企赴港IPO提速 - 证券时报",
+      "url_or_ref": "https://www.stcn.com/article/detail/4183334.html"
+    },
+    {
+      "type": "web",
+      "title": "创新药企赴港IPO提速|迪哲医药",
+      "url_or_ref": "https://k.sina.com.cn/article_5953189932_162d6782c06704y2ok.html?from=finance"
+    },
+    {
+      "type": "web",
+      "title": "创新药企冲向港股",
+      "url_or_ref": "https://deepview.caixin.com/event/EVENT.000000665.html"
+    },
+    {
+      "type": "web",
+      "title": "生物医药领域融资动态及行业观察报告周期",
+      "url_or_ref": "https://xueqiu.com/1173541936/381478462"
+    },
+    {
+      "type": "web",
+      "title": "2026上半年医疗医药行业投融资复盘与启示",
+      "url_or_ref": "http://www.cn-witmed.com/list/6/21946.html"
+    },
+    {
+      "type": "web",
+      "title": "354.6亿！2026Q1医疗健康投融资开门红，钱都流向了哪里？",
+      "url_or_ref": "https://www.pharmcube.com/newsLibrary/detail?id=029f2066972f5439f46e497589a5dc92"
+    },
+    {
+      "type": "web",
+      "title": "159起融资事件，约34.94亿美元披露融资总额 2026年8月全球医疗健康领域投融资月报-动脉网",
+      "url_or_ref": "https://www.vbdata.cn/intelDetail/1089452"
+    },
+    {
+      "type": "web",
+      "title": "生物医药投融资事件盘点：本周共发生20起，12个公司获超亿元资金_摩熵医药",
+      "url_or_ref": "https://www.pharnexcloud.com/zixun/trz_5652"
+    },
+    {
+      "type": "web",
+      "title": "艾媒咨询 | 2026年中国医疗健康行业半年投融资情况(附下载)-艾媒网",
+      "url_or_ref": "https://www.iimedia.cn/c400/114052.html"
+    },
+    {
+      "type": "web",
+      "title": "并购潮回归：半年52笔，中国浓度飙升",
+      "url_or_ref": "https://www.phirda.com/artilce_43085.html?module=trackingCodeGenerator"
+    },
+    {
+      "type": "web",
+      "title": "ѧ—δ2026＼ʵ͹ȣҵƾ֣ - Ĳ",
+      "url_or_ref": "https://blog.sciencenet.cn/blog-3592244-1530902.html"
+    },
+    {
+      "type": "web",
+      "title": "2026年度科技产业高质量发展计划“生物医药创新 ...",
+      "url_or_ref": "https://www.pudong.gov.cn/009009/20260611/828021.html"
+    },
+    {
+      "type": "web",
+      "title": "2026年七八月重大交易盘点：ADC、自免、代谢及新兴技术平台持续升温 - 专注肿瘤免疫",
+      "url_or_ref": "https://www.dimabio.cn/blog/2026-july-august-biopharma-deals"
+    },
+    {
+      "type": "web",
+      "title": "复星医药2026战略解析：ADC创新药与全球化出海双轮驱动",
+      "url_or_ref": "https://zhuanlan.zhihu.com/p/2022680983200112862"
+    },
+    {
+      "type": "web",
+      "title": "2026产业大变局，医药创新迎来质变时刻 - 中国金融网",
+      "url_or_ref": "http://www.financeun.com/newsDetail/64117.shtml"
+    },
+    {
+      "type": "web",
+      "title": "44款新药获批上市",
+      "url_or_ref": "https://www.phirda.com/artilce_42471.html?module=trackingCodeGenerator"
+    },
+    {
+      "type": "web",
+      "title": "南方财经网 - 南方财经全媒体集团",
+      "url_or_ref": "https://m.sfccn.com/2026/9-1/yNMDE1MjZfMjIyNzYyNQ.html"
+    },
+    {
+      "type": "web",
+      "title": "细胞基因疗法融资狂飙，商业化窄门为何难以跨越？ | 新药网",
+      "url_or_ref": "https://xinyaoapp.com/1452.html"
+    },
+    {
+      "type": "web",
+      "title": "2026年最值得期待的十大医药IPO",
+      "url_or_ref": "https://www.tmtpost.com/baidu/7891986.html"
+    },
+    {
+      "type": "web",
+      "title": "GLP-1 改寫慢病藥物市場，產業代表齊聚剖析兆元商機",
+      "url_or_ref": "https://geneonline.news/bioasiataiwan2026-glp1-026newsjuly"
+    },
+    {
+      "type": "web",
+      "title": "信达生物关闭一家研发中心医药新闻-ByDrug-一站式医药资源共享中心-医药魔方",
+      "url_or_ref": "https://bydrug.pharmcube.com/news/detail/bc504ac851511b60bea347336e6fbb7e"
+    },
+    {
+      "type": "web",
+      "title": "2026H1复盘：中国创新药交出997亿美金BD答卷",
+      "url_or_ref": "https://www.phirda.com/artilce_43072.html?module=trackingCodeGenerator"
+    },
+    {
+      "type": "web",
+      "title": "2026年1月全球医药BD与并购趋势：ADC、双抗、AI制药等-缔码生物",
+      "url_or_ref": "https://www.dimabio.cn/blog/global-pharma-bd-ma-trends-january-2026"
+    },
+    {
+      "type": "web",
+      "title": "中国新药，重回并购场 - 知乎",
+      "url_or_ref": "https://zhuanlan.zhihu.com/p/2025519965030065656"
+    },
+    {
+      "type": "web",
+      "title": "中国创新药资产再获外资“高额购” 出海合作模式多元化 - 新华网客户端",
+      "url_or_ref": "https://app.xinhuanet.com/news/article.html?articleId=20260326b9d86b9443744374b125a14685fea9a3"
+    },
+    {
+      "type": "web",
+      "title": "在不确定中遇见和锚定机遇：探讨中国生物医药并购趋势与核心风险点_文章_洞察_方达律师事务所",
+      "url_or_ref": "https://www.fangdalaw.com/content/details32_8632.html"
+    },
+    {
+      "type": "web",
+      "title": "2026年跨国药企并购转向管线补强模式，已验证临床数据被 ...",
+      "url_or_ref": "https://www.zyzhan.com/news/detail/100329.html"
+    },
+    {
+      "type": "web",
+      "title": "2026上半年，中国创新药出海license-out 数据名单一览 - 摩熵医药",
+      "url_or_ref": "https://www.pharnexcloud.com/zixun/kp_330909"
+    },
+    {
+      "type": "web",
+      "title": "1430亿美元，全球创新药并购重回高峰",
+      "url_or_ref": "https://www.pharmcube.com/newsLibrary/detail?id=3a76e9ddab417d94787cda1e8544c153"
+    },
+    {
+      "type": "web",
+      "title": "2026生物医药产业合作大会|构建医药强国：创新引擎、政策支持与产业生态的协同演进 - 生物医药产业国际合作大会",
+      "url_or_ref": "https://www.cbpfcn.com/news/8733"
+    },
+    {
+      "type": "web",
+      "title": "焦点访谈：制度改革破局国产创新药跑出“加速度”",
+      "url_or_ref": "https://www.nhsa.gov.cn/art/2026/6/8/art_14_20882.html"
+    },
+    {
+      "type": "web",
+      "title": "《焦点访谈》 20260607 中国创新药 跑出加速度",
+      "url_or_ref": "https://tv.cctv.com/2026/06/07/VIDE8MkKN4tn0VJAxB9k5vgw260607.shtml"
+    },
+    {
+      "type": "web",
+      "title": "国家医疗保障局医保动态2026年药品目录调整工作方案解读活动文字 ...",
+      "url_or_ref": "https://www.nhsa.gov.cn/art/2026/5/26/art_14_20707.html"
+    },
+    {
+      "type": "web",
+      "title": "北京市医疗保障局等十部门关于印发《北京市支持创新医药高 ...",
+      "url_or_ref": "https://ybj.beijing.gov.cn/zwgk/2024zcwj/202604/t20260407_4575328.html"
+    },
+    {
+      "type": "web",
+      "title": "生育保险和工伤保险药品目录及商保创新药目录调整初步 ...",
+      "url_or_ref": "https://www.nhsa.gov.cn/art/2026/6/29/art_105_21130.html"
+    },
+    {
+      "type": "web",
+      "title": "国务院办公厅关于全面深化药品医疗器械监管改革促进医药产业高 ...",
+      "url_or_ref": "https://www.nmpa.gov.cn/xxgk/fgwj/qita/20250103170940152.html?type=pc&m="
+    },
+    {
+      "type": "web",
+      "title": "《中华人民共和国药品管理法实施条例》修订要点解读 - 金杜律师事务所",
+      "url_or_ref": "https://www.kingandwood.com/cn/zh/insights/latest-thinking/key-aspects-of-2026-revision-of-the-regulations-for-the-implementation-of-drug-administration-law-of-china.html"
+    },
+    {
+      "type": "web",
+      "title": "中国医药健康产业研究报告 (2026)丨AgeClub",
+      "url_or_ref": "https://m.ageclub.net/article-detail/9374"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 212706,
+    "output_tokens": 11078,
+    "total_tokens": 223784
+  },
+  "duration_s": 65.54,
+  "status": "completed",
+  "error": null,
+  "started_at": "2026-09-16T12:09:34.401065",
+  "finished_at": "2026-09-16T12:10:39.938015"
+}

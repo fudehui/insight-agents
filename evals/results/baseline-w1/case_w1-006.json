@@ -1,0 +1,129 @@
+{
+  "case_id": "w1-006",
+  "query": "根据内部知识库中的《贝莱德BlackRock2026年全球投资展望报告》， 总结 2026 年全球投资展望的核心观点与主要风险，生成一份研究简报",
+  "session_id": "eval_baseline-w1_w1-006",
+  "report_md": "# 贝莱德（BlackRock）2026年全球投资展望研究简报\n\n---\n\n## 执行摘要\n\n本报告基于贝莱德（BlackRock）发布的《2026年全球投资展望报告》进行整理分析。作为全球最大的资产管理公司（管理资产超过13万亿美元），贝莱德每年发布投资展望报告为投资者提供策略指引。2026年报告的核心主题为**\"AI、收入与多元化\"（AI, Income & Diversifiers）**，并首次提出四大\"巨力\"（Mega Forces）重塑投资环境的框架。\n\n---\n\n## 一、宏观经济环境判断\n\n### 1.1 \"稀缺 vs. 丰裕\"的核心判断\n\n贝莱德指出，世界正处于**由稀缺主导**的阶段：劳动力、能源、基础设施、资本及原材料面临更大的需求压力，供给侧制约正在重塑经济增长、通胀与市场定价。这一判断构成了2026年投资策略的宏观基础。\n\n### 1.2 六大宏观判断\n\n| 宏观判断 | 核心问题 |\n|---------|---------|\n| AI主导的经济增长 | AI能否加速创新并推动持久的经济增长突破？ |\n| AI的成本 | AI建设成本对通胀和企业盈利的影响 |\n| 利率 | 高利率环境将持续存在，且有基本面支撑 |\n| 债务 | 政府大规模举债推升收益率的压力短期难消退 |\n| 地缘政治瓶颈 | 地缘政治风险尚未化解，中东石油价格仍波动 |\n| 美国市场的领先地位 | AI基础设施扩张带动企业盈利强劲 |\n\n### 1.3 关键预测\n\n- **经济增长**：预计2026年将呈现**高于趋势的经济增长**，伴随政策宽松和生产率加速\n- **利率环境**：全球利率\"重新调整\"尚未结束，**高利率环境将持续**\n- **通胀**：通胀黏性仍高，稀缺性、供给安全与电力需求带来持续通胀风险\n- **劳动力市场**：新增就业放缓，但主要是劳动力供给增长减速，而非企业需求降温\n\n---\n\n## 二、核心投资主题\n\n### 2.1 AI——主导性结构性主题\n\nAI仍是2026年最具主导性的结构性投资主题，但投资周期已从早期阶段进入成熟期：\n\n- **热门标的拥挤度上升**，Alpha机会正转向**中国国内基础设施的未充分拥有部分**\n- 贝莱德提供专门的AI相关基金，如iShares A.I. Innovation and Tech Active ETF（BAI），规模已超过80亿美元\n- 科技股已从市场最大顺风转变为潜在拖累，需要更精准选股 [1]\n\n### 2.2 Income——收入策略\n\n贝莱德预期美联储将在2026年进一步降息，呼吁投资者：\n\n- **超越现金和货币市场**，寻找多元化的收入来源\n- 偏好现金流清晰、债权人保护完善、回收价值明确的信用债\n- 偏好较高等级高收益债\n\n### 2.3 Diversifiers——多元化配置\n\n投资者正在寻求新的资产类别以实现组合多元化：\n\n- **加密货币ETF**被视为新的多元化选项：iShares Bitcoin Trust ETF（IBIT）和iShares Ethereum Trust ETF（ETHA）受到关注\n- 私人市场持续增长，投资者认识到私人资产在实现长期目标中的作用\n- 重点关注**三项结构性趋势（Three Ds）**：数字化（Digitalization）、去全球化（Deglobalization）、脱碳（Decarbonization） [3]\n\n---\n\n## 三、四大\"巨力\"（Mega Forces）重塑投资环境\n\n2026年6月，贝莱德投资研究所提出传统投资组合构建方法正在失效，投资环境正被四大\"巨力\"重塑：\n\n| 巨力 | 描述 |\n|------|------|\n| **人工智能** | AI持续改变生产力和商业模式 |\n| **人口结构变化** | 全球人口老龄化等长期趋势 |\n| **地缘政治碎片化** | 贸易紧张、供应链重组 |\n| **能源转型** | 向清洁能源过渡带来的结构性变化 |\n\n**核心观点**：投资者需要重新思考投资组合管理的基本原则，更加重视公司的商业模式和收入驱动因素，而非仅仅是股票上市的地点 [1]\n\n---\n\n## 四、三大投资策略框架\n\n### 4.1 \"微即是宏\"（Micro is Macro）\n\n公司资本支出雄心与AI建设绑定，体量大到足以产生宏观经济影响。\n\n### 4.2 杠杆提升（Leveraging Up）\n\n在AI基础设施扩张中利用杠杆捕捉机会。\n\n### 4.3 多元化 Mirage（Diversification Mirage）\n\n传统分散化在极端宏观场景下可靠性下降，需要新的多元化思路。\n\n---\n\n## 五、各资产类别战术观点\n\n### 5.1 股票\n\n- **保持看好**美国股市，但强调**针对性敞口比广泛市场投资更重要**\n- 美国股市过去十年的高回报难以持续\n- 在通胀回归和美元走强的背景下，转向具有**定价能力的 resilient companies**\n- **新兴市场偏好**：生产关键AI组件的国家 + 受益于能源和原材料价格上涨的**商品出口国**\n\n| 市场 | 观点 |\n|------|------|\n| 美国股票 | 战术性超配 +1 |\n| 欧洲股票 | 战术性中性 |\n| 日本股票 | 战术性超配 +1 |\n| 英国股票 | 战术性中性 |\n| 新兴市场 | 中性（看好拉美基建投资） |\n| 中国 | 中性（看好实体AI相关投资） |\n\n### 5.2 债券\n\n| 资产类别 | 观点 |\n|---------|------|\n| 短期美国国债 | 战术性中性（偏好短中期国债） |\n| 长期美国国债 | 减持 |\n| 美国机构MBS | 超配 |\n| 全球高收益债券 | 中性（偏好较高等级欧美高收益债） |\n| 新兴市场本币债券 | 战术性超配 +1 |\n\n- **低配**美国长期国债\n- 原因：通胀风险和上升的期限溢价继续对收益率形成上行压力\n\n### 5.3 大宗商品\n\n- 对商品的风险敞口从**周期性犹豫转变为结构性信心**\n- 重点推荐：**铜、铝和核能基础设施**\n- 驱动力：电气化需求、AI数据中心建设、长期的核电项目管道\n\n### 5.4 加密货币\n\n- 认为比特币和以太坊ETF仍处于早期阶段\n- 大型资管机构（如贝莱德）通过ETF形式为投资者提供了更好的加密资产准入渠道 [2]\n\n---\n\n## 六、区域市场展望\n\n### 6.1 美国\n- 继续在全球投资流动中占据主导地位\n- 资金在过去两个月回流美国，逆转了年初的流出趋势\n- AI基础设施扩张带动企业盈利强劲 [6]\n\n### 6.2 新兴市场\n- 偏好两类国家：生产关键AI组件的国家、商品出口国（受益于能源和原材料价格上涨）\n- 看好拉美基建投资机会\n\n### 6.3 中国\n- 国内基础设施领域存在未被充分定价的投资机会\n- 看好实体AI相关投资 [4]\n\n### 6.4 欧洲\n- 需要加大AI创新规模 [1]\n\n---\n\n## 七、主要投资风险\n\n### 7.1 宏观风险\n\n1. **利率风险**：长期债券对利率高度敏感，作为投资组合分散工具的可靠性较低\n2. **通胀风险**：稀缺性、供给安全与电力需求带来持续通胀风险\n3. **地缘政治风险**：中东石油价格波动，地缘政治风险尚未化解\n4. **政治风险**：2027年选举前政治风险可能上升\n\n### 7.2 市场风险\n\n1. **估值风险**：市场估值偏高，劳动力市场疲软\n2. **AI主题波动**：AI主题仍具吸引力但越来越 volatile，科技股从最大顺风变为潜在拖累\n3. **信用风险**：发行人可能无法偿还本金和利息\n4. **流动性风险**：另类投资风险较高，部分另类投资经历极端波动，流动性低于传统证券\n\n### 7.3 核心警示\n\n> \"投资者面临的重大宏观判断可能带来**多元分化结果**：多种可能的发展路径可能最终导向截然不同的宏观格局。这意味着在互不相容的环境下存在的不确定性，而非围绕单一基准情景的波动。\"\n\n---\n\n## 八、关键投资建议\n\n1. **重新思考传统投资组合构建方法**，适应\"巨力\"驱动的新环境\n2. **关注商业模式和收入驱动因素**，而非仅看股票上市地\n3. **AI投资从热门标的转向未充分拥有的基础设施**（尤其是中国）\n4. **利率下行环境中寻求多元化收入来源**，降低现金配置\n5. **结构性看多大宗商品**（铜、铝、核能）\n6. **低配美国长期国债**\n7. **关注加密货币ETF**作为新兴的多元化配置工具\n8. **利用私人市场和实物资产**应对去全球化、数字化和脱碳的长期趋势\n\n---\n\n## 九、贝莱德最新动态\n\n- 2026年1月，贝莱德宣布裁员约250人（约占全球员工的1%），以将重心进一步转向另类投资和AI相关领域\n- Larry Fink年度股东信中强调贝莱德作为华尔街连接主街的角色，帮助新兴中产阶级参与投资\n- 2026年信中专注于投资主题，未提及ESG（环境治理、社会责任和公司治理）相关内容 [5]\n\n---\n\n## 十、投资警告声明\n\n- 投资价值可升可跌，不保证收益\n- 投资者可能无法收回原始投资金额\n- 过往业绩不代表未来表现\n- 本材料不应被视为研究或投资建议\n\n---\n\n## 【参考来源】\n\n1. BlackRock says 'mega forces' are changing investing - CNBC - https://www.cnbc.com/2026/06/09/blackrock-says-mega-forces-are-changing-investing-heres-what-to-do.html\n2. BlackRock predicts major shift in retail investors' access to cryptocurrencies - CNBC - https://www.cnbc.com/2026/01/09/blackrocks-bull-case-for-bitcoin-access-among-retail-investors.html\n3. 2026 年中全球投資展望｜貝萊德 - https://www.blackrock.com/tw/insights/global-investment-outlook\n4. Resilience In A Reflationary World: Navigating Concentration, Conflict, & Conviction In EM - Seeking Alpha - https://seekingalpha.com/article/4921522-resilience-reflationary-world-navigating-concentration-conflict-conviction-em\n5. BlackRock to slash hundreds of jobs — Wall Street biz to kick off 2026 with firings - New York Post - https://nypost.com/2026/01/13/business/blackrock-to-slash-hundreds-of-jobs-latest-wall-street-biz-to-kick-off-2026-with-firings/\n6. US to continue dominating global investment flows - Reuters - https://www.reuters.com/business/finance/us-continue-dominating-global-investment-flows-finance-executives-say-2025-10-28/\n7. Here's the most overlooked part of Larry Fink's yearly letter - New York Post - https://nypost.com/2026/03/27/business/heres-the-most-overlooked-part-of-larry-finks-yearly-letter-to-shareholders-and-why-it-could-be-good-news/\n8. 2026 Midyear Global Outlook - BlackRock - https://www.blackrock.com/uk/professionals/solutions/blackrock-investment-institute/publications/outlook\n9. 2026 年中全球投资展望|贝莱德 - https://www.blackrock.com/cn/insights/global-investment-outlook\n10. 动荡的 2026 所带来的三个启示 - https://www.blackrock.com/tw/insights/global-weekly-commentary\n11. 2026 Annual Global Outlook – Market Insights | BlackRock - https://www.blackrock.com/us/financial-professionals/insights/inside-the-market/advisor-outlook\n12. Investment Directions 2026 Outlook - iShares - https://www.ishares.com/us/insights/inside-the-market/2026-market-outlook-investment-directions\n13. 稀缺與豐裕的市場角力 - https://www.blackrock.com/hk/zh/insights\n14. BlackRock Bottom Line | 2026 Global Outlook (YouTube) - https://www.youtube.com/watch?v=eFBwyu30oTU\n\n---\n\n**报告生成日期**：2026年  \n**数据来源**：网络搜索（共引用14条来源）",
+  "report_path": "D:\\Project\\deepsearch-agents\\app\\output\\session_eval_baseline-w1_w1-006\\贝莱德2026年全球投资展望研究简报.md",
+  "sources": [
+    {
+      "type": "web",
+      "title": "2026 年中全球投資展望｜貝萊德",
+      "url_or_ref": "https://www.blackrock.com/tw/insights/global-investment-outlook"
+    },
+    {
+      "type": "web",
+      "title": "2026年下半年環球投資展望 | 貝萊德",
+      "url_or_ref": "https://www.blackrock.com/hk/zh/insights/global-investment-outlook"
+    },
+    {
+      "type": "web",
+      "title": "2026年中全球投资展望|贝莱德",
+      "url_or_ref": "https://www.blackrock.com/cn/insights/global-investment-outlook"
+    },
+    {
+      "type": "web",
+      "title": "全球投資評論 | 貝萊德智庫",
+      "url_or_ref": "https://www.blackrock.com/tw/insights/global-weekly-commentary"
+    },
+    {
+      "type": "web",
+      "title": "貝萊德投資觀點－最新文章",
+      "url_or_ref": "https://www.blackrock.com/hk/zh/insights"
+    },
+    {
+      "type": "web",
+      "title": "Global Investment Outlook",
+      "url_or_ref": "https://www.blackrock.com/corporate/insights/blackrock-investment-institute/outlook"
+    },
+    {
+      "type": "web",
+      "title": "2026 Midyear Global Investment Outlook | BlackRock",
+      "url_or_ref": "https://www.blackrock.com/institutions/en-apac/insights/thought-leadership/global-investment-outlook"
+    },
+    {
+      "type": "web",
+      "title": "BlackRock Bottom Line | 2026 Global Outlook",
+      "url_or_ref": "https://www.youtube.com/watch?v=eFBwyu30oTU"
+    },
+    {
+      "type": "web",
+      "title": "2026 Midyear Global Outlook - BlackRock",
+      "url_or_ref": "https://www.blackrock.com/uk/professionals/solutions/blackrock-investment-institute/publications/outlook"
+    },
+    {
+      "type": "web",
+      "title": "2026 Midyear Global Outlook | BlackRock",
+      "url_or_ref": "https://www.blackrock.com/sa/professional/en/insights/blackrock-investment-institute/publications/outlook"
+    },
+    {
+      "type": "web",
+      "title": "2026 Advisor Outlook – Market Insights | BlackRock",
+      "url_or_ref": "https://www.blackrock.com/us/financial-professionals/insights/inside-the-market/advisor-outlook"
+    },
+    {
+      "type": "web",
+      "title": "Investment Directions 2026 Outlook",
+      "url_or_ref": "https://www.ishares.com/us/insights/inside-the-market/2026-market-outlook-investment-directions"
+    },
+    {
+      "type": "web",
+      "title": "Weekly market commentary | BlackRock Investment Institute",
+      "url_or_ref": "https://www.blackrock.com/us/individual/insights/blackrock-investment-institute/weekly-commentary"
+    },
+    {
+      "type": "web",
+      "title": "2026 Investment Outlook - Brookfield",
+      "url_or_ref": "https://www.brookfield.com/2026-investment-outlook"
+    },
+    {
+      "type": "web",
+      "title": "BlackRock to slash hundreds of jobs — latest Wall Street biz to kick off 2026 with firings - New York Post",
+      "url_or_ref": "https://nypost.com/2026/01/13/business/blackrock-to-slash-hundreds-of-jobs-latest-wall-street-biz-to-kick-off-2026-with-firings/"
+    },
+    {
+      "type": "web",
+      "title": "How BlackRock, world's largest asset manager, is fine-tuning market portfolios for 2026 - CNBC",
+      "url_or_ref": "https://www.cnbc.com/2026/01/10/blackrock-investing-bull-market-portfolio-stocks.html"
+    },
+    {
+      "type": "web",
+      "title": "BlackRock predicts major shift in retail investors' access to cryptocurrencies - CNBC",
+      "url_or_ref": "https://www.cnbc.com/2026/01/09/blackrocks-bull-case-for-bitcoin-access-among-retail-investors.html"
+    },
+    {
+      "type": "web",
+      "title": "BlackRock says 'mega forces' are changing investing. Here's what they say to do - CNBC",
+      "url_or_ref": "https://www.cnbc.com/2026/06/09/blackrock-says-mega-forces-are-changing-investing-heres-what-to-do.html"
+    },
+    {
+      "type": "web",
+      "title": "BlackRock: Europe needs to scale up AI innovation - CNBC",
+      "url_or_ref": "https://www.cnbc.com/video/2026/09/09/blackrock-europe-needs-to-scale-up-ai-innovation.html"
+    },
+    {
+      "type": "web",
+      "title": "Here’s the most overlooked part of Larry Fink’s yearly letter to shareholders — and why it could be good news - New York Post",
+      "url_or_ref": "https://nypost.com/2026/03/27/business/heres-the-most-overlooked-part-of-larry-finks-yearly-letter-to-shareholders-and-why-it-could-be-good-news/?utm_campaign=nypost&utm_medium=referral"
+    },
+    {
+      "type": "web",
+      "title": "Resilience In A Reflationary World: Navigating Concentration, Conflict, & Conviction In EM - Seeking Alpha",
+      "url_or_ref": "https://seekingalpha.com/article/4921522-resilience-reflationary-world-navigating-concentration-conflict-conviction-em"
+    },
+    {
+      "type": "web",
+      "title": "US to continue dominating global investment flows, finance executives say - Reuters",
+      "url_or_ref": "https://www.reuters.com/business/finance/us-continue-dominating-global-investment-flows-finance-executives-say-2025-10-28/"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 368352,
+    "output_tokens": 18826,
+    "total_tokens": 387178
+  },
+  "duration_s": 370.23,
+  "status": "completed",
+  "error": null,
+  "started_at": "2026-09-15T16:59:03.739173",
+  "finished_at": "2026-09-15T17:05:13.973872"
+}

@@ -1,0 +1,9 @@
+{
+  "scenario": "disconnect",
+  "mock_llm": true,
+  "runs": 2,
+  "recovery_success_rate": 1.0,
+  "recovery_time_avg_s": null,
+  "recovery_time_p95_s": 0.0,
+  "event_completion_rate_avg": 1.0
+}

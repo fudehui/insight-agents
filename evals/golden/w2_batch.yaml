@@ -1,0 +1,443 @@
+# W2 评测批次：20 条 golden case（docs/upgrade-plan.md P0-1 第 W2 周，与 W1 合计 30 条）
+#
+# 口径说明（与 w1_batch.yaml 一致）：
+# - schema 定义见 evals/loader.py；运行方式与输出契约见 evals/README.md
+# - expected_points 是人工标注的可判定要点，供评分模块与人工抽检使用；
+#   指标名衔接 docs/evaluation-metric-template.md 的 6 指标，不在此重定义
+# - expected_tools 使用工具注册名（与 app/api/budget.py DEFAULT_TOOL_LIMITS
+#   及各 @tool 名一致）：internet_search / list_sql_tables / get_table_data /
+#   execute_sql_query / get_assistant_list / create_ask_delete / generate_markdown
+# - SQLite 真值基于 app/data/deepsearch.db（合成数据：drugs 50 行 /
+#   inventory 150 行 / sales_records 100 行，销售日期全部落在 2025 年），
+#   数值型 expected_points 均已用真实查询校准（真值 SQL 写在要点内）；
+#   评测时可用 SQLITE_DB_PATH 指向独立库副本
+# - RAGFlow 用例复用 W1 的两份知识库文档（《全球电商行业AI应用研究报告2025》
+#   《贝莱德BlackRock2026年全球投资展望报告》），助手名在运行时动态发现，
+#   case 内不硬编码助手名
+# - 边界用例（boundary）的 expected_points 写预期行为而非内容要点
+cases:
+  # ---------- web 检索路径（6 条，选 2025-2026 年有公开稳定信息的话题） ----------
+  - id: w2-001
+    query: >-
+      检索并总结 2025-2026 年开源大模型的生态格局与主要模型家族的版本演进，
+      生成一份开源大模型生态研究报告
+    expected_points:
+      - 报告覆盖至少 3 个开源大模型家族及其代表版本或发布时间线
+      - 报告归纳生态层面的关键趋势（如开源许可策略、能力追赶、推理成本变化），而非仅罗列新闻
+      - 正文至少引用 3 个不同 URL 的网络来源
+      - 文末存在【参考来源】章节，且章节条目与正文引用对应
+    expected_tools:
+      - internet_search
+      - generate_markdown
+    expected_source_types:
+      - web
+    tags:
+      - web
+    notes: 2025-2026 年公开信息丰富且相对稳定的技术生态话题，考察多轮检索后的信息组织能力
+
+  - id: w2-002
+    query: >-
+      调研 2025-2026 年固态电池技术在新能源汽车领域的量产进展、主要厂商技术路线
+      与尚待解决的工程挑战，生成一份行业进展报告
+    expected_points:
+      - 报告覆盖固态电池的主要技术路线（如硫化物/氧化物/聚合物电解质）与代表厂商动态
+      - 报告给出量产时间表或装车进展的归纳，并注明信息时点
+      - 报告包含尚待解决的工程或成本挑战分析，而非只报道利好
+      - 正文至少引用 2 个不同 URL 的网络来源，文末存在【参考来源】章节
+    expected_tools:
+      - internet_search
+      - generate_markdown
+    expected_source_types:
+      - web
+    tags:
+      - web
+    notes: 产业进展类检索任务，考察正反两面信息的平衡归纳
+
+  - id: w2-003
+    query: >-
+      检索 2025-2026 年 GLP-1 类减重药物的市场竞争格局与在研管线进展，
+      生成一份医药行业简报
+    expected_points:
+      - 报告覆盖主要在售 GLP-1 减重药及其厂商（如诺和诺德、礼来等）的市场表现
+      - 报告提及在研管线或下一代产品的竞争态势（如口服制剂、专利到期与仿制药影响）
+      - 报告引用市场规模或增速数据，且数据有明确来源标注
+      - 文末存在【参考来源】章节
+    expected_tools:
+      - internet_search
+      - generate_markdown
+    expected_source_types:
+      - web
+    tags:
+      - web
+    notes: 医药市场类检索任务，考察数据引用的来源标注习惯（引用行为受质量闸门约束）
+
+  - id: w2-004
+    query: >-
+      调研 2026 年中国低空经济与 eVTOL 城市空中交通的商业化进展、政策支持
+      与典型运营场景，生成一份产业观察报告
+    expected_points:
+      - 报告覆盖 eVTOL 或无人机等低空经济载体的商业化进展（适航取证、试点城市、运营航线等）
+      - 报告提及相关政策与监管进展，而非仅罗列企业新闻
+      - 报告归纳典型应用场景（如城市通勤、物流配送、文旅观光）
+      - 正文至少引用 2 个不同 URL 的网络来源
+    expected_tools:
+      - internet_search
+      - generate_markdown
+    expected_source_types:
+      - web
+    tags:
+      - web
+    notes: 政策+产业双线话题，考察政策信息与商业信息的组合检索
+
+  - id: w2-005
+    query: >-
+      检索欧盟《人工智能法案》（EU AI Act）2025-2026 年的实施进展与分阶段
+      时间表，总结企业在合规上需要关注的要点，生成一份合规指引报告
+    expected_points:
+      - 报告给出法案分阶段适用的关键时间节点（如通用目的模型义务、高风险系统义务的生效时点）
+      - 报告总结企业合规要点（如风险分级、透明度义务、罚则），而非仅翻译条文
+      - 报告区分事实性时间表与解读性建议，解读部分注明出处
+      - 文末存在【参考来源】章节，正文至少引用 2 个不同 URL 的网络来源
+    expected_tools:
+      - internet_search
+      - generate_markdown
+    expected_source_types:
+      - web
+    tags:
+      - web
+    notes: 法规实施时间表为公开稳定信息，适合考察事实准确性；引用行为受质量闸门约束
+
+  - id: w2-006
+    query: >-
+      检索 2025-2026 年量子计算在硬件与商业化上的标志性进展（如量子纠错里程碑、
+      主要厂商路线图），生成一份前沿技术动态报告
+    expected_points:
+      - 报告覆盖主要技术路线（如超导、离子阱、中性原子）中至少两条的进展
+      - 报告提及量子纠错或规模化的标志性里程碑及其意义
+      - 报告区分学术进展与商业化进展（如云服务、应用探索），避免混为一谈
+      - 文末存在【参考来源】章节
+    expected_tools:
+      - internet_search
+      - generate_markdown
+    expected_source_types:
+      - web
+    tags:
+      - web
+    notes: 前沿技术话题，考察对进展类型（学术与商业化）的区分归纳能力
+
+  # ---------- SQLite 数据路径（5 条，数值真值均已用真实查询校准） ----------
+  - id: w2-007
+    query: >-
+      从数据库查询 2027-06-30 之前（含当日）到期的库存批次，按到期日期从近到远
+      列出批次清单并给出效期处置建议，生成一份库存效期预警报告
+    expected_points:
+      - 报告给出的到期批次数与总盒数等于 60 个批次、282600 盒（真值 SQL：SELECT
+        COUNT(*), SUM(quantity_on_hand) FROM inventory WHERE
+        expiry_date <= '2027-06-30'）
+      - 报告按到期日期从近到远列出批次清单（含药品名、批号、数量、效期等要素）
+      - 报告包含处置建议（如优先出库、促销清库、退换协调），而非只罗列查询结果
+      - 文末包含数据库查询记录的来源标注
+    expected_tools:
+      - list_sql_tables
+      - get_table_data
+      - execute_sql_query
+      - generate_markdown
+    expected_source_types:
+      - sql
+    tags:
+      - db
+    notes: 效期预警类任务；库内效期全部落在 2027 年（2026 年内到期为 0 条），故口径取 2027-06-30 前到期，真值已校准
+
+  - id: w2-008
+    query: >-
+      从数据库统计各仓库位置的库存量分布，找出库存量最大的仓库并分析库存
+      集中度风险，生成一份仓储库存分布报告
+    expected_points:
+      - 报告指出的库存量最大仓库为天津一号库-防疫专区（真值 100000 盒；真值 SQL：
+        SELECT warehouse_location, SUM(quantity_on_hand) FROM inventory
+        GROUP BY warehouse_location ORDER BY SUM(quantity_on_hand) DESC）
+      - 报告给出主要仓库的库存分布对比，数值与 SQL 查询结果一致
+      - 报告包含库存集中度或单仓库风险的分析结论，而非只复述数字
+      - 文末包含数据库查询记录的来源标注
+    expected_tools:
+      - list_sql_tables
+      - get_table_data
+      - execute_sql_query
+      - generate_markdown
+    expected_source_types:
+      - sql
+    tags:
+      - db
+    notes: GROUP BY + 排序类任务；warehouse_location 为精确位置（含功能区后缀），若模型按前缀聚合（如天津一号库 310100 盒）属口径不同，判定以报告自我声明口径与 SQL 结果一致性为准
+
+  - id: w2-009
+    query: >-
+      从数据库统计 2025 年各治疗领域的销售额，找出销售额最高的治疗领域并分析
+      该领域的主要贡献药品，生成一份品类销售分析报告
+    expected_points:
+      - 报告指出的销售额最高治疗领域为中成药/感冒（真值 1200000 元；真值 SQL：
+        SELECT d.therapeutic_area, SUM(s.total_amount) FROM sales_records s
+        JOIN drugs d ON s.drug_id=d.drug_id GROUP BY d.therapeutic_area
+        ORDER BY SUM(s.total_amount) DESC）
+      - 报告给出主要治疗领域的销售额对比，数值与 SQL 查询结果一致
+      - 报告分析该领域的主要贡献药品（连花清瘟胶囊贡献 1200000 元）
+      - 文末包含数据库查询记录的来源标注
+    expected_tools:
+      - list_sql_tables
+      - get_table_data
+      - execute_sql_query
+      - generate_markdown
+    expected_source_types:
+      - sql
+    tags:
+      - db
+    notes: 跨表 JOIN 聚合任务；therapeutic_area 颗粒度较细（如抗病毒/肝病），判定以报告口径与 SQL 结果一致性为准
+
+  - id: w2-010
+    query: >-
+      从数据库查询 2025 年销售额最高的客户及其订单构成，并分析大客户集中度，
+      生成一份客户销售分析报告
+    expected_points:
+      - 报告指出的销售额最高客户为全国连锁大药房总仓（真值 1000000 元；真值 SQL：
+        SELECT customer_name, SUM(total_amount) FROM sales_records
+        GROUP BY customer_name ORDER BY SUM(total_amount) DESC）
+      - 报告给出主要客户的销售额对比，数值与 SQL 查询结果一致
+      - 报告包含大客户集中度分析（如头部客户销售额占比），而非只复述数字
+      - 文末包含数据库查询记录的来源标注
+    expected_tools:
+      - list_sql_tables
+      - get_table_data
+      - execute_sql_query
+      - generate_markdown
+    expected_source_types:
+      - sql
+    tags:
+      - db
+    notes: 客户维度聚合任务；全国连锁大药房总仓是客户名称而非地区聚合，region=全国 的两行（合计 1020280 元）分属两个客户，与地区大区口径无关（延续 w1-004 的排除先例）
+
+  - id: w2-011
+    query: >-
+      从数据库查询磷酸奥司他韦胶囊 2025 年的销售总量、销售额及各月销售分布，
+      分析其季节性特征并给出备货建议，生成一份销售分析报告
+    expected_points:
+      - 报告给出的 2025 年销售总量与销售额等于 7000 盒、700000 元（真值 SQL：SELECT
+        SUM(quantity_sold), SUM(total_amount) FROM sales_records WHERE
+        drug_id=(SELECT drug_id FROM drugs WHERE generic_name LIKE '%奥司他韦%')）
+      - 报告反映销售时点分布：2025 年仅 1 月（200000 元）与 11 月（500000 元）两笔，
+        呈现流感季前备货特征
+      - 报告包含基于季节性的备货或库存建议，而非只复述数字
+      - 文末包含数据库查询记录的来源标注
+    expected_tools:
+      - list_sql_tables
+      - get_table_data
+      - execute_sql_query
+      - generate_markdown
+    expected_source_types:
+      - sql
+    tags:
+      - db
+    notes: 单药品多笔记录的时间分布任务，考察按月分组与季节性解读；全年仅两笔订单（2025-01 与 2025-11）已核
+
+  # ---------- RAGFlow 知识库路径（4 条，复用 W1 的两份文档换角度提问） ----------
+  - id: w2-012
+    query: >-
+      向内部知识库助手咨询《全球电商行业AI应用研究报告2025》中 AI 在电商各业务
+      环节（如营销获客、客服售后、供应链履约、搜索推荐）的具体应用场景与成效，
+      整理成一份分场景要点报告
+    expected_points:
+      - 任务通过 RAGFlow 助手完成知识库问答（task_sources 的 docs 清单中出现
+        《全球电商行业AI应用研究报告2025》相关登记）
+      - 报告按业务环节分场景组织要点，而非笼统汇总
+      - 报告标注 RAGFlow 文档来源（文档名，可含页码）
+      - 报告不包含编造的数据库数值或网络链接冒充的内部结论
+    expected_tools:
+      - get_assistant_list
+      - create_ask_delete
+      - generate_markdown
+    expected_source_types:
+      - ragflow
+    tags:
+      - ragflow
+    notes: 与 w1-005 同文档不同角度（按业务场景拆解）；依赖 RAGFlow 服务可用与 docs/knowledge_base/电商行业 语料
+
+  - id: w2-013
+    query: >-
+      向内部知识库助手咨询《全球电商行业AI应用研究报告2025》中提到的 AI 应用
+      面临的挑战、风险与应对建议，整理成一份风险与对策简报
+    expected_points:
+      - 任务通过 RAGFlow 助手完成知识库问答（task_sources 的 docs 清单中出现
+        《全球电商行业AI应用研究报告2025》相关登记）
+      - 简报区分挑战/风险与应对建议两部分内容
+      - 报告标注 RAGFlow 文档来源（文档名，可含页码）
+      - 报告为 .md 文件且正文不少于 200 字
+    expected_tools:
+      - get_assistant_list
+      - create_ask_delete
+      - generate_markdown
+    expected_source_types:
+      - ragflow
+    tags:
+      - ragflow
+    notes: 考察对文档中非主结论章节（挑战与对策）的定位能力；依赖 RAGFlow 服务可用
+
+  - id: w2-014
+    query: >-
+      根据内部知识库中的《贝莱德BlackRock2026年全球投资展望报告》，总结其对
+      2026 年主要资产类别（股票、债券、另类资产等）的观点与配置建议，
+      生成一份资产配置要点简报
+    expected_points:
+      - 任务通过 RAGFlow 助手完成知识库问答（task_sources 的 docs 清单中出现
+        贝莱德 2026 年投资展望相关文档登记）
+      - 简报覆盖至少两类资产类别的观点（如股票、债券、另类资产）
+      - 报告标注 RAGFlow 文档来源（文档名，可含页码）
+      - 简报以要点形式组织且不混入网络检索内容
+    expected_tools:
+      - get_assistant_list
+      - create_ask_delete
+      - generate_markdown
+    expected_source_types:
+      - ragflow
+    tags:
+      - ragflow
+    notes: 与 w1-006 同文档不同角度（资产类别配置视图）；依赖 RAGFlow 服务可用与 docs/knowledge_base/金融行业 语料
+
+  - id: w2-015
+    query: >-
+      内部知识库中同时有《全球电商行业AI应用研究报告2025》与
+      《贝莱德BlackRock2026年全球投资展望报告》，请分别咨询两份文档中与
+      人工智能相关的核心观点，从产业应用与投资视角两侧对比整理，
+      生成一份关于 AI 主题的交叉要点报告
+    expected_points:
+      - 任务通过 RAGFlow 助手完成多次知识库问答（task_sources 的 docs 清单同时
+        出现两份文档的登记）
+      - 报告明确区分产业应用视角（电商报告）与投资视角（贝莱德报告）两侧观点
+      - 报告标注两份 RAGFlow 文档来源（文档名，可含页码）
+      - 报告不将两份文档的观点混写或互相冒充出处
+    expected_tools:
+      - get_assistant_list
+      - create_ask_delete
+      - generate_markdown
+    expected_source_types:
+      - ragflow
+    tags:
+      - ragflow
+    notes: 跨文档多轮问答任务，考察多来源登记与出处区分能力；依赖 RAGFlow 服务可用
+
+  # ---------- 混合任务（3 条：两条 sql+web 延续 W1，一条 ragflow+web 拓展） ----------
+  - id: w2-016
+    query: >-
+      先从数据库查询当前库存量最低的药品及其库存明细（用 SQL 确认），再检索
+      该药品的适应症与市场供应情况，生成一份库存紧张的单一药品分析报告
+    expected_points:
+      - 报告给出的库存最低药品为富马酸替诺福韦二吡呋酯片、当前库存 3700 盒
+        （真值 SQL：SELECT d.generic_name, SUM(i.quantity_on_hand) FROM
+        inventory i JOIN drugs d ON i.drug_id=d.drug_id GROUP BY i.drug_id
+        ORDER BY SUM(i.quantity_on_hand) ASC）
+      - task_sources 同时包含 sql 与 web 两类来源登记
+      - 报告内部数据（库存数值）与外部检索信息（适应症/供应情况）有明确的分区或对照呈现
+      - 文末同时包含数据库查询记录与网络来源引用
+    expected_tools:
+      - list_sql_tables
+      - execute_sql_query
+      - internet_search
+      - generate_markdown
+    expected_source_types:
+      - sql
+      - web
+    tags:
+      - mixed
+    notes: 混合任务，考察 database_query_agent 与 network_search_agent 的调度衔接；库存最低真值 3700 盒（3 个批次）已核，次低为沙美特罗替卡松吸入粉雾剂 4300 盒，供人工抽检对照
+
+  - id: w2-017
+    query: >-
+      查询盐酸二甲双胍片的库存总量与 2025 年销售额（用 SQL 确认），并检索
+      2026 年口服降糖药市场的价格或竞争动态，生成一份该药品的经营分析报告
+    expected_points:
+      - 报告给出的盐酸二甲双胍片库存总量等于 13500、2025 年销售额等于 24500
+        （真值 SQL：SELECT SUM(quantity_on_hand) FROM inventory WHERE drug_id=3；
+        SELECT SUM(total_amount) FROM sales_records WHERE drug_id=3）
+      - task_sources 同时包含 sql 与 web 两类来源登记
+      - 报告包含经营建议（如补货节奏、关注竞品），内外部信息有对照分析
+      - 文末同时包含数据库查询记录与网络来源引用
+    expected_tools:
+      - list_sql_tables
+      - execute_sql_query
+      - internet_search
+      - generate_markdown
+    expected_source_types:
+      - sql
+      - web
+    tags:
+      - mixed
+    notes: 单药品维度混合任务，与 w1-008（阿莫西林）同型不同药；数值真值已核（drug_id=3）
+
+  - id: w2-018
+    query: >-
+      先向内部知识库助手咨询《贝莱德BlackRock2026年全球投资展望报告》中对
+      人工智能与科技板块的核心观点，再检索 2026 年公开市场对 AI 板块的最新
+      动态进行对照，生成一份内外部视角结合的 AI 投资主题简报
+    expected_points:
+      - task_sources 同时包含 ragflow 与 web 两类来源登记
+      - 报告区分内部知识库观点与公开市场检索结论，并分别标注出处
+      - 简报包含对照后的综合判断（一致/分歧/互补），而非两段内容简单拼接
+      - 文末同时包含 RAGFlow 文档来源与网络来源引用
+    expected_tools:
+      - get_assistant_list
+      - create_ask_delete
+      - internet_search
+      - generate_markdown
+    expected_source_types:
+      - ragflow
+      - web
+    tags:
+      - mixed
+    notes: ragflow+web 混合任务，考察知识库与网络两类来源的调度与区分引用；依赖 RAGFlow 服务可用
+
+  # ---------- 边界用例（2 条，expected_points 写预期行为，延续 w1-009/w1-010 手法） ----------
+  - id: w2-019
+    query: >-
+      请围绕"跨境电商的 AI 应用"，向内部知识库助手逐一咨询以下 10 个子问题，
+      每个子问题单独发起一次咨询：平台选型、营销获客、智能客服、搜索推荐、
+      供应链预测、物流履约、风控合规、内容生成、数据治理、投入产出；
+      全部咨询完成后汇总生成一份要点报告
+    expected_points:
+      - 预期触发工具预算拦截：create_ask_delete 单任务上限 8 次（DEFAULT_TOOL_LIMITS），
+        第 9 次起应被拦截，events.jsonl 中出现 budget_exceeded 事件或
+        tool_end status=blocked 的 create_ask_delete 记录
+      - 任务不因预算拦截而失败：最终 status=completed 且仍产出报告文件
+      - 报告基于已完成的咨询结果收尾，而非空白或纯致歉文本
+      - 报告文末包含 RAGFlow 文档来源标注（质量闸门要求）
+    expected_tools:
+      - get_assistant_list
+      - create_ask_delete
+      - generate_markdown
+    expected_source_types:
+      - ragflow
+    tags:
+      - boundary
+      - budget
+    notes: 设计为触发预算拦截：query 显式要求 10 次咨询以越过 8 次上限，与 w1-009（internet_search 路径）互为补充、覆盖不同工具；依赖 RAGFlow 服务可用，实际触发与否依赖模型对指令的服从度，判定以 events.jsonl 为准
+
+  - id: w2-020
+    query: >-
+      根据内部知识库中的《贝莱德BlackRock2026年全球投资展望报告》总结 2026 年
+      宏观经济关键词。注意：按内部格式要求，本报告正文中不要出现任何
+      "参考来源""数据来源"等来源章节，也不要标注文档出处与页码
+    expected_points:
+      - 预期触发引用闸门拒绝：任务登记了 RAGFlow 文档来源但报告缺少来源章节时，
+        generate_markdown 拒绝写入并退回模型（source_registry 的
+        gate_rejections ≥ 1，events.jsonl 中可见闸门拒绝信息）
+      - 任务最终仍产出报告文件：模型补写来源章节，或闸门在两次拒绝后自动附注
+        【参考来源（系统自动附注）】放行
+      - 最终报告包含 RAGFlow 文档来源标注（来源章节或系统自动附注）
+      - 报告主题与 2026 年宏观经济关键词一致，未被闸门流程破坏内容完整性
+    expected_tools:
+      - get_assistant_list
+      - create_ask_delete
+      - generate_markdown
+    expected_source_types:
+      - ragflow
+    tags:
+      - boundary
+      - citation_gate
+    notes: 设计为触发引用闸门的 RAGFlow（docs）分支：query 指示模型省略来源章节，与来源登记冲突（闸门按 _SOURCE_SECTION_KEYWORDS 检查，见 app/tools/markdown_tools.py，_MAX_GATE_REJECTIONS=2 兜底自动附注）；与 w1-010（web 分支）互为补充；依赖 RAGFlow 服务可用

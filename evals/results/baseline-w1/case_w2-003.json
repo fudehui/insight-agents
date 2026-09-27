@@ -1,0 +1,119 @@
+{
+  "case_id": "w2-003",
+  "query": "检索 2025-2026 年 GLP-1 类减重药物的市场竞争格局与在研管线进展， 生成一份医药行业简报",
+  "session_id": "eval_baseline-w1_w2-003",
+  "report_md": "# 2025-2026年GLP-1类减重药物市场竞争格局与在研管线进展\n## 医药行业简报\n\n---\n\n## 一、市场概览：从爆发增长到精耕细作\n\n### 1.1 全球市场规模与预测\n\nGLP-1（胰高血糖素样肽-1）受体激动剂已成为全球医药市场增长最快的赛道之一。根据多机构数据综合：\n\n| 指标 | 数据 | 数据来源 |\n|------|------|---------|\n| 2025年全球GLP-1市场规模 | **940.6亿美元** | InsightAce [1] |\n| 2035年预测规模 | **2,161.2亿美元** | InsightAce [1] |\n| 2026-2035年CAGR | **8.8%** | InsightAce [1] |\n| 2025年GLP-1受体激动剂市场 | **628.3亿美元** | Fortune Business Insights [5] |\n| 2026年预测规模 | **733.9亿美元** | Fortune Business Insights [5] |\n| 2034年预测规模 | **2,541.9亿美元** | Fortune Business Insights [5] |\n| 2026-2034年CAGR | **16.80%** | Fortune Business Insights [5] |\n| GLP-1减重药物市场(2024年) | **138亿美元** | Grand View Research [7] |\n| GLP-1减重药物市场(2030年) | **488亿美元** | Grand View Research [7] |\n| GLP-1减重药物市场(2026年) | **686.5亿美元** | Evolvance [8] |\n| GLP-1减重药物市场(2035年) | **1,950.1亿美元** | Evolvance [8] |\n| GLP-1减重药物CAGR(2026-2035) | **12.3%** | Evolvance [8] |\n\n> 注：不同机构统计口径略有差异，减重药物市场规模约占整体GLP-1市场的30%-50%。\n\n### 1.2 区域格局\n\n- **北美**占全球市场**55.51%**份额（2025年）\n- **亚太地区**增速最快，预计将从75.4亿美元增至88.1亿美元 [5]\n- 中国市场2019年GLP-1市场规模仅12亿元，2023年已达87亿元，2030年预测超330亿元 [1]\n\n---\n\n## 二、竞争格局：双寡头垄断与国产突围\n\n### 2.1 全球双寡头格局\n\n| 企业 | 核心产品 | 2025年上半年销售额 | 2025年全年销售额 | 市场地位 |\n|------|---------|------------------|----------------|---------|\n| **诺和诺德** | 司美格鲁肽(诺和泰/诺和盈) | 165亿美元 | ~293亿美元(2024全年) | \"药王\"，全球市值前三药厂 |\n| **礼来** | 替尔泊肽(Mounjaro/Zepbound) | 140亿美元 | ~365亿美元 | 全球市值最高药厂 |\n\n**关键事实：**\n- 司美格鲁肽、替尔泊肽、度拉糖肽三款产品占据全球GLP-1糖尿病药物市场**86.4%** [4]\n- 双寡头合计占据中国市场**95%**份额，国产药企市占率不足个位数 [4]\n\n### 2.2 中国本土玩家竞争态势\n\n#### 已获批创新药\n\n| 企业 | 产品 | 阶段 | 核心特色 |\n|------|------|------|---------|\n| **信达生物** | 玛仕度肽 | ✅ 已获批 | 全球首个GCG/GLP-1双靶点激动剂 |\n| **先为达生物** | 埃诺格鲁肽 | ✅ 已获批 | 全球首个cAMP偏向型GLP-1受体激动剂 |\n\n#### III期临床/申报上市\n\n| 企业 | 产品 | 靶点 | 减重效果 | 状态 |\n|------|------|------|---------|------|\n| **恒瑞医药** | HRS9531(注射剂) | GLP-1/GIP | **19.2%(48周)** | NMPA受理(2025.9) |\n| **恒瑞医药** | HRS-7535(口服) | GLP-1 | - | III期临床，预计2027年底申报 |\n| **翰森制药** | 奥莱泊肽(HS-20094) | GLP-1/GIP | **19.3%(48周)** | III期成功(2026.3) |\n| **华东医药** | HDM1002(口服) | GLP-1单靶点 | - | III期临床 |\n| **硕迪生物** | Aleniglipron | GLP-1 | **14.7%-16.3%(44周)** | III期临床，有望成为全球第二款口服GLP-1减重药 |\n| **闻泰药业** | VCT220 | GLP-1 | **12.2%-12.4%(52周)** | III期成功(2026.5) |\n\n#### 司美格鲁肽仿制药梯队\n\n截至2026年3月，国内已有**10+家**药企提交仿制药上市申请，包括九源基因、丽珠集团、联邦制药等，拥有9条临床III期管线、5条临床I期管线、2款已获批上市 [2]。\n\n---\n\n## 三、在研管线进展分析\n\n### 3.1 双靶点/多靶点赛道：国产领跑\n\n| 产品 | 企业 | 靶点 | 减重效果 | 状态 |\n|------|------|------|---------|------|\n| 玛仕度肽 | 信达生物 | GCG/GLP-1 | - | ✅ 已获批(全球首个) |\n| 奥莱泊肽 | 翰森制药 | GLP-1/GIP | **19.3%(48周)** | III期成功 |\n| HRS9531 | 恒瑞医药 | GLP-1/GIP | **19.2%(48周)** | NMPA受理 |\n| Retatrutide | 礼来 | GLP-1/GIP/GCGR | **28.7%** | III期临床 |\n| CagriSema | 诺和诺德 | GLP-1+Amylin | **22.7%** | NDA提交中 |\n\n**里程碑事件：** 信达生物玛仕度肽两项III期研究于2025年12月以\"背靠背\"形式发表于《自然》主刊，创代谢疾病领域先河 [1]。\n\n### 3.2 口服GLP-1赛道：差异化竞争焦点\n\n口服制剂被认为是下一代GLP-1药物的核心竞争力所在：\n\n| 产品 | 企业 | 减重效果 | 状态 |\n|------|------|---------|------|\n| Orforglipron | 礼来 | **7.9%(40周)** | III期/临近上市 |\n| Aleniglipron | 硕迪生物 | **14.7%-16.3%(44周)** | III期临床 |\n| VCT220 | 闻泰药业 | **12.2%-12.4%(52周)** | III期成功(2026.5) |\n| HRS-7535 | 恒瑞医药 | - | III期临床 |\n| HDM1002 | 华东医药 | - | III期临床 |\n| Wegovy口服片 | 诺和诺德 | - | 2026.1美国上市 |\n\n> **市场预测：** 口服减重药2030年占市场**24%**，2035年占**32%** [1]。\n\n### 3.3 \"减脂增肌\"新赛道\n\n传统GLP-1药物约**1/3减重效果源于肌肉流失**，行业正从\"单纯减重\"转向\"高质量减重\"：\n\n| 企业 | 靶点 | 产品 |\n|------|------|------|\n| 礼来 | ActRII | Bima |\n| 罗氏/赛诺菲 | MSTN/GDF-8 | - |\n| 诺和诺德 | Amylin+GLP-1 | CagriSema、Amycretin |\n\n---\n\n## 四、政策监管环境\n\n### 4.1 关键时间节点\n\n| 时间 | 事件 |\n|------|------|\n| 2026.1.3 | 诺和诺德\"依柯胰岛素司美格鲁肽复方\"获NMPA批准，国内首款胰岛素-GLP-1复方制剂 |\n| 2026.3.6 | **司美格鲁肽核心化合物专利在中国到期** [2] |\n| 2026.3起 | 多款司美格鲁肽仿制药冲刺上市审批 |\n\n### 4.2 政策影响分析\n\n1. **仿制药浪潮：** 专利到期后，国产仿制药将批量上市，预计引发**50%-80%价格降幅** [1][4]\n2. **医保纳入可能性：** 目前司美格鲁肽降糖适应症已进入医保，但减重适应症仍以自费为主（年费用超万元），仿制药上市后将显著降低用药门槛\n3. **监管趋势：** NMPA加速审批国产创新GLP-1药物，双靶点、口服制剂等差异化产品获优先审评通道\n\n---\n\n## 五、未来发展趋势与投资机会\n\n### 5.1 从\"增量蓝海\"到\"存量红海\"\n\n- 2026年起，GLP-1减重药市场从爆发式增长转入**精耕细作阶段** [1]\n- 诺和诺德2025年9月股价较高点蒸发了**4,000亿美元**，宣布裁员9,000人重组研发 [4]\n\n### 5.2 竞争维度全面升级\n\n| 维度 | 现状 | 趋势 |\n|------|------|------|\n| 疗效 | 减重幅度比拼 | 向\"减脂增肌\"质量转变 |\n| 给药方式 | 周制剂注射为主 | 口服制剂、超长效制剂崛起 |\n| 靶点 | 单靶点GLP-1 | 双靶点/多靶点成为主流 |\n| 价格 | 高溢价 | 仿制药冲击，降价50%-80% |\n\n### 5.3 产业链投资机会\n\n#### 上游原料药\n\nGLP-1原料药需求爆发式增长，口服剂型剂量需提升数十至上百倍：\n\n- **翰宇药业：** 与某保密客户签署**1.8亿元**原料药订单，年产能超10吨\n- **圣诺生物：** 2025年归母净利润预计增长**204%-280%**\n\n#### CDMO领域\n\n多肽合成能力成为核心竞争力，头部CDMO企业订单饱满。\n\n### 5.4 中国企业的历史机遇\n\n> \"国内企业研发的口服GLP-1制剂，有实力与礼来、诺和诺德同台竞争\"——先为达生物王镇博士 [3]\n\n关键进展：\n- 国产口服GLP-1管线在有效性指标上开始**跑赢**国际竞品\n- 信达生物玛仕度肽2025年电商销售额已**超越司美格鲁肽** [4]\n- 中国企业在双靶点领域已进入\"**并跑阶段**\" [1]\n\n---\n\n## 六、结论与展望\n\n2025-2026年是GLP-1减重药物市场竞争格局重塑的关键窗口期：\n\n1. **双寡头格局松动：** 司美格鲁肽专利到期后，国产仿制药与创新药将迎来历史性机遇\n2. **中国创新药崛起：** 信达生物、恒瑞医药、翰森制药等企业凭借双靶点、口服制剂等差异化路径，正在从\"跟跑\"转向\"并跑\"甚至\"领跑\"\n3. **市场进入理性竞争：** 从早期野蛮生长转向精耕细作，疗效、安全性、给药便利性、价格等多维度竞争全面展开\n4. **产业链价值重估：** 上游原料药、CDMO等环节受益于需求爆发，投资价值凸显\n\n---\n\n## 【参考来源】\n\n1. 諾和諾德「藥王」寶座保得住？GLP-1專利明年到期 陸8藥廠搶仿司美格魯肽 - https://hk.finance.yahoo.com/news/%E8%AB%BE%E5%92%8C%E8%AB%BE%E5%BE%B7-%E8%97%A5%E7%8E%8B-%E5%AF%B6%E5%BA%A7%E4%BF%9D%E5%BE%97%E4%BD%8F-glp-1%E5%B0%88%E5%88%A9%E6%98%8E%E5%B9%B4%E5%88%B0%E6%9C%9F-030004809.html\n2. 2026年中国司美格鲁肽研发管线全景追踪与仿制药竞争格局 - https://www.pharnexcloud.com/zixun/sd_294457\n3. 第一个由中国创新药挑大梁的大赛道，出现了 - https://www.phirda.com/artilce_43123.html?module=trackingCodeGenerator\n4. 减重大战再添中国玩家：翰森奥莱泊肽III期成功，国产GLP-1/GIP双靶点加速入场 - https://cn.hspharm.com/news/mtbd-detail-513439.htm\n5. GLP-1 受体激动剂市场规模、份额 |成长[2034] - https://www.fortunebusinessinsights.com/zh/glp-1-receptor-agonist-market-112827\n6. GLP-1 Market Size, Scope, Forecast Report 2026 to 2035 - https://www.insightaceanalytic.com/report/glp-1-market/2592\n7. GLP-1 Agonists Weight Loss Drugs Market Report, 2025-2030 - https://www.grandviewresearch.com/industry-analysis/glp-1-agonists-weight-loss-drugs-market-report\n8. GLP-1 Weight Loss Drug Market Size, Share | Forecast 2026-2034 - https://evolvancemarketresearch.com/reports/glp-1-weight-loss-drug-market\n9. 减肥药市场逐渐内卷银诺医药和时间赛跑 - https://hk.finance.yahoo.com/news/%E6%B8%9B%E8%82%A5%E8%97%A5%E5%B8%82%E5%A0%B4%E9%80%90%E6%BC%B8%E5%85%A7%E6%8D%B2-%E9%8A%80%E8%AB%BE%E9%86%AB%E8%97%A5%E5%92%8C%E6%99%82%E9%96%93%E8%B3%BD%E8%B7%91-020354766.html\n10. 2026年了，GLP-1还值得投资吗？ - https://www.phirda.com/artilce_41335.html?module=trackingCodeGenerator\n11. 中国减肥药竞争格局：从信达生物双靶点到先为达偏向型GLP-1 - https://www.pharnexcloud.com/zixun/sdsl_284990\n\n---\n\n*本报告基于公开信息整理，仅供参考，不构成投资建议。*\n",
+  "report_path": "D:\\Project\\deepsearch-agents\\app\\output\\session_eval_baseline-w1_w2-003\\GLP-1减重药物市场竞争格局与在研管线进展_2025-2026.md",
+  "sources": [
+    {
+      "type": "web",
+      "title": "辉瑞2025战略全景深度报告：从新冠到肿瘤，研发管线重塑，ESG与供应链韧性并进_摩熵医药",
+      "url_or_ref": "https://www.pharnexcloud.com/zixun/sd_260791"
+    },
+    {
+      "type": "web",
+      "title": "GLP-1 Market Size, Scope, Forecast Report 2026 to 2035",
+      "url_or_ref": "https://www.insightaceanalytic.com/report/glp-1-market/2592"
+    },
+    {
+      "type": "web",
+      "title": "GLP-1 Agonists Weight Loss Drugs Market Report, 2025-2030",
+      "url_or_ref": "https://www.grandviewresearch.com/industry-analysis/glp-1-agonists-weight-loss-drugs-market-report"
+    },
+    {
+      "type": "web",
+      "title": "GLP-1 Weight Loss Drug Market Size, Share | Forecast 2026-2034",
+      "url_or_ref": "https://evolvancemarketresearch.com/reports/glp-1-weight-loss-drug-market"
+    },
+    {
+      "type": "web",
+      "title": "GLP-1 Receptor Agonist Market Size & Trends 2035",
+      "url_or_ref": "https://www.rootsanalysis.com/reports/glp-1-market.html"
+    },
+    {
+      "type": "web",
+      "title": "GLP-1 Market Size, Share & Forecast 2036",
+      "url_or_ref": "https://www.factmr.com/report/glp-1-market"
+    },
+    {
+      "type": "web",
+      "title": "諾和諾德「藥王」寶座保得住？GLP-1專利明年到期 陸8藥廠搶仿司美格魯肽 爭搶千億市場",
+      "url_or_ref": "https://hk.finance.yahoo.com/news/%E8%AB%BE%E5%92%8C%E8%AB%BE%E5%BE%B7-%E8%97%A5%E7%8E%8B-%E5%AF%B6%E5%BA%A7%E4%BF%9D%E5%BE%97%E4%BD%8F-glp-1%E5%B0%88%E5%88%A9%E6%98%8E%E5%B9%B4%E5%88%B0%E6%9C%9F-030004809.html"
+    },
+    {
+      "type": "web",
+      "title": "減肥藥市場逐漸內捲銀諾醫藥和時間賽跑 - Yahoo 財經",
+      "url_or_ref": "https://hk.finance.yahoo.com/news/%E6%B8%9B%E8%82%A5%E8%97%A5%E5%B8%82%E5%A0%B4%E9%80%90%E6%BC%B8%E5%85%A7%E6%8D%B2-%E9%8A%80%E8%AB%BE%E9%86%AB%E8%97%A5%E5%92%8C%E6%99%82%E9%96%93%E8%B3%BD%E8%B7%91-020354766.html"
+    },
+    {
+      "type": "web",
+      "title": "騰訊美團押注減肥藥明星企業先為達生物衝刺港股 - Yahoo 財經",
+      "url_or_ref": "https://hk.finance.yahoo.com/news/%E9%A8%B0%E8%A8%8A%E7%BE%8E%E5%9C%98%E6%8A%BC%E6%B3%A8%E6%B8%9B%E8%82%A5%E8%97%A5%E6%98%8E%E6%98%9F%E4%BC%81%E6%A5%AD-%E5%85%88%E7%82%BA%E9%81%94%E7%94%9F%E7%89%A9%E8%A1%9D%E5%88%BA%E6%B8%AF%E8%82%A1-003558696.html"
+    },
+    {
+      "type": "web",
+      "title": "諾和諾德如何痛失GLP-1減肥藥市場領先地位",
+      "url_or_ref": "https://cn.wsj.com/articles/%E8%AB%BE%E5%92%8C%E8%AB%BE%E5%BE%B7%E5%A6%82%E4%BD%95%E7%97%9B%E5%A4%B1glp-1%E6%B8%9B%E8%82%A5%E8%97%A5%E5%B8%82%E5%A0%B4%E9%A0%98%E5%85%88%E5%9C%B0%E4%BD%8D-679d790d"
+    },
+    {
+      "type": "web",
+      "title": "​​泰德醫藥啓動港股招股客戶集中與地緣風險待解 - Yahoo 財經",
+      "url_or_ref": "https://hk.finance.yahoo.com/news/%E6%B3%B0%E5%BE%B7%E9%86%AB%E8%97%A5%E5%95%93%E5%8B%95%E6%B8%AF%E8%82%A1%E6%8B%9B%E8%82%A1-%E5%AE%A2%E6%88%B6%E9%9B%86%E4%B8%AD%E8%88%87%E5%9C%B0%E7%B7%A3%E9%A2%A8%E9%9A%AA%E5%BE%85%E8%A7%A3-004218438.html"
+    },
+    {
+      "type": "web",
+      "title": "减重大战再添中国玩家：翰森奥莱泊肽III期成功，国产GLP-1/GIP双靶点加速入场-媒体报道-翰森制药集团有限公司",
+      "url_or_ref": "https://cn.hspharm.com/news/mtbd-detail-513439.htm"
+    },
+    {
+      "type": "web",
+      "title": "2026年中国司美格鲁肽研发管线全景追踪与仿制药竞争格局 ...",
+      "url_or_ref": "https://www.pharnexcloud.com/zixun/sd_294457"
+    },
+    {
+      "type": "web",
+      "title": "2025ADA 重磅数据披露,关注减脂增肌、 Amylin 及口服赛道",
+      "url_or_ref": "https://pdf.dfcfw.com/pdf/H3_AP202506291699897412_1.pdf?1751231760000.pdf="
+    },
+    {
+      "type": "web",
+      "title": "第一个由中国创新药挑大梁的大赛道，出现了",
+      "url_or_ref": "https://www.phirda.com/artilce_43123.html?module=trackingCodeGenerator"
+    },
+    {
+      "type": "web",
+      "title": "A股-研报详情",
+      "url_or_ref": "https://stock.finance.sina.com.cn/stock/view/paper.php?symbol=sh000001&reportid=809485054111"
+    },
+    {
+      "type": "web",
+      "title": "2026年了，GLP-1还值得投资吗？|诺和诺德|药物|靶点|赛道|患者_手机新浪网",
+      "url_or_ref": "https://finance.sina.cn/stock/jdts/2026-01-09/detail-inhfswxr5869531.d.html?oid=Hermes%E4%B8%80%E6%AF%94%E4%B8%80%E9%AB%98%E4%BB%BF%E3%80%8C%E5%BE%AE%E4%BF%A1198099199%E3%80%8DIidC&vt=4"
+    },
+    {
+      "type": "web",
+      "title": "2026年了，GLP-1还值得投资吗？",
+      "url_or_ref": "https://www.phirda.com/artilce_41335.html?module=trackingCodeGenerator"
+    },
+    {
+      "type": "web",
+      "title": "中国减肥药竞争格局：从信达生物双靶点到先为达偏向型GLP-1，谁将定义下一代“减肥神药”？_摩熵医药",
+      "url_or_ref": "https://www.pharnexcloud.com/zixun/sdsl_284990"
+    },
+    {
+      "type": "web",
+      "title": "GLP-1 受体激动剂市场规模、份额 |成长[2034]",
+      "url_or_ref": "https://www.fortunebusinessinsights.com/zh/glp-1-receptor-agonist-market-112827"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 141941,
+    "output_tokens": 14178,
+    "total_tokens": 156112
+  },
+  "duration_s": 157.0,
+  "status": "completed",
+  "error": null,
+  "started_at": "2026-09-25T14:40:22.890271",
+  "finished_at": "2026-09-25T14:42:59.893238"
+}

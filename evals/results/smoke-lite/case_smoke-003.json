@@ -1,0 +1,24 @@
+{
+  "case_id": "smoke-003",
+  "query": "查询库存总量最多的药品名称及其库存数量，生成一份简短的 markdown 报告（不超过 200 字）。",
+  "session_id": "eval_smoke-lite_smoke-003",
+  "report_md": "# 药品库存分析报告\n\n## 库存总量最多的药品\n\n**药品名称**：连花清瘟胶囊（商品名：连花清瘟）  \n**规格**：0.35g × 24粒  \n**剂型**：胶囊剂  \n**生产厂家**：本公司制药  \n**治疗领域**：中成药 / 感冒  \n\n**库存总量**：160,000 件  \n\n## 库存分布详情\n\n该药品共有3个批次，分布在不同仓库：\n\n| 批次号 | 仓库位置 | 库存数量 |\n|--------|----------|----------|\n| MY-250101-A | 天津二号库-防疫专区 | 10,000 |\n| MY-250615-B | 北京二号库-防疫专区 | 50,000 |\n| MY-251120-C | 天津一号库-防疫专区 | 100,000 |\n\n## 分析说明\n\n连花清瘟胶囊因在中成药/感冒领域的广泛应用需求，是目前库存量最高的药品，总量达16万件。其库存主要集中在天津和北京两大仓的防疫专区，反映出该产品在特殊时期的战略储备地位。\n\n---\n\n【参考来源】  \n1. 数据库查询结果 - 药品库存表",
+  "report_path": "D:\\Project\\deepsearch-agents\\app\\output\\session_eval_smoke-lite_smoke-003\\药品库存分析报告.md",
+  "sources": [
+    {
+      "type": "sql",
+      "title": "SQL 查询记录",
+      "url_or_ref": "SELECT d.generic_name, d.brand_name, d.specifications, d.dosage_form, d.manufacturer, d.therapeutic_area, SUM(i.quantity_on_hand) AS total_stock FROM inventory i JOIN drugs d ON i.drug_id = d.drug_id GROUP BY d.drug_id ORDER BY total_stock DESC LIMIT 1"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 99022,
+    "output_tokens": 1938,
+    "total_tokens": 100960
+  },
+  "duration_s": 52.64,
+  "status": "failed",
+  "error": "执行主智能发生异常信息：Error code: 429 - {'error': {'code': '', 'message': 'You’ve reached the API rate limit for free users. Upgrade to a Token Plan to unlock higher limits and continue using the API without interruption. (request id: 20260925123842637866924Vjt5hJ8R)', 'type': 'AgnesAI_error'}}",
+  "started_at": "2026-09-25T20:37:50.270017",
+  "finished_at": "2026-09-25T20:38:42.911271"
+}

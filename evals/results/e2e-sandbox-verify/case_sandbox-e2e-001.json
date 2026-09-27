@@ -1,0 +1,29 @@
+{
+  "case_id": "sandbox-e2e-001",
+  "query": "从数据库查询磷酸奥司他韦胶囊 2025 年各月的销售额，调用 run_code 在沙箱中 计算逐月环比增速，并用 matplotlib 生成一张柱状图，最后生成一份引用该图表的 销售分析 markdown 报告。",
+  "session_id": "eval_e2e-sandbox-verify_sandbox-e2e-001",
+  "report_md": null,
+  "report_path": null,
+  "sources": [
+    {
+      "type": "sql",
+      "title": "SQL 查询记录",
+      "url_or_ref": "SELECT strftime('%m', sale_date) AS month, SUM(total_amount) AS sales_amount FROM sales_records JOIN drugs ON sales_records.drug_id = drugs.drug_id WHERE drugs.generic_name = '磷酸奥司他韦胶囊' AND strftime('%Y', sale_date) = '2025' GROUP BY strftime('%m', sale_date) ORDER BY month"
+    },
+    {
+      "type": "sql",
+      "title": "SQL 查询记录",
+      "url_or_ref": "WITH RECURSIVE months(m) AS (VALUES('01'),('02'),('03'),('04'),('05'),('06'),('07'),('08'),('09'),('10'),('11'),('12')),\ndrug_sales AS (SELECT strftime('%m', sale_date) AS month, SUM(total_amount) AS sales_amount FROM sales_records JOIN drugs ON sales_records.drug_id = drugs.drug_id WHERE drugs.generic_name = '磷酸奥司他韦胶囊' AND strftime('%Y', sale_date) = '2025' GROUP BY strftime('%m', sale_date))\nSELECT m.m AS month, COALESCE(ds.sales_amount, 0) AS sales_amount FROM months m LEFT JOIN drug_sales ds ON m.m = ds.month ORDER BY m.m"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 82529,
+    "output_tokens": 3526,
+    "total_tokens": 86055
+  },
+  "duration_s": 57.43,
+  "status": "failed",
+  "error": "执行主智能发生异常信息：Error code: 429 - {'error': {'code': '', 'message': 'You’ve reached the API rate limit for free users. Upgrade to a Token Plan to unlock higher limits and continue using the API without interruption. (request id: 20260926224316101927697GNMBUuV1)', 'type': 'AgnesAI_error'}}",
+  "started_at": "2026-09-27T06:42:19.171389",
+  "finished_at": "2026-09-27T06:43:16.596642"
+}
