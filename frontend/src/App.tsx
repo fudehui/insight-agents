@@ -5,6 +5,7 @@ import {
   CloseCircleOutlined,
   CloseOutlined,
   CloudServerOutlined,
+  CodeOutlined,
   DatabaseOutlined,
   DeleteOutlined,
   FileSearchOutlined,
@@ -741,6 +742,10 @@ export default function App() {
             <li>
               <FileSearchOutlined aria-hidden />
               RAGFlow 助手
+            </li>
+            <li>
+              <CodeOutlined aria-hidden />
+              数据分析助手
             </li>
           </ul>
         </div>

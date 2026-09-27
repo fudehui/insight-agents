@@ -123,6 +123,26 @@ export async function deleteSession(threadId: string): Promise<DeleteSessionResp
   );
 }
 
+// 报告修订（P0-3）：保存修订 + 暂存为待沉淀记忆；409 = 版本冲突或任务运行中
+export interface ReportPatchResult {
+  message: string;
+  new_sha256: string;
+  revision_id: number;
+}
+
+export async function patchReport(body: {
+  session_id: string;
+  filename: string;
+  base_sha256: string;
+  content: string;
+}): Promise<ReportPatchResult> {
+  return requestJson<ReportPatchResult>(apiUrl("/api/reports"), {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
 // <a href> / iframe 场景带不了请求头，令牌以查询参数附加
 function appendTokenQuery(url: string): string {
   const token = getAccessToken();

@@ -1177,6 +1177,20 @@ textarea {
   padding: 0;
 }
 
+/* 报告内嵌交互图表：围栏被 MarkdownRenderer 拦截后渲染的容器 */
+.markdown-body .echarts-block {
+  margin: 14px 0;
+  border: 1px solid rgba(8, 145, 178, 0.16);
+  border-radius: 8px;
+  background: #fbfdff;
+  padding: 8px;
+}
+
+/* option JSON 解析失败时降级为普通代码块的提示样式 */
+.markdown-body .echarts-fallback {
+  margin: 14px 0;
+}
+
 .markdown-body a {
   color: var(--cyan);
   text-decoration: none;
@@ -1831,4 +1845,24 @@ textarea {
   font-size: 12px;
   font-weight: 400;
   line-height: 1.5;
+}
+
+/* 报告编辑态（P0-3 修订反馈）：编辑器 + 实时预览的分隔 */
+.report-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.report-editor-live {
+  border: 1px solid rgba(8, 145, 178, 0.16);
+  border-radius: 8px;
+  background: #fbfdff;
+  padding: 4px 14px 12px;
+}
+
+.report-editor-live-hint {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 8px 0 0;
 }

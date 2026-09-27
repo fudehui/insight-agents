@@ -253,9 +253,16 @@ function summarizeMessage(message: string): string {
     (match) => {
       const segments = match.split(/[\\/]/).filter(Boolean);
       const last = segments[segments.length - 1] ?? match;
-      return segments.some((segment) => segment.startsWith("session_"))
-        ? `…/${segments.find((segment) => segment.startsWith("session_"))}/${last}`
-        : `…/${last}`;
+      const sessionSegment = segments.find((segment) =>
+        segment.startsWith("session_")
+      );
+      if (!sessionSegment) {
+        return `…/${last}`;
+      }
+      // 路径末段就是会话目录本身时（如"工作目录已创建"），不再重复拼接
+      return sessionSegment === last
+        ? `…/${sessionSegment}`
+        : `…/${sessionSegment}/${last}`;
     }
   );
 }
